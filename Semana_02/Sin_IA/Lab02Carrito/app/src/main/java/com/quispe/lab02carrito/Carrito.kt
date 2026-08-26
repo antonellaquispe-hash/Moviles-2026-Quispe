@@ -1,4 +1,4 @@
-package com.quispe.lab02carritokotlin
+package com.quispe.lab02carrito
 
 data class Producto(
     val nombre: String,
