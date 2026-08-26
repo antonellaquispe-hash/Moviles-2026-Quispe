@@ -9,31 +9,59 @@ import androidx.activity.ComponentActivity
 
 class MainActivity : ComponentActivity() {
 
+    // Polimorfismo:
+    // la lista puede almacenar ProductoNormal y ProductoOferta
+    // porque ambos heredan de Producto.
     private val carrito = mutableListOf<Producto>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
 
-        val etNombreCliente = findViewById<EditText>(R.id.etNombreCliente)
-        val etNombreProducto = findViewById<EditText>(R.id.etNombreProducto)
-        val etPrecio = findViewById<EditText>(R.id.etPrecio)
-        val etCantidad = findViewById<EditText>(R.id.etCantidad)
+        val etNombreCliente =
+            findViewById<EditText>(R.id.etNombreCliente)
 
-        val btnAgregar = findViewById<Button>(R.id.btnAgregar)
-        val btnCalcular = findViewById<Button>(R.id.btnCalcular)
+        val etNombreProducto =
+            findViewById<EditText>(R.id.etNombreProducto)
 
-        val tvListaProductos = findViewById<TextView>(R.id.tvListaProductos)
-        val tvResultado = findViewById<TextView>(R.id.tvResultado)
+        val etPrecio =
+            findViewById<EditText>(R.id.etPrecio)
+
+        val etCantidad =
+            findViewById<EditText>(R.id.etCantidad)
+
+        val btnAgregar =
+            findViewById<Button>(R.id.btnAgregar)
+
+        val btnCalcular =
+            findViewById<Button>(R.id.btnCalcular)
+
+        val tvListaProductos =
+            findViewById<TextView>(R.id.tvListaProductos)
+
+        val tvResultado =
+            findViewById<TextView>(R.id.tvResultado)
 
         // Botón para agregar producto
         btnAgregar.setOnClickListener {
 
-            val nombre = etNombreProducto.text.toString().trim()
-            val precioStr = etPrecio.text.toString().trim()
-            val cantidadStr = etCantidad.text.toString().trim()
+            val nombre =
+                etNombreProducto.text.toString().trim()
 
-            if (nombre.isEmpty() || precioStr.isEmpty() || cantidadStr.isEmpty()) {
+            val precioStr =
+                etPrecio.text.toString().trim()
+
+            val cantidadStr =
+                etCantidad.text.toString().trim()
+
+            if (
+                nombre.isEmpty() ||
+                precioStr.isEmpty() ||
+                cantidadStr.isEmpty()
+            ) {
+
                 Toast.makeText(
                     this,
                     "Completa todos los campos",
@@ -43,10 +71,14 @@ class MainActivity : ComponentActivity() {
                 return@setOnClickListener
             }
 
-            val precio = precioStr.toDoubleOrNull()
-            val cantidad = cantidadStr.toIntOrNull()
+            val precio =
+                precioStr.toDoubleOrNull()
+
+            val cantidad =
+                cantidadStr.toIntOrNull()
 
             if (precio == null || cantidad == null) {
+
                 Toast.makeText(
                     this,
                     "Ingresa valores numéricos válidos",
@@ -57,6 +89,7 @@ class MainActivity : ComponentActivity() {
             }
 
             if (precio <= 0 || cantidad <= 0) {
+
                 Toast.makeText(
                     this,
                     "Precio y cantidad deben ser mayores a 0",
@@ -66,17 +99,40 @@ class MainActivity : ComponentActivity() {
                 return@setOnClickListener
             }
 
-            val producto = Producto(
-                nombre = nombre,
-                precio = precio,
-                cantidad = cantidad
-            )
+            /*
+             * Para demostrar polimorfismo:
+             *
+             * Los productos cuyo precio sea mayor o igual a S/500
+             * serán considerados productos en oferta.
+             *
+             * Los demás serán productos normales.
+             */
 
+            val producto: Producto
+
+            if (precio >= 500) {
+
+                producto = ProductoOferta(
+                    nombre = nombre,
+                    precio = precio,
+                    cantidad = cantidad
+                )
+
+            } else {
+
+                producto = ProductoNormal(
+                    nombre = nombre,
+                    precio = precio,
+                    cantidad = cantidad
+                )
+            }
+
+            // Se agrega a una lista de Producto
             carrito.add(producto)
 
             actualizarLista(tvListaProductos)
 
-            // Limpiar campos después de agregar
+            // Limpiar campos
             etNombreProducto.text.clear()
             etPrecio.text.clear()
             etCantidad.text.clear()
@@ -90,10 +146,11 @@ class MainActivity : ComponentActivity() {
             ).show()
         }
 
-        // Botón para calcular el total
+        // Botón para calcular
         btnCalcular.setOnClickListener {
 
             if (carrito.isEmpty()) {
+
                 Toast.makeText(
                     this,
                     "Agrega productos primero",
@@ -103,33 +160,63 @@ class MainActivity : ComponentActivity() {
                 return@setOnClickListener
             }
 
-            val nombreCliente = etNombreCliente
-                .text
-                .toString()
-                .trim()
-                .ifEmpty { "Cliente" }
+            val nombreCliente =
+                etNombreCliente.text
+                    .toString()
+                    .trim()
+                    .ifEmpty {
+                        "Cliente"
+                    }
 
-            val subtotal = calcularSubtotal(carrito)
-            val igv = calcularIGV(subtotal)
-            val total = calcularTotal(subtotal, igv)
+            // Utiliza las funciones de Carrito.kt
+            val subtotal =
+                calcularSubtotal(carrito)
 
-            val descuento = calcularDescuento(total)
-            val totalConDescuento = total - descuento
+            val igv =
+                calcularIGV(subtotal)
+
+            val total =
+                calcularTotal(subtotal, igv)
+
+            val descuento =
+                calcularDescuento(total)
+
+            val totalConDescuento =
+                total - descuento
 
             var resultado = ""
 
-            resultado += "=========================================\n"
-            resultado += " CARRITO DE COMPRAS - TIENDA TECSUP\n"
-            resultado += "=========================================\n"
-            resultado += "Cliente: $nombreCliente\n\n"
+            resultado +=
+                "=========================================\n"
 
-            resultado += "--------- DETALLE DEL CARRITO ---------\n"
+            resultado +=
+                " CARRITO DE COMPRAS - TIENDA TECSUP\n"
+
+            resultado +=
+                "=========================================\n"
+
+            resultado +=
+                "Cliente: $nombreCliente\n\n"
+
+            resultado +=
+                "--------- DETALLE DEL CARRITO ---------\n"
 
             var i = 1
 
             for (p in carrito) {
 
-                val importe = p.precio * p.cantidad
+                /*
+                 * POLIMORFISMO:
+                 *
+                 * p es de tipo Producto, pero puede ser
+                 * ProductoNormal o ProductoOferta.
+                 *
+                 * Cada clase utiliza su propia versión
+                 * de calcularImporte().
+                 */
+
+                val importe =
+                    p.calcularImporte()
 
                 resultado += String.format(
                     "%d. %-20s x%d S/%8.2f\n",
@@ -142,56 +229,95 @@ class MainActivity : ComponentActivity() {
                 i++
             }
 
-            resultado += "---------------------------------------\n"
+            resultado +=
+                "---------------------------------------\n"
 
-            resultado += "Subtotal: S/ ${
-                String.format("%.2f", subtotal)
-            }\n"
+            resultado +=
+                "Subtotal: S/${
+                    String.format(
+                        "%.2f",
+                        subtotal
+                    )
+                }\n"
 
-            resultado += "IGV (18%): S/ ${
-                String.format("%.2f", igv)
-            }\n"
+            resultado +=
+                "IGV (18%): S/${
+                    String.format(
+                        "%.2f",
+                        igv
+                    )
+                }\n"
 
-            resultado += "Total: S/ ${
-                String.format("%.2f", total)
-            }\n\n"
+            resultado +=
+                "Total: S/${
+                    String.format(
+                        "%.2f",
+                        total
+                    )
+                }\n\n"
 
-            // Buscar el producto más caro
-            val masCaro = carrito.maxByOrNull { it.precio }
+            // Producto más caro
+            val masCaro =
+                carrito.maxByOrNull {
+                    it.precio
+                }
 
             if (masCaro != null) {
 
-                resultado += "Producto más caro: ${masCaro.nombre} " +
-                        "(S/${String.format("%.2f", masCaro.precio)})\n\n"
+                resultado +=
+                    "Producto más caro: " +
+                            "${masCaro.nombre} " +
+                            "(S/${
+                                String.format(
+                                    "%.2f",
+                                    masCaro.precio
+                                )
+                            })\n\n"
             }
 
-            // Mostrar descuento si corresponde
+            // Descuento
             if (descuento > 0) {
 
-                resultado += "¡Descuento aplicado: S/${
-                    String.format("%.2f", descuento)
-                }!\n"
+                resultado +=
+                    "¡Descuento aplicado: S/${
+                        String.format(
+                            "%.2f",
+                            descuento
+                        )
+                    }!\n"
             }
 
-            resultado += "\nTOTAL CON DESCUENTO: S/${
-                String.format("%.2f", totalConDescuento)
-            }"
+            resultado +=
+                "\nTOTAL CON DESCUENTO: S/${
+                    String.format(
+                        "%.2f",
+                        totalConDescuento
+                    )
+                }"
 
-            tvResultado.text = resultado
+            tvResultado.text =
+                resultado
         }
     }
 
-    // Actualiza la lista de productos agregados
+    // Actualiza la lista de productos
     private fun actualizarLista(tv: TextView) {
 
-        var texto = "Productos agregados (${carrito.size}):\n"
+        var texto =
+            "Productos agregados (${carrito.size}):\n"
 
         for ((index, p) in carrito.withIndex()) {
 
-            texto += "${index + 1}. " +
-                    "${p.nombre} - " +
-                    "S/${String.format("%.2f", p.precio)} " +
-                    "x${p.cantidad}\n"
+            texto +=
+                "${index + 1}. " +
+                        "${p.nombre} - " +
+                        "S/${
+                            String.format(
+                                "%.2f",
+                                p.precio
+                            )
+                        } " +
+                        "x${p.cantidad}\n"
         }
 
         tv.text = texto
