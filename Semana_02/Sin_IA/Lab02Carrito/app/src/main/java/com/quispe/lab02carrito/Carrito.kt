@@ -22,14 +22,20 @@ fun calcularTotal(subtotal: Double, igv: Double): Double {
     return subtotal + igv
 }
 
+fun calcularDescuento(total: Double): Double {
+    return when {
+        total > 5000 -> total * 0.10
+        total > 3000 -> total * 0.05
+        else -> 0.0
+    }
+}
+
 fun mostrarDetalle(productos: List<Producto>) {
     println("--------- DETALLE DEL CARRITO ---------")
     var i = 1
     for (p in productos) {
         val importe = p.precio * p.cantidad
-        // %-20s: 20 espacios, alineado a la izquierda
-        // %8.2f: 8 espacios totales, con 2 decimales, alineado a la derecha
-        println(String.format("%d. %-20s x%d  S/%8.2f", i, p.nombre, p.cantidad, importe))
+        println(String.format("%d. %-20s x%d S/%8.2f", i, p.nombre, p.cantidad, importe))
         i++
     }
     println("---------------------------------------")
@@ -37,7 +43,7 @@ fun mostrarDetalle(productos: List<Producto>) {
 
 fun main() {
     println("=========================================")
-    println("   CARRITO DE COMPRAS - TIENDA TECSUP")
+    println(" CARRITO DE COMPRAS - TIENDA TECSUP")
     println("=========================================")
 
     val nombreCliente = "Antonella Quispe"
@@ -61,12 +67,20 @@ fun main() {
     val total = calcularTotal(subtotal, igv)
 
     mostrarDetalle(carrito)
-
     println("Cantidad de productos: ${carrito.size}")
     println()
 
+    val masCaro = carrito.maxByOrNull { it.precio }
+    if (masCaro != null) {
+        println("Producto mas caro: ${masCaro.nombre} " + String.format("(S/%.2f)", masCaro.precio))
+    }
+    println()
 
-    println(String.format("%-25s S/%8.2f", "Subtotal:", subtotal))
-    println(String.format("%-25s S/%8.2f", "IGV (18%):", igv))
-    println(String.format("%-25s S/%8.2f", "TOTAL A PAGAR:", total))
+    val descuento = calcularDescuento(total)
+    val totalConDescuento = total - descuento
+
+    if (descuento > 0) {
+        println("¡Descuento aplicado: " + String.format("S/%.2f", descuento) + " !")
+    }
+    println(String.format("%-25s S/%8.2f", "TOTAL CON DESCUENTO:", totalConDescuento))
 }
