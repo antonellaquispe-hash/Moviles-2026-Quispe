@@ -1,4 +1,4 @@
-<img width="1487" height="785" alt="image" src="https://github.com/user-attachments/assets/a1aec293-ac8c-41a1-aeca-db469d94e0db" /># Laboratorio 02: Carrito de Compras en Kotlin
+Compras en Kotlin
 
 **Nombre:** Antonella Quispe
 **Curso:** Programación en Móviles - 4to Ciclo
