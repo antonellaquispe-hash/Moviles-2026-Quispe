@@ -79,7 +79,15 @@ fun main() {
     println("=========================================")
     println("             DETALLE DEL CARRITO")
     println("=========================================")
-    println(String.format("%-20s %10s %8s %12s", "Producto", "Precio", "Cant.", "Importe"))
+    println(
+        String.format(
+            "%-20s %10s %8s %12s",
+            "Producto",
+            "Precio",
+            "Cant.",
+            "Importe"
+        )
+    )
     println("-----------------------------------------")
 
     for (producto in carrito) {
@@ -108,3 +116,14 @@ fun main() {
         println("Producto más caro: ${productoMasCaro.nombre}")
         println("Precio: S/ ${String.format("%.2f", productoMasCaro.precio)}")
     }
+
+    println()
+
+    val categoria = when {
+        total < 100 -> "Compra pequeña"
+        total < 500 -> "Compra mediana"
+        else -> "Compra grande"
+    }
+
+    println("Categoría de compra: $categoria")
+}
