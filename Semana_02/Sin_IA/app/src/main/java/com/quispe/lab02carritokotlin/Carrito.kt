@@ -76,7 +76,35 @@ fun main() {
     val total = calcularTotal(subtotal, igv)
 
     println()
-    println("Subtotal: S/ $subtotal")
-    println("IGV: S/ $igv")
-    println("Total: S/ $total")
-}
+    println("=========================================")
+    println("             DETALLE DEL CARRITO")
+    println("=========================================")
+    println(String.format("%-20s %10s %8s %12s", "Producto", "Precio", "Cant.", "Importe"))
+    println("-----------------------------------------")
+
+    for (producto in carrito) {
+        val importe = producto.precio * producto.cantidad
+
+        println(
+            String.format(
+                "%-20s %10.2f %8d %12.2f",
+                producto.nombre,
+                producto.precio,
+                producto.cantidad,
+                importe
+            )
+        )
+    }
+
+    println("-----------------------------------------")
+    println(String.format("%-30s %12.2f", "Subtotal:", subtotal))
+    println(String.format("%-30s %12.2f", "IGV (18%):", igv))
+    println(String.format("%-30s %12.2f", "TOTAL:", total))
+
+    val productoMasCaro = carrito.maxByOrNull { it.precio }
+
+    if (productoMasCaro != null) {
+        println()
+        println("Producto más caro: ${productoMasCaro.nombre}")
+        println("Precio: S/ ${String.format("%.2f", productoMasCaro.precio)}")
+    }
