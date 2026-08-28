@@ -10,7 +10,7 @@ object CalculadoraCuotas {
             in 1..6 -> 0.20
             in 7..12 -> 0.40
             in 13..24 -> 0.60
-            else -> 0.60
+            else -> 0.0
         }
     }
 
@@ -26,18 +26,22 @@ object CalculadoraCuotas {
         val montoTotalPagar = montoInicial + montoIntereses
         val pagoMensual = montoTotalPagar / numCuotas
 
+        println()
         println("==================================================")
-        println(" RESUMEN DE COMPRA: $nombreProducto")
+        println("              RESUMEN DE COMPRA")
         println("==================================================")
-        println("Precio unitario: S/ $precio")
+        println("Producto: $nombreProducto")
+        println("Precio unitario: S/ ${String.format("%.2f", precio)}")
         println("Cantidad: $cantidad")
-        println("Monto Inicial (Costo principal): S/ ${String.format("%.2f", montoInicial)}")
+        println("Monto inicial: S/ ${String.format("%.2f", montoInicial)}")
         println("Número de cuotas: $numCuotas")
-        println("Tasa de interés aplicada: ${(tasaInteres * 100).toInt()}%")
-        println("Monto total a pagar (con intereses): S/ ${String.format("%.2f", montoTotalPagar)}")
-        println("Pago mensual estimado: S/ ${String.format("%.2f", pagoMensual)}")
+        println("Interés aplicado: ${(tasaInteres * 100).toInt()}%")
+        println("Monto de intereses: S/ ${String.format("%.2f", montoIntereses)}")
+        println("Monto total a pagar: S/ ${String.format("%.2f", montoTotalPagar)}")
+        println("Pago mensual: S/ ${String.format("%.2f", pagoMensual)}")
         println("==================================================")
-        println(" FECHAS DE PAGO ESTIMADAS:")
+        println("              FECHAS DE PAGO")
+        println("==================================================")
 
         val calendario = Calendar.getInstance()
         val formatoFecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -45,8 +49,56 @@ object CalculadoraCuotas {
         for (i in 1..numCuotas) {
             calendario.add(Calendar.MONTH, 1)
             val fechaPago = formatoFecha.format(calendario.time)
-            println(" -> Cuota $i: S/ ${String.format("%.2f", pagoMensual)} | Fecha: $fechaPago")
+            println("Cuota $i - $fechaPago - S/ ${String.format("%.2f", pagoMensual)}")
         }
+
         println("==================================================")
+    }
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+
+        println("==================================================")
+        println("             CALCULADORA DE CUOTAS")
+        println("==================================================")
+
+        print("Ingrese nombre del producto: ")
+        val nombreProducto = readLine()?.trim() ?: ""
+
+        print("Ingrese precio del producto: ")
+        val precio = readLine()?.toDoubleOrNull() ?: 0.0
+
+        print("Ingrese cantidad: ")
+        val cantidad = readLine()?.toIntOrNull() ?: 0
+
+        print("Ingrese número de cuotas (1-24): ")
+        val numCuotas = readLine()?.toIntOrNull() ?: 0
+
+        if (nombreProducto.isEmpty()) {
+            println("Error: debe ingresar el nombre del producto.")
+            return
+        }
+
+        if (precio <= 0) {
+            println("Error: el precio debe ser mayor que 0.")
+            return
+        }
+
+        if (cantidad <= 0) {
+            println("Error: la cantidad debe ser mayor que 0.")
+            return
+        }
+
+        if (numCuotas !in 1..24) {
+            println("Error: el número de cuotas debe estar entre 1 y 24.")
+            return
+        }
+
+        calcularYMostrarEnConsola(
+            nombreProducto,
+            precio,
+            cantidad,
+            numCuotas
+        )
     }
 }
