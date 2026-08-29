@@ -14,4 +14,5 @@ Aplicación móvil desarrollada en **Android Studio** utilizando **Kotlin**. El 
 - **Salida en Consola:** Todos los resultados se imprimen en la terminal.
 - 
 ## Resultado
-<img width="525" height="820" alt="image" src="https://github.com/user-attachments/assets/4e44059e-f219-4f9a-89f4-230eeb3a685c" />
+<img width="512" height="795" alt="image" src="https://github.com/user-attachments/assets/354bce18-4627-4eeb-96bf-38c377a1b795" />
+
