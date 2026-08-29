@@ -3,6 +3,12 @@ package com.quispe.calculadoracuotas
 import java.text.SimpleDateFormat
 import java.util.*
 
+data class Producto(
+    val nombre: String,
+    val precio: Double,
+    val cantidad: Int
+)
+
 object CalculadoraCuotas {
 
     fun obtenerTasaInteres(numCuotas: Int): Double {
@@ -15,12 +21,10 @@ object CalculadoraCuotas {
     }
 
     fun calcularYMostrarEnConsola(
-        nombreProducto: String,
-        precio: Double,
-        cantidad: Int,
+        productos: List<Producto>,
         numCuotas: Int
     ) {
-        val montoInicial = precio * cantidad
+        val montoInicial = productos.sumOf { it.precio * it.cantidad }
         val tasaInteres = obtenerTasaInteres(numCuotas)
         val montoIntereses = montoInicial * tasaInteres
         val montoTotalPagar = montoInicial + montoIntereses
@@ -30,15 +34,24 @@ object CalculadoraCuotas {
         println("==================================================")
         println("              RESUMEN DE COMPRA")
         println("==================================================")
-        println("Producto: $nombreProducto")
-        println("Precio unitario: S/ ${String.format("%.2f", precio)}")
-        println("Cantidad: $cantidad")
+
+        productos.forEachIndexed { index, producto ->
+            val subtotal = producto.precio * producto.cantidad
+
+            println("${index + 1}. ${producto.nombre}")
+            println("   Precio unitario: S/ ${String.format("%.2f", producto.precio)}")
+            println("   Cantidad: ${producto.cantidad}")
+            println("   Subtotal: S/ ${String.format("%.2f", subtotal)}")
+            println()
+        }
+
         println("Monto inicial: S/ ${String.format("%.2f", montoInicial)}")
         println("Número de cuotas: $numCuotas")
         println("Interés aplicado: ${(tasaInteres * 100).toInt()}%")
         println("Monto de intereses: S/ ${String.format("%.2f", montoIntereses)}")
         println("Monto total a pagar: S/ ${String.format("%.2f", montoTotalPagar)}")
         println("Pago mensual: S/ ${String.format("%.2f", pagoMensual)}")
+
         println("==================================================")
         println("              FECHAS DE PAGO")
         println("==================================================")
@@ -62,32 +75,62 @@ object CalculadoraCuotas {
         println("             CALCULADORA DE CUOTAS")
         println("==================================================")
 
-        print("Ingrese nombre del producto: ")
-        val nombreProducto = readLine()?.trim() ?: ""
+        val productos = mutableListOf<Producto>()
 
-        print("Ingrese precio del producto: ")
-        val precio = readLine()?.toDoubleOrNull() ?: 0.0
+        while (true) {
+            println()
+            println("PRODUCTO ${productos.size + 1}")
+            println("------------------------------------------")
 
-        print("Ingrese cantidad: ")
-        val cantidad = readLine()?.toIntOrNull() ?: 0
+            print("Ingrese nombre del producto: ")
+            val nombreProducto = readLine()?.trim() ?: ""
 
+            if (nombreProducto.isEmpty()) {
+                println("Error: debe ingresar el nombre del producto.")
+                continue
+            }
+
+            print("Ingrese precio del producto: ")
+            val precio = readLine()?.toDoubleOrNull() ?: 0.0
+
+            if (precio <= 0) {
+                println("Error: el precio debe ser mayor que 0.")
+                continue
+            }
+
+            print("Ingrese cantidad: ")
+            val cantidad = readLine()?.toIntOrNull() ?: 0
+
+            if (cantidad <= 0) {
+                println("Error: la cantidad debe ser mayor que 0.")
+                continue
+            }
+
+            productos.add(
+                Producto(
+                    nombreProducto,
+                    precio,
+                    cantidad
+                )
+            )
+
+            println()
+            print("¿Desea agregar otro producto? (s/n): ")
+            val respuesta = readLine()?.trim()?.lowercase()
+
+            if (respuesta != "s") {
+                break
+            }
+        }
+
+        if (productos.isEmpty()) {
+            println("No se agregaron productos.")
+            return
+        }
+
+        println()
         print("Ingrese número de cuotas (1-24): ")
         val numCuotas = readLine()?.toIntOrNull() ?: 0
-
-        if (nombreProducto.isEmpty()) {
-            println("Error: debe ingresar el nombre del producto.")
-            return
-        }
-
-        if (precio <= 0) {
-            println("Error: el precio debe ser mayor que 0.")
-            return
-        }
-
-        if (cantidad <= 0) {
-            println("Error: la cantidad debe ser mayor que 0.")
-            return
-        }
 
         if (numCuotas !in 1..24) {
             println("Error: el número de cuotas debe estar entre 1 y 24.")
@@ -95,10 +138,9 @@ object CalculadoraCuotas {
         }
 
         calcularYMostrarEnConsola(
-            nombreProducto,
-            precio,
-            cantidad,
+            productos,
             numCuotas
         )
     }
+
 }
