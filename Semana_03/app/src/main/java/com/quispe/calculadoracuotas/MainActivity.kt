@@ -42,7 +42,7 @@ fun PantallaRegistro() {
                 .verticalScroll(rememberScrollState())
         ) {
             Text(
-                text = "Nuevo Producto",
+                text = "Nuevo Producto en tienda",
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 8.dp)
