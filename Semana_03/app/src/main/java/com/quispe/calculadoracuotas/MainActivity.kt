@@ -29,6 +29,7 @@ fun PantallaRegistro() {
     var nombre by remember { mutableStateOf("") }
     var precio by remember { mutableStateOf("") }
     var cantidad by remember { mutableStateOf("") }
+    var numCuotas by remember { mutableStateOf("") }
     var mostrarResumen by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -42,7 +43,7 @@ fun PantallaRegistro() {
                 .verticalScroll(rememberScrollState())
         ) {
             Text(
-                text = "Nuevo Producto en tienda",
+                text = "Nuevo Producto",
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -81,6 +82,15 @@ fun PantallaRegistro() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            OutlinedTextField(
+                value = numCuotas,
+                onValueChange = { numCuotas = it },
+                label = { Text("Número de cuotas (1-24)") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             Button(
                 onClick = { mostrarResumen = true },
                 modifier = Modifier.fillMaxWidth()
@@ -93,6 +103,7 @@ fun PantallaRegistro() {
 
                 val precioNum = precio.toDoubleOrNull() ?: 0.0
                 val cantidadNum = cantidad.toIntOrNull() ?: 0
+                val cuotasNum = numCuotas.toIntOrNull() ?: 1
                 val importe = precioNum * cantidadNum
 
                 Card(
@@ -111,6 +122,9 @@ fun PantallaRegistro() {
                         )
                         Text(
                             text = "Cantidad: $cantidadNum"
+                        )
+                        Text(
+                            text = "Cuotas: $cuotasNum"
                         )
                         Text(
                             text = "Importe: S/ " + String.format("%.2f", importe),
