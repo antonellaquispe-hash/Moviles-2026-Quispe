@@ -9,6 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
@@ -60,8 +61,12 @@ fun PantallaRegistro() {
 
             OutlinedTextField(
                 value = nombre,
-                onValueChange = { nombre = it },
-                label = { Text("Nombre del producto") },
+                onValueChange = {
+                    nombre = it
+                },
+                label = {
+                    Text("Nombre del producto")
+                },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -73,8 +78,12 @@ fun PantallaRegistro() {
 
                 OutlinedTextField(
                     value = precio,
-                    onValueChange = { precio = it },
-                    label = { Text("Precio (S/)") },
+                    onValueChange = {
+                        precio = it
+                    },
+                    label = {
+                        Text("Precio (S/)")
+                    },
                     modifier = Modifier.weight(1f)
                 )
 
@@ -82,8 +91,12 @@ fun PantallaRegistro() {
 
                 OutlinedTextField(
                     value = cantidad,
-                    onValueChange = { cantidad = it },
-                    label = { Text("Cantidad") },
+                    onValueChange = {
+                        cantidad = it
+                    },
+                    label = {
+                        Text("Cantidad")
+                    },
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -140,6 +153,14 @@ fun PantallaRegistro() {
                         )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "✓ Producto registrado correctamente",
+                    color = Color(0xFF2E7D32),
+                    fontWeight = FontWeight.Medium
+                )
             }
         }
     }
