@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -31,7 +32,9 @@ fun PantallaRegistro() {
     var nombre by remember { mutableStateOf("") }
     var precio by remember { mutableStateOf("") }
     var cantidad by remember { mutableStateOf("") }
+
     var mostrarResumen by remember { mutableStateOf(false) }
+    var mostrarError by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
@@ -63,6 +66,7 @@ fun PantallaRegistro() {
                 value = nombre,
                 onValueChange = {
                     nombre = it
+                    mostrarError = false
                 },
                 label = {
                     Text("Nombre del producto")
@@ -80,6 +84,7 @@ fun PantallaRegistro() {
                     value = precio,
                     onValueChange = {
                         precio = it
+                        mostrarError = false
                     },
                     label = {
                         Text("Precio (S/)")
@@ -93,6 +98,7 @@ fun PantallaRegistro() {
                     value = cantidad,
                     onValueChange = {
                         cantidad = it
+                        mostrarError = false
                     },
                     label = {
                         Text("Cantidad")
@@ -105,20 +111,58 @@ fun PantallaRegistro() {
 
             Button(
                 onClick = {
-                    mostrarResumen = true
+
+                    if (
+                        nombre.isBlank() ||
+                        precio.isBlank() ||
+                        cantidad.isBlank()
+                    ) {
+                        mostrarError = true
+                        mostrarResumen = false
+                    } else {
+                        mostrarError = false
+                        mostrarResumen = true
+                    }
+
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("AGREGAR PRODUCTO")
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedButton(
+                onClick = {
+                    nombre = ""
+                    precio = ""
+                    cantidad = ""
+                    mostrarResumen = false
+                    mostrarError = false
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("LIMPIAR")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (mostrarError) {
+
+                Text(
+                    text = "Error: completa todos los campos.",
+                    color = Color.Red,
+                    fontWeight = FontWeight.Bold
+                )
+            }
 
             if (mostrarResumen) {
 
                 val precioNum = precio.toDoubleOrNull() ?: 0.0
                 val cantidadNum = cantidad.toIntOrNull() ?: 0
                 val importe = precioNum * cantidadNum
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
