@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -31,7 +32,9 @@ fun PantallaRegistro() {
     var nombre by remember { mutableStateOf("") }
     var precio by remember { mutableStateOf("") }
     var cantidad by remember { mutableStateOf("") }
+
     var mostrarResumen by remember { mutableStateOf(false) }
+    var mensajeError by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
@@ -63,6 +66,7 @@ fun PantallaRegistro() {
                 value = nombre,
                 onValueChange = {
                     nombre = it
+                    mensajeError = null
                 },
                 label = {
                     Text("Nombre del producto")
@@ -80,6 +84,7 @@ fun PantallaRegistro() {
                     value = precio,
                     onValueChange = {
                         precio = it
+                        mensajeError = null
                     },
                     label = {
                         Text("Precio (S/)")
@@ -93,6 +98,7 @@ fun PantallaRegistro() {
                     value = cantidad,
                     onValueChange = {
                         cantidad = it
+                        mensajeError = null
                     },
                     label = {
                         Text("Cantidad")
@@ -105,20 +111,95 @@ fun PantallaRegistro() {
 
             Button(
                 onClick = {
-                    mostrarResumen = true
+
+                    when {
+
+                        nombre.isBlank() -> {
+                            mensajeError =
+                                "Error: completa el nombre del producto."
+                            mostrarResumen = false
+                        }
+
+                        precio.isBlank() -> {
+                            mensajeError =
+                                "Error: completa el precio."
+                            mostrarResumen = false
+                        }
+
+                        precio.toDoubleOrNull() == null -> {
+                            mensajeError =
+                                "Error: el precio debe ser un número válido."
+                            mostrarResumen = false
+                        }
+
+                        precio.toDouble() <= 0 -> {
+                            mensajeError =
+                                "Error: el precio debe ser mayor que 0."
+                            mostrarResumen = false
+                        }
+
+                        cantidad.isBlank() -> {
+                            mensajeError =
+                                "Error: completa la cantidad."
+                            mostrarResumen = false
+                        }
+
+                        cantidad.toIntOrNull() == null -> {
+                            mensajeError =
+                                "Error: la cantidad debe ser un número entero."
+                            mostrarResumen = false
+                        }
+
+                        cantidad.toInt() <= 0 -> {
+                            mensajeError =
+                                "Error: la cantidad debe ser mayor que 0."
+                            mostrarResumen = false
+                        }
+
+                        else -> {
+                            mensajeError = null
+                            mostrarResumen = true
+                        }
+                    }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("AGREGAR PRODUCTO")
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedButton(
+                onClick = {
+                    nombre = ""
+                    precio = ""
+                    cantidad = ""
+                    mostrarResumen = false
+                    mensajeError = null
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("LIMPIAR")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (mensajeError != null) {
+
+                Text(
+                    text = mensajeError!!,
+                    color = Color.Red,
+                    fontWeight = FontWeight.Bold
+                )
+            }
 
             if (mostrarResumen) {
 
                 val precioNum = precio.toDoubleOrNull() ?: 0.0
                 val cantidadNum = cantidad.toIntOrNull() ?: 0
                 val importe = precioNum * cantidadNum
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
