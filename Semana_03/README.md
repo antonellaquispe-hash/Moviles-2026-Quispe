@@ -1,18 +1,11 @@
-# Semana 03: Calculadora de Cuotas
+# Semana 03: Registro producto
 
 Aplicación móvil desarrollada en **Android Studio** utilizando **Kotlin**. El objetivo de esta práctica es crear una calculadora de financiamiento que permita al usuario ingresar los datos de un producto y obtener los pagos, intereses y fechas de vencimiento, mostrando los resultados directamente en la consola.
 
-## Características y Funcionalidades
+## Descripcion
+En este laboratorio se desarrolló una interfaz de registro de productos utilizando Android Studio y Jetpack Compose. Se aplicaron diferentes componentes de diseño como Column, Row, OutlinedTextField, Button y Card, siguiendo reglas de diseño para mejorar la organización y presentación de la aplicación.
 
-- **Ingreso de Datos:** El usuario puede ingresar el nombre del producto, precio unitario, cantidad y el número de cuotas (hasta un máximo de 24).
-- **Cálculo de Intereses Dinámico:** La tasa de interés varía automáticamente según el número de cuotas seleccionadas.
-- **Resultados Financieros:**
-  - Monto inicial (Costo principal).
-  - Monto total a pagar (Costo principal + Intereses).
-  - Pago mensual estimado.
-- **Cronograma de Pagos:** Generación automática de las fechas de pago correspondientes a cada mes.
-- **Salida en Consola:** Todos los resultados se imprimen en la terminal.
-- 
+La aplicación permite ingresar el nombre del producto, precio y cantidad, y al presionar el botón “AGREGAR PRODUCTO” muestra un resumen del producto registrado junto con el cálculo del importe total.
+
 ## Resultado
-<img width="512" height="795" alt="image" src="https://github.com/user-attachments/assets/354bce18-4627-4eeb-96bf-38c377a1b795" />
-
+<img width="302" height="397" alt="image" src="https://github.com/user-attachments/assets/6decb823-d4c4-4b0e-8c2d-44e156edde38" />
