@@ -15,14 +15,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -65,6 +69,9 @@ fun RegistroNotasApp() {
     var nota2 by remember { mutableFloatStateOf(0f) }
     var nota3 by remember { mutableFloatStateOf(0f) }
     var nota4 by remember { mutableFloatStateOf(0f) }
+
+    var redondear by remember { mutableStateOf(false) }
+    var confirmado by remember { mutableStateOf(false) }
 
     val notas = listOf(nota1, nota2, nota3, nota4)
 
@@ -155,6 +162,64 @@ fun RegistroNotasApp() {
                             }
                         }
                     }
+                }
+            }
+
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Redondear promedio final",
+                            modifier = Modifier.weight(1f),
+                            fontSize = 16.sp
+                        )
+
+                        Switch(
+                            checked = redondear,
+                            onCheckedChange = {
+                                redondear = it
+                            }
+                        )
+                    }
+                }
+            }
+
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = confirmado,
+                        onCheckedChange = {
+                            confirmado = it
+                        }
+                    )
+
+                    Text(
+                        text = "Confirmo que las notas son correctas",
+                        fontSize = 15.sp
+                    )
+                }
+            }
+
+            item {
+                Button(
+                    onClick = {},
+                    enabled = confirmado,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "CALCULAR PROMEDIO",
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
