@@ -4,20 +4,34 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.quispe.registronotas.model.Curso
 
 class MainActivity : ComponentActivity() {
 
@@ -35,24 +49,14 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun RegistroNotasApp() {
 
-    val cursos = listOf(
-        com.quispe.registronotas.model.Curso(
-            "Fundamentos de Programación",
-            20
-        ),
-        com.quispe.registronotas.model.Curso(
-            "Programación Orientada a Objetos",
-            25
-        ),
-        com.quispe.registronotas.model.Curso(
-            "Programación en Móviles",
-            30
-        ),
-        com.quispe.registronotas.model.Curso(
-            "Base de Datos",
-            25
+    val cursos = remember {
+        mutableStateListOf(
+            Curso("Fundamentos de Programación", 20),
+            Curso("Programación Orientada a Objetos", 25),
+            Curso("Programación en Móviles", 30),
+            Curso("Base de Datos", 25)
         )
-    )
+    }
 
     Column(
         modifier = Modifier
@@ -79,17 +83,63 @@ fun RegistroNotasApp() {
             )
         }
 
-        Column(
+        LazyColumn(
             modifier = Modifier
+                .fillMaxWidth()
                 .weight(1f)
-                .padding(16.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            cursos.forEach { curso ->
-                Text(
-                    text = "${curso.nombre} (${curso.peso}%)",
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    fontSize = 16.sp
-                )
+            items(cursos) { curso ->
+
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "${curso.nombre} (${curso.peso}%)",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Slider(
+                                value = curso.nota,
+                                onValueChange = { valor ->
+                                    val indice = cursos.indexOf(curso)
+                                    cursos[indice] = curso.copy(nota = valor)
+                                },
+                                valueRange = 0f..20f,
+                                steps = 19,
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            Spacer(modifier = Modifier.width(12.dp))
+
+                            Surface(
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = MaterialTheme.shapes.small
+                            ) {
+                                Text(
+                                    text = curso.nota.toInt().toString(),
+                                    modifier = Modifier.padding(
+                                        horizontal = 12.dp,
+                                        vertical = 6.dp
+                                    ),
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
 
