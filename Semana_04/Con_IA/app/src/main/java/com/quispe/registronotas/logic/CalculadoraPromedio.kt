@@ -14,4 +14,13 @@ class CalculadoraPromedio {
     fun redondear(promedio: Double): Int {
         return promedio.roundToInt()
     }
+
+    fun obtenerObservacion(promedio: Double): String {
+        return when {
+            promedio >= 17 -> "EXCELENTE"
+            promedio >= 13 -> "APROBADO"
+            promedio >= 10 -> "EN RECUPERACIÓN"
+            else -> "DESAPROBADO"
+        }
+    }
 }
