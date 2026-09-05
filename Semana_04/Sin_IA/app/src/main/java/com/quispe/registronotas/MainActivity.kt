@@ -15,9 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
@@ -36,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.math.roundToInt
 
 data class Curso(
     val nombre: String,
@@ -72,6 +75,7 @@ fun RegistroNotasApp() {
 
     var redondear by remember { mutableStateOf(false) }
     var confirmado by remember { mutableStateOf(false) }
+    var calcular by remember { mutableStateOf(false) }
 
     val notas = listOf(nota1, nota2, nota3, nota4)
 
@@ -148,7 +152,7 @@ fun RegistroNotasApp() {
 
                             Surface(
                                 color = MaterialTheme.colorScheme.primary,
-                                shape = MaterialTheme.shapes.small
+                                shape = RoundedCornerShape(8.dp)
                             ) {
                                 Text(
                                     text = notas[indice].toInt().toString(),
@@ -212,7 +216,9 @@ fun RegistroNotasApp() {
 
             item {
                 Button(
-                    onClick = {},
+                    onClick = {
+                        calcular = true
+                    },
                     enabled = confirmado,
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -220,6 +226,104 @@ fun RegistroNotasApp() {
                         text = "CALCULAR PROMEDIO",
                         fontWeight = FontWeight.Bold
                     )
+                }
+            }
+
+            item {
+                if (!calcular) {
+                    Text(
+                        text = "Asigna las notas y confirma para calcular",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        color = Color.Gray,
+                        fontSize = 14.sp
+                    )
+                } else {
+                    val promedioPonderado =
+                        nota1 * 0.20 +
+                                nota2 * 0.25 +
+                                nota3 * 0.30 +
+                                nota4 * 0.25
+
+                    val promedioFinal = if (redondear) {
+                        promedioPonderado.roundToInt().toDouble()
+                    } else {
+                        promedioPonderado
+                    }
+
+                    val observacion = when {
+                        promedioFinal >= 17 -> "EXCELENTE"
+                        promedioFinal >= 13 -> "APROBADO"
+                        promedioFinal >= 10 -> "EN RECUPERACIÓN"
+                        else -> "DESAPROBADO"
+                    }
+
+                    val chipColor = when {
+                        promedioFinal >= 17 -> Color(0xFF2E7D32)
+                        promedioFinal >= 13 -> Color(0xFF43A047)
+                        promedioFinal >= 10 -> Color(0xFFFFA000)
+                        else -> Color(0xFFD32F2F)
+                    }
+
+                    Card(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(20.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Resultados",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Text(
+                                text = "Promedio ponderado: %.2f".format(promedioPonderado),
+                                fontSize = 16.sp
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Text(
+                                text = if (redondear) {
+                                    "Promedio final: ${promedioFinal.toInt()} (redondeado)"
+                                } else {
+                                    "Promedio final: %.2f".format(promedioFinal)
+                                },
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            FilterChip(
+                                selected = true,
+                                onClick = {},
+                                label = {
+                                    Text(
+                                        text = observacion,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                },
+                                colors = androidx.compose.material3.FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = chipColor,
+                                    selectedLabelColor = Color.White
+                                )
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Text(
+                                text = "✓ Las notas han sido confirmadas correctamente.",
+                                color = Color(0xFF2E7D32),
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
                 }
             }
         }
