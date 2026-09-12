@@ -94,12 +94,23 @@ fun TaskScreen() {
 
                     Text(
                         text = "${index + 1}. ${item.first}",
+                        modifier = Modifier.weight(1f),
                         textDecoration = if (item.second) {
                             TextDecoration.LineThrough
                         } else {
                             TextDecoration.None
                         }
                     )
+
+                    Button(
+                        onClick = {
+                            tareas = tareas.toMutableList().also {
+                                it.removeAt(index)
+                            }
+                        }
+                    ) {
+                        Text("Eliminar")
+                    }
                 }
             }
         }
