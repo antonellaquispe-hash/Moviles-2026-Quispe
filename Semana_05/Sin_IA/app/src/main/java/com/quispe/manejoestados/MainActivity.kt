@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 
 class MainActivity : ComponentActivity() {
@@ -34,7 +36,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun TaskScreen() {
     var tarea by remember { mutableStateOf("") }
-    var tareas by remember { mutableStateOf(listOf<String>()) }
+    var tareas by remember { mutableStateOf(listOf<Pair<String, Boolean>>()) }
 
     Column(
         modifier = Modifier
@@ -59,7 +61,7 @@ fun TaskScreen() {
         Button(
             onClick = {
                 if (tarea.isNotBlank()) {
-                    tareas = tareas + tarea
+                    tareas = tareas + Pair(tarea, false)
                     tarea = ""
                 }
             },
@@ -79,10 +81,25 @@ fun TaskScreen() {
         ) {
             tareas.forEachIndexed { index, item ->
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "${index + 1}. $item")
+                    Checkbox(
+                        checked = item.second,
+                        onCheckedChange = { completada ->
+                            tareas = tareas.toMutableList().also {
+                                it[index] = Pair(item.first, completada)
+                            }
+                        }
+                    )
+
+                    Text(
+                        text = "${index + 1}. ${item.first}",
+                        textDecoration = if (item.second) {
+                            TextDecoration.LineThrough
+                        } else {
+                            TextDecoration.None
+                        }
+                    )
                 }
             }
         }
