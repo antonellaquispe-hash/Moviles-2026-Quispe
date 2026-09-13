@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
@@ -36,34 +38,45 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun TaskScreen() {
-    var tarea by remember { mutableStateOf("") }
-    var tareas by remember { mutableStateOf(listOf<Tarea>()) }
+    var textoTarea by remember { mutableStateOf("") }
+    var contadorId by remember { mutableStateOf(1) }
+    var listaTareas by remember { mutableStateOf(listOf<Tarea>()) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp)
+            .padding(16.dp)
     ) {
-        Text(text = "Lista de Tareas")
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = tarea,
-            onValueChange = { tarea = it },
-            modifier = Modifier.fillMaxWidth(),
-            label = {
-                Text("Escribe una tarea")
-            }
+        Text(
+            text = "Lista de tareas"
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(
+            modifier = Modifier.padding(8.dp)
+        )
+
+        OutlinedTextField(
+            value = textoTarea,
+            onValueChange = { textoTarea = it },
+            label = {
+                Text("Ingrese una tarea")
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(
+            modifier = Modifier.padding(4.dp)
+        )
 
         Button(
             onClick = {
-                if (tarea.isNotBlank()) {
-                    tareas = tareas + Tarea(tarea)
-                    tarea = ""
+                if (textoTarea.isNotBlank()) {
+                    listaTareas = listaTareas + Tarea(
+                        id = contadorId,
+                        nombre = textoTarea
+                    )
+                    contadorId++
+                    textoTarea = ""
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -71,44 +84,91 @@ fun TaskScreen() {
             Text("Agregar tarea")
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(
+            modifier = Modifier.padding(8.dp)
+        )
 
-        Text(text = "Cantidad de tareas: ${tareas.size}")
+        Text(
+            text = "Total de tareas: ${listaTareas.size}"
+        )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(
+            modifier = Modifier.padding(8.dp)
+        )
 
-        Column(
+        LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            tareas.forEachIndexed { index, item ->
-                Card(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                    ) {
-                        Checkbox(
-                            checked = item.completada,
-                            onCheckedChange = { completada ->
-                                tareas = tareas.toMutableList().also {
-                                    it[index] = item.copy(completada = completada)
-                                }
-                            }
-                        )
-
-                        Text(
-                            text = item.nombre,
-                            modifier = Modifier.padding(top = 12.dp),
-                            textDecoration = if (item.completada) {
-                                TextDecoration.LineThrough
+            items(
+                items = listaTareas,
+                key = { it.id }
+            ) { tarea ->
+                ItemTarea(
+                    tarea = tarea,
+                    onEliminar = {
+                        listaTareas = listaTareas.filter {
+                            it.id != tarea.id
+                        }
+                    },
+                    onCambiarEstado = { completada ->
+                        listaTareas = listaTareas.map {
+                            if (it.id == tarea.id) {
+                                it.copy(completada = completada)
                             } else {
-                                TextDecoration.None
+                                it
                             }
-                        )
+                        }
                     }
-                }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ItemTarea(
+    tarea: Tarea,
+    onEliminar: () -> Unit,
+    onCambiarEstado: (Boolean) -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                modifier = Modifier.weight(1f)
+            ) {
+                Checkbox(
+                    checked = tarea.completada,
+                    onCheckedChange = {
+                        onCambiarEstado(it)
+                    }
+                )
+
+                Text(
+                    text = tarea.nombre,
+                    modifier = Modifier.padding(top = 12.dp),
+                    textDecoration = if (tarea.completada) {
+                        TextDecoration.LineThrough
+                    } else {
+                        TextDecoration.None
+                    }
+                )
+            }
+
+            Spacer(
+                modifier = Modifier.width(8.dp)
+            )
+
+            Button(
+                onClick = onEliminar
+            ) {
+                Text("Eliminar")
             }
         }
     }
