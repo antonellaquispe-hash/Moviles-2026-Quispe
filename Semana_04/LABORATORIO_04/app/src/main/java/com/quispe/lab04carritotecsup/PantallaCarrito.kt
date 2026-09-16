@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -114,10 +115,43 @@ fun PantallaCarrito() {
             modifier = Modifier.fillMaxWidth()
         ) {
             items(productos) { producto ->
-                Text(
-                    text = "${producto.nombre} - S/ ${"%.2f".format(producto.precio)} x ${producto.cantidad}",
-                    modifier = Modifier.padding(8.dp)
-                )
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = producto.nombre,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+
+                            Text(
+                                text = "Precio: S/ ${"%.2f".format(producto.precio)}"
+                            )
+
+                            Text(
+                                text = "Cantidad: ${producto.cantidad}"
+                            )
+                        }
+
+                        Button(
+                            onClick = {
+                                productos.remove(producto)
+                            }
+                        ) {
+                            Text("ELIMINAR")
+                        }
+                    }
+                }
             }
         }
     }
