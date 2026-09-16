@@ -1,4 +1,4 @@
-package com.quispe.lab04carrito
+package com.quispe.lab04carritotecsup
 
 data class Producto(
     val nombre: String,
