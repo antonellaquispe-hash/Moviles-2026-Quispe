@@ -33,10 +33,9 @@ fun PantallaCarrito() {
     var nombre by remember { mutableStateOf("") }
     var precio by remember { mutableStateOf("") }
     var cantidad by remember { mutableStateOf("") }
+    var productoEliminar by remember { mutableStateOf<Producto?>(null) }
 
     val productos = remember { mutableStateListOf<Producto>() }
-
-    var productoEliminar by remember { mutableStateOf<Producto?>(null) }
 
     val subtotal = productos.sumOf {
         it.precio * it.cantidad
@@ -45,6 +44,14 @@ fun PantallaCarrito() {
     val igv = subtotal * 0.18
 
     val total = subtotal + igv
+
+    val descuento = when {
+        total > 5000 -> total * 0.10
+        total > 3000 -> total * 0.05
+        else -> 0.0
+    }
+
+    val totalConDescuento = total - descuento
 
     Column(
         modifier = Modifier
@@ -56,7 +63,9 @@ fun PantallaCarrito() {
             style = MaterialTheme.typography.headlineMedium
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(
+            modifier = Modifier.height(16.dp)
+        )
 
         OutlinedTextField(
             value = nombre,
@@ -65,7 +74,9 @@ fun PantallaCarrito() {
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(
+            modifier = Modifier.height(8.dp)
+        )
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -86,7 +97,9 @@ fun PantallaCarrito() {
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(
+            modifier = Modifier.height(12.dp)
+        )
 
         Button(
             onClick = {
@@ -118,11 +131,15 @@ fun PantallaCarrito() {
             Text("AGREGAR")
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(
+            modifier = Modifier.height(16.dp)
+        )
 
         Text("Productos: ${productos.size}")
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(
+            modifier = Modifier.height(8.dp)
+        )
 
         if (productos.isEmpty()) {
             Box(
@@ -131,7 +148,9 @@ fun PantallaCarrito() {
                     .weight(1f),
                 contentAlignment = Alignment.Center
             ) {
-                Text("No hay productos en el carrito")
+                Text(
+                    text = "No hay productos en el carrito"
+                )
             }
         } else {
             LazyColumn(
@@ -149,7 +168,7 @@ fun PantallaCarrito() {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column(
                                 modifier = Modifier.weight(1f)
@@ -201,8 +220,14 @@ fun PantallaCarrito() {
                     text = "IGV 18%: S/ ${"%.2f".format(igv)}"
                 )
 
+                if (descuento > 0) {
+                    Text(
+                        text = "Descuento: -S/ ${"%.2f".format(descuento)}"
+                    )
+                }
+
                 Text(
-                    text = "Total: S/ ${"%.2f".format(total)}",
+                    text = "Total: S/ ${"%.2f".format(totalConDescuento)}",
                     style = MaterialTheme.typography.titleMedium
                 )
             }
