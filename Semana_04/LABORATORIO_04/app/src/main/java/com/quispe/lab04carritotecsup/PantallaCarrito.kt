@@ -4,17 +4,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -32,6 +35,8 @@ fun PantallaCarrito() {
     var cantidad by remember { mutableStateOf("") }
 
     val productos = remember { mutableStateListOf<Producto>() }
+
+    var productoEliminar by remember { mutableStateOf<Producto?>(null) }
 
     val subtotal = productos.sumOf {
         it.precio * it.cantidad
@@ -51,9 +56,7 @@ fun PantallaCarrito() {
             style = MaterialTheme.typography.headlineMedium
         )
 
-        androidx.compose.foundation.layout.Spacer(
-            modifier = Modifier.height(16.dp)
-        )
+        Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = nombre,
@@ -62,9 +65,7 @@ fun PantallaCarrito() {
             modifier = Modifier.fillMaxWidth()
         )
 
-        androidx.compose.foundation.layout.Spacer(
-            modifier = Modifier.height(8.dp)
-        )
+        Spacer(modifier = Modifier.height(8.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -85,9 +86,7 @@ fun PantallaCarrito() {
             )
         }
 
-        androidx.compose.foundation.layout.Spacer(
-            modifier = Modifier.height(12.dp)
-        )
+        Spacer(modifier = Modifier.height(12.dp))
 
         Button(
             onClick = {
@@ -119,15 +118,11 @@ fun PantallaCarrito() {
             Text("AGREGAR")
         }
 
-        androidx.compose.foundation.layout.Spacer(
-            modifier = Modifier.height(16.dp)
-        )
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text("Productos: ${productos.size}")
 
-        androidx.compose.foundation.layout.Spacer(
-            modifier = Modifier.height(8.dp)
-        )
+        Spacer(modifier = Modifier.height(8.dp))
 
         if (productos.isEmpty()) {
             Box(
@@ -136,9 +131,7 @@ fun PantallaCarrito() {
                     .weight(1f),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "No hay productos en el carrito"
-                )
+                Text("No hay productos en el carrito")
             }
         } else {
             LazyColumn(
@@ -156,7 +149,7 @@ fun PantallaCarrito() {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(
                                 modifier = Modifier.weight(1f)
@@ -167,22 +160,24 @@ fun PantallaCarrito() {
                                 )
 
                                 Text(
-                                    text = "Precio: S/ ${
-                                        "%.2f".format(producto.precio)
-                                    }"
+                                    text = "S/ ${"%.2f".format(producto.precio)} x ${producto.cantidad}"
                                 )
 
                                 Text(
-                                    text = "Cantidad: ${producto.cantidad}"
+                                    text = "Subtotal: S/ ${
+                                        "%.2f".format(
+                                            producto.precio * producto.cantidad
+                                        )
+                                    }"
                                 )
                             }
 
                             Button(
                                 onClick = {
-                                    productos.remove(producto)
+                                    productoEliminar = producto
                                 }
                             ) {
-                                Text("ELIMINAR")
+                                Text("🗑️")
                             }
                         }
                     }
@@ -212,5 +207,38 @@ fun PantallaCarrito() {
                 )
             }
         }
+    }
+
+    productoEliminar?.let { producto ->
+        AlertDialog(
+            onDismissRequest = {
+                productoEliminar = null
+            },
+            title = {
+                Text("¿Eliminar este producto?")
+            },
+            text = {
+                Text(producto.nombre)
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        productos.remove(producto)
+                        productoEliminar = null
+                    }
+                ) {
+                    Text("ELIMINAR")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        productoEliminar = null
+                    }
+                ) {
+                    Text("CANCELAR")
+                }
+            }
+        )
     }
 }
