@@ -36,7 +36,7 @@ fun ProfileScreen(navController: NavController) {
         )
 
         Text(
-            text = "Juan León Suiyon",
+            text = "Antonella Quispe",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
