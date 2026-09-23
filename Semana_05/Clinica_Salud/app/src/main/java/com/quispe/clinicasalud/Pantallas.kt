@@ -1,6 +1,7 @@
 package com.quispe.clinicasalud
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun Inicio(
-    onPerfil: () -> Unit
+    onMedicoSeleccionado: (String, String, String) -> Unit
 ) {
     val especialidades = listOf(
         "Cardiología",
@@ -82,7 +82,15 @@ fun Inicio(
         ) {
             items(medicos) { medico ->
                 Card(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onMedicoSeleccionado(
+                                medico.first,
+                                medico.second,
+                                medico.third
+                            )
+                        }
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp)
@@ -104,25 +112,37 @@ fun Inicio(
                 }
             }
         }
-
-        Button(
-            onClick = onPerfil,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp)
-        ) {
-            Text("Perfil médico")
-        }
     }
 }
 
 @Composable
-fun Perfil() {
+fun Perfil(
+    nombre: String,
+    especialidad: String,
+    valoracion: String
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text("Perfil médico")
+        Text(
+            text = "Perfil médico"
+        )
+
+        Text(
+            text = nombre,
+            modifier = Modifier.padding(top = 24.dp)
+        )
+
+        Text(
+            text = "Especialidad: $especialidad",
+            modifier = Modifier.padding(top = 12.dp)
+        )
+
+        Text(
+            text = "Valoración: ⭐ $valoracion",
+            modifier = Modifier.padding(top = 12.dp)
+        )
     }
 }
