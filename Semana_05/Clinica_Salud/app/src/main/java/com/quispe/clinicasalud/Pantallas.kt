@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -14,6 +15,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -25,6 +27,13 @@ fun Inicio(
         "Pediatría",
         "Dermatología",
         "Odontología"
+    )
+
+    val medicos = listOf(
+        Triple("Dra. María López", "Cardiología", "4.9"),
+        Triple("Dr. Carlos Pérez", "Pediatría", "4.8"),
+        Triple("Dra. Ana Torres", "Dermatología", "4.7"),
+        Triple("Dr. Luis Ramírez", "Odontología", "4.9")
     )
 
     Column(
@@ -48,7 +57,7 @@ fun Inicio(
             items(especialidades) { especialidad ->
                 Card(
                     modifier = Modifier
-                        .background(androidx.compose.ui.graphics.Color.Transparent)
+                        .background(Color.Transparent)
                         .padding(2.dp)
                 ) {
                     Text(
@@ -62,11 +71,45 @@ fun Inicio(
             }
         }
 
+        Text(
+            text = "Médicos disponibles",
+            modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+        )
+
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(medicos) { medico ->
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = medico.first
+                        )
+
+                        Text(
+                            text = medico.second,
+                            modifier = Modifier.padding(top = 6.dp)
+                        )
+
+                        Text(
+                            text = "⭐ ${medico.third}",
+                            modifier = Modifier.padding(top = 6.dp)
+                        )
+                    }
+                }
+            }
+        }
+
         Button(
             onClick = onPerfil,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 24.dp)
+                .padding(top = 12.dp)
         ) {
             Text("Perfil médico")
         }
