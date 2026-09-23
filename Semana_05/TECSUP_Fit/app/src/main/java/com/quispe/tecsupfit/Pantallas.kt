@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -127,7 +128,8 @@ fun Inicio(
 @Composable
 fun DetalleClase(
     nombre: String,
-    horario: String
+    horario: String,
+    onReservar: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -147,5 +149,51 @@ fun DetalleClase(
             text = "Horario: $horario",
             modifier = Modifier.padding(top = 12.dp)
         )
+
+        Button(
+            onClick = onReservar,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp)
+        ) {
+            Text("Reservar cupo")
+        }
+    }
+}
+
+@Composable
+fun Confirmacion(
+    nombre: String,
+    horario: String,
+    onVerReservas: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Reserva confirmada"
+        )
+
+        Text(
+            text = "Clase: $nombre",
+            modifier = Modifier.padding(top = 24.dp)
+        )
+
+        Text(
+            text = "Horario: $horario",
+            modifier = Modifier.padding(top = 12.dp)
+        )
+
+        Button(
+            onClick = onVerReservas,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp)
+        ) {
+            Text("Ver reservas")
+        }
     }
 }

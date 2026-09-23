@@ -53,8 +53,38 @@ fun AppNavigation() {
 
             DetalleClase(
                 nombre = nombre,
-                horario = horario
+                horario = horario,
+                onReservar = {
+                    navController.navigate(
+                        "confirmacion/${Uri.encode(nombre)}/${Uri.encode(horario)}"
+                    )
+                }
             )
+        }
+
+        composable(
+            route = "confirmacion/{nombre}/{horario}"
+        ) { backStackEntry ->
+
+            val nombre = backStackEntry.arguments
+                ?.getString("nombre")
+                ?: ""
+
+            val horario = backStackEntry.arguments
+                ?.getString("horario")
+                ?: ""
+
+            Confirmacion(
+                nombre = nombre,
+                horario = horario,
+                onVerReservas = {
+                    navController.navigate("reservas")
+                }
+            )
+        }
+
+        composable("reservas") {
+            Text("Reservas")
         }
     }
 }
