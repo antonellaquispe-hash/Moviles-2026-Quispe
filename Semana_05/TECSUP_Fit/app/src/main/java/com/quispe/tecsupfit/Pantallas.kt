@@ -12,6 +12,9 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,6 +23,66 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+
+@Composable
+fun BarraNavegacion(
+    destinoActual: String,
+    onNavegar: (String) -> Unit
+) {
+    NavigationBar {
+        NavigationBarItem(
+            selected = destinoActual == "inicio",
+            onClick = {
+                onNavegar("inicio")
+            },
+            icon = {
+                Text("⌂")
+            },
+            label = {
+                Text("Inicio")
+            }
+        )
+
+        NavigationBarItem(
+            selected = destinoActual == "reservas",
+            onClick = {
+                onNavegar("reservas")
+            },
+            icon = {
+                Text("✓")
+            },
+            label = {
+                Text("Reservas")
+            }
+        )
+
+        NavigationBarItem(
+            selected = destinoActual == "rutinas",
+            onClick = {
+                onNavegar("rutinas")
+            },
+            icon = {
+                Text("★")
+            },
+            label = {
+                Text("Rutinas")
+            }
+        )
+
+        NavigationBarItem(
+            selected = destinoActual == "perfil",
+            onClick = {
+                onNavegar("perfil")
+            },
+            icon = {
+                Text("●")
+            },
+            label = {
+                Text("Perfil")
+            }
+        )
+    }
+}
 
 @Composable
 fun Inicio(
@@ -93,7 +156,7 @@ fun Inicio(
         )
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(clases) { clase ->
@@ -195,5 +258,133 @@ fun Confirmacion(
         ) {
             Text("Ver reservas")
         }
+    }
+}
+
+@Composable
+fun Reservas() {
+    val reservas = listOf(
+        Triple(
+            "Entrenamiento funcional",
+            "08:00",
+            "Confirmada"
+        ),
+        Triple(
+            "Spinning",
+            "10:00",
+            "Completada"
+        ),
+        Triple(
+            "Yoga",
+            "18:00",
+            "Confirmada"
+        )
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "Mis reservas",
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(reservas) { reserva ->
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = reserva.first
+                        )
+
+                        Text(
+                            text = "Horario: ${reserva.second}",
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+
+                        Text(
+                            text = reserva.third,
+                            modifier = Modifier.padding(top = 10.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun Rutinas() {
+    val rutinas = listOf(
+        "Rutina de fuerza",
+        "Rutina de cardio",
+        "Rutina de movilidad"
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "Rutinas",
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(rutinas) { rutina ->
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = rutina,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PerfilUsuario() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "Mi perfil"
+        )
+
+        Text(
+            text = "Antonella Quispe",
+            modifier = Modifier.padding(top = 24.dp)
+        )
+
+        Text(
+            text = "Clases tomadas: 12",
+            modifier = Modifier.padding(top = 16.dp)
+        )
+
+        Text(
+            text = "Racha de asistencia: 5 días",
+            modifier = Modifier.padding(top = 12.dp)
+        )
+
+        Text(
+            text = "Horas entrenadas: 18",
+            modifier = Modifier.padding(top = 12.dp)
+        )
     }
 }
