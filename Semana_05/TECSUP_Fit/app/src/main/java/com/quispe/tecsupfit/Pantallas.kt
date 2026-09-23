@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -17,7 +18,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -28,6 +28,13 @@ fun Inicio(
     val filtros = listOf(
         "Hoy",
         "Esta semana"
+    )
+
+    val clases = listOf(
+        "Entrenamiento funcional" to "08:00",
+        "Spinning" to "10:00",
+        "Yoga" to "18:00",
+        "Cross training" to "19:30"
     )
 
     var filtroSeleccionado by remember {
@@ -77,13 +84,45 @@ fun Inicio(
             modifier = Modifier.padding(top = 20.dp)
         )
 
+        Text(
+            text = "Clases disponibles",
+            modifier = Modifier.padding(
+                top = 20.dp,
+                bottom = 10.dp
+            )
+        )
+
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(clases) { clase ->
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = clase.first
+                        )
+
+                        Text(
+                            text = "Horario: ${clase.second}",
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                }
+            }
+        }
+
         Button(
             onClick = onDetalle,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 24.dp)
+                .padding(top = 12.dp)
         ) {
-            Text("Ver clases")
+            Text("Ver detalle")
         }
     }
 }
@@ -93,10 +132,15 @@ fun DetalleClase() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .padding(16.dp)
     ) {
-        Text("Detalle de clase")
+        Text(
+            text = "Detalle de clase"
+        )
+
+        Text(
+            text = "Selecciona una clase para ver sus detalles.",
+            modifier = Modifier.padding(top = 20.dp)
+        )
     }
 }
