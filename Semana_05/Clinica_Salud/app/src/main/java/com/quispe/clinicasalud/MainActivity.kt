@@ -3,27 +3,38 @@ package com.quispe.clinicasalud
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.Composable
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Inicio()
+            AppNavigation()
         }
     }
 }
 
-@androidx.compose.runtime.Composable
-fun Inicio() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+@Composable
+fun AppNavigation() {
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController,
+        startDestination = "inicio"
     ) {
-        Text("Clínica Salud+")
+        composable("inicio") {
+            Inicio(
+                onPerfil = {
+                    navController.navigate("perfil")
+                }
+            )
+        }
+
+        composable("perfil") {
+            Perfil()
+        }
     }
 }
