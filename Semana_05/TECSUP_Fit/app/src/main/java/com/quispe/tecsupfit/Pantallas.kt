@@ -1,20 +1,24 @@
 package com.quispe.tecsupfit
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -265,24 +269,30 @@ fun Confirmacion(
 
 @Composable
 fun Reservas() {
-    val reservas = remember {
-        listOf(
-            Reserva(
-                "Entrenamiento funcional",
-                "08:00",
-                "Confirmada"
-            ),
-            Reserva(
-                "Spinning",
-                "10:00",
-                "Completada"
-            ),
-            Reserva(
-                "Yoga",
-                "18:00",
-                "Confirmada"
+    var reservas by remember {
+        mutableStateOf(
+            listOf(
+                Reserva(
+                    "Entrenamiento funcional",
+                    "08:00",
+                    "Confirmada"
+                ),
+                Reserva(
+                    "Spinning",
+                    "10:00",
+                    "Completada"
+                ),
+                Reserva(
+                    "Yoga",
+                    "18:00",
+                    "Confirmada"
+                )
             )
         )
+    }
+
+    var reservaSeleccionada by remember {
+        mutableStateOf<Reserva?>(null)
     }
 
     Column(
@@ -318,17 +328,72 @@ fun Reservas() {
                             text = reserva.estado,
                             modifier = Modifier
                                 .padding(top = 12.dp)
-                                .then(
-                                    Modifier.padding(
-                                        horizontal = 12.dp,
-                                        vertical = 6.dp
-                                    )
+                                .background(
+                                    if (reserva.estado == "Confirmada") {
+                                        Color(0xFFDFF5E1)
+                                    } else {
+                                        Color(0xFFE0E0E0)
+                                    }
+                                )
+                                .padding(
+                                    horizontal = 12.dp,
+                                    vertical = 6.dp
                                 )
                         )
+
+                        if (reserva.estado == "Confirmada") {
+                            Button(
+                                onClick = {
+                                    reservaSeleccionada = reserva
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 12.dp)
+                            ) {
+                                Text("Cancelar reserva")
+                            }
+                        }
                     }
                 }
             }
         }
+    }
+
+    reservaSeleccionada?.let { reserva ->
+        AlertDialog(
+            onDismissRequest = {
+                reservaSeleccionada = null
+            },
+            title = {
+                Text("Cancelar reserva")
+            },
+            text = {
+                Text(
+                    "¿Deseas cancelar la reserva de ${reserva.clase} a las ${reserva.horario}?"
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        reservas = reservas.filter {
+                            it != reserva
+                        }
+                        reservaSeleccionada = null
+                    }
+                ) {
+                    Text("Sí, cancelar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        reservaSeleccionada = null
+                    }
+                ) {
+                    Text("No")
+                }
+            }
+        )
     }
 }
 
