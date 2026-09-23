@@ -55,7 +55,35 @@ fun AppNavigation() {
             Perfil(
                 nombre = nombre,
                 especialidad = especialidad,
-                valoracion = valoracion
+                valoracion = valoracion,
+                onAgendar = {
+                    navController.navigate(
+                        "agendar/${Uri.encode(nombre)}/${Uri.encode(especialidad)}"
+                    )
+                }
+            )
+        }
+
+        composable(
+            route = "agendar/{nombre}/{especialidad}"
+        ) { backStackEntry ->
+
+            val nombre = backStackEntry.arguments
+                ?.getString("nombre")
+                ?: ""
+
+            val especialidad = backStackEntry.arguments
+                ?.getString("especialidad")
+                ?: ""
+
+            AgendarCita(
+                nombre = nombre,
+                especialidad = especialidad,
+                onConfirmar = { fecha, horario ->
+                    navController.navigate(
+                        "confirmacion/${Uri.encode(nombre)}/${Uri.encode(especialidad)}/${Uri.encode(fecha)}/${Uri.encode(horario)}"
+                    )
+                }
             )
         }
     }
