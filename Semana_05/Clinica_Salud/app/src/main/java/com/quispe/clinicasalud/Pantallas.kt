@@ -288,3 +288,52 @@ fun AgendarCita(
         }
     }
 }
+
+@Composable
+fun Confirmacion(
+    nombre: String,
+    especialidad: String,
+    fecha: String,
+    horario: String,
+    onFinalizar: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Cita confirmada"
+        )
+
+        Text(
+            text = "Médico: $nombre",
+            modifier = Modifier.padding(top = 24.dp)
+        )
+
+        Text(
+            text = "Especialidad: $especialidad",
+            modifier = Modifier.padding(top = 12.dp)
+        )
+
+        Text(
+            text = "Fecha: $fecha",
+            modifier = Modifier.padding(top = 12.dp)
+        )
+
+        Text(
+            text = "Horario: $horario",
+            modifier = Modifier.padding(top = 12.dp)
+        )
+
+        Button(
+            onClick = onFinalizar,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp)
+        ) {
+            Text("Volver al inicio")
+        }
+    }
+}

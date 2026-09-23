@@ -86,5 +86,40 @@ fun AppNavigation() {
                 }
             )
         }
+
+        composable(
+            route = "confirmacion/{nombre}/{especialidad}/{fecha}/{horario}"
+        ) { backStackEntry ->
+
+            val nombre = backStackEntry.arguments
+                ?.getString("nombre")
+                ?: ""
+
+            val especialidad = backStackEntry.arguments
+                ?.getString("especialidad")
+                ?: ""
+
+            val fecha = backStackEntry.arguments
+                ?.getString("fecha")
+                ?: ""
+
+            val horario = backStackEntry.arguments
+                ?.getString("horario")
+                ?: ""
+
+            Confirmacion(
+                nombre = nombre,
+                especialidad = especialidad,
+                fecha = fecha,
+                horario = horario,
+                onFinalizar = {
+                    navController.navigate("inicio") {
+                        popUpTo("inicio") {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
+        }
     }
 }
