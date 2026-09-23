@@ -1,9 +1,11 @@
 package com.quispe.tecsupfit
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,7 +16,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -312,7 +314,19 @@ fun Reservas() {
 
                         Text(
                             text = reserva.third,
-                            modifier = Modifier.padding(top = 10.dp)
+                            modifier = Modifier
+                                .padding(top = 12.dp)
+                                .background(
+                                    if (reserva.third == "Confirmada") {
+                                        Color(0xFFDFF5E1)
+                                    } else {
+                                        Color(0xFFE0E0E0)
+                                    }
+                                )
+                                .padding(
+                                    horizontal = 12.dp,
+                                    vertical = 6.dp
+                                )
                         )
                     }
                 }
@@ -373,18 +387,36 @@ fun PerfilUsuario() {
         )
 
         Text(
-            text = "Clases tomadas: 12",
-            modifier = Modifier.padding(top = 16.dp)
+            text = "Estudiante TECSUP",
+            modifier = Modifier.padding(top = 8.dp)
         )
 
         Text(
-            text = "Racha de asistencia: 5 días",
-            modifier = Modifier.padding(top = 12.dp)
+            text = "Estadísticas",
+            modifier = Modifier.padding(
+                top = 24.dp,
+                bottom = 12.dp
+            )
         )
 
-        Text(
-            text = "Horas entrenadas: 18",
-            modifier = Modifier.padding(top = 12.dp)
-        )
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text("Clases tomadas: 12")
+
+                Text(
+                    text = "Racha de asistencia: 5 días",
+                    modifier = Modifier.padding(top = 12.dp)
+                )
+
+                Text(
+                    text = "Horas entrenadas: 18",
+                    modifier = Modifier.padding(top = 12.dp)
+                )
+            }
+        }
     }
 }
