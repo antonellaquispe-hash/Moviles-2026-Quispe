@@ -18,13 +18,17 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -97,8 +101,23 @@ fun AppDrawer(
     ) {
         Scaffold { paddingValues ->
             Column(
-                modifier = Modifier.padding(paddingValues)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
             ) {
+                Button(
+                    onClick = {
+                        scope.launch {
+                            drawerState.open()
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text("☰ Menú")
+                }
+
                 contenido()
             }
         }
@@ -110,6 +129,7 @@ fun Inicio(
     onMedicoSeleccionado: (String, String, String) -> Unit
 ) {
     val especialidades = listOf(
+        "Todas",
         "Cardiología",
         "Pediatría",
         "Dermatología",
@@ -125,6 +145,26 @@ fun Inicio(
         )
     }
 
+    var busqueda by remember {
+        mutableStateOf("")
+    }
+
+    var especialidadSeleccionada by remember {
+        mutableStateOf("Todas")
+    }
+
+    val medicosFiltrados = medicos.filter { medico ->
+        val coincideBusqueda =
+            medico.nombre.contains(busqueda, ignoreCase = true) ||
+                    medico.especialidad.contains(busqueda, ignoreCase = true)
+
+        val coincideEspecialidad =
+            especialidadSeleccionada == "Todas" ||
+                    medico.especialidad == especialidadSeleccionada
+
+        coincideBusqueda && coincideEspecialidad
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -132,6 +172,19 @@ fun Inicio(
     ) {
         Text(
             text = "Clínica Salud+"
+        )
+
+        OutlinedTextField(
+            value = busqueda,
+            onValueChange = {
+                busqueda = it
+            },
+            label = {
+                Text("Buscar médico")
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
         )
 
         Text(
@@ -149,6 +202,9 @@ fun Inicio(
             items(especialidades) { especialidad ->
                 Card(
                     modifier = Modifier
+                        .clickable {
+                            especialidadSeleccionada = especialidad
+                        }
                         .background(Color.Transparent)
                         .padding(2.dp)
                 ) {
@@ -171,38 +227,44 @@ fun Inicio(
             )
         )
 
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(medicos) { medico ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            onMedicoSeleccionado(
-                                medico.nombre,
-                                medico.especialidad,
-                                medico.valoracion
+        if (medicosFiltrados.isEmpty()) {
+            Text(
+                text = "No se encontraron médicos"
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(medicosFiltrados) { medico ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onMedicoSeleccionado(
+                                    medico.nombre,
+                                    medico.especialidad,
+                                    medico.valoracion
+                                )
+                            }
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            Text(
+                                text = medico.nombre
+                            )
+
+                            Text(
+                                text = medico.especialidad,
+                                modifier = Modifier.padding(top = 6.dp)
+                            )
+
+                            Text(
+                                text = "⭐ ${medico.valoracion}",
+                                modifier = Modifier.padding(top = 6.dp)
                             )
                         }
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            text = medico.nombre
-                        )
-
-                        Text(
-                            text = medico.especialidad,
-                            modifier = Modifier.padding(top = 6.dp)
-                        )
-
-                        Text(
-                            text = "⭐ ${medico.valoracion}",
-                            modifier = Modifier.padding(top = 6.dp)
-                        )
                     }
                 }
             }
@@ -270,12 +332,12 @@ fun AgendarCita(
         "15:00"
     )
 
-    var fechaSeleccionada = remember {
-        androidx.compose.runtime.mutableStateOf("")
+    var fechaSeleccionada by remember {
+        mutableStateOf("")
     }
 
-    var horarioSeleccionado = remember {
-        androidx.compose.runtime.mutableStateOf("")
+    var horarioSeleccionado by remember {
+        mutableStateOf("")
     }
 
     Column(
@@ -310,14 +372,14 @@ fun AgendarCita(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        fechaSeleccionada.value = fecha
+                        fechaSeleccionada = fecha
                     }
                     .padding(vertical = 6.dp)
             ) {
                 RadioButton(
-                    selected = fechaSeleccionada.value == fecha,
+                    selected = fechaSeleccionada == fecha,
                     onClick = {
-                        fechaSeleccionada.value = fecha
+                        fechaSeleccionada = fecha
                     }
                 )
 
@@ -344,14 +406,14 @@ fun AgendarCita(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        horarioSeleccionado.value = horario
+                        horarioSeleccionado = horario
                     }
                     .padding(vertical = 6.dp)
             ) {
                 RadioButton(
-                    selected = horarioSeleccionado.value == horario,
+                    selected = horarioSeleccionado == horario,
                     onClick = {
-                        horarioSeleccionado.value = horario
+                        horarioSeleccionado = horario
                     }
                 )
 
@@ -368,12 +430,12 @@ fun AgendarCita(
         Button(
             onClick = {
                 onConfirmar(
-                    fechaSeleccionada.value,
-                    horarioSeleccionado.value
+                    fechaSeleccionada,
+                    horarioSeleccionado
                 )
             },
-            enabled = fechaSeleccionada.value.isNotEmpty() &&
-                    horarioSeleccionado.value.isNotEmpty(),
+            enabled = fechaSeleccionada.isNotEmpty() &&
+                    horarioSeleccionado.isNotEmpty(),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 20.dp)

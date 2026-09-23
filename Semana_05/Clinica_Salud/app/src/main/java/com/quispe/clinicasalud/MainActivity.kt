@@ -50,7 +50,6 @@ fun AppNavigation() {
         composable(
             route = "perfil/{nombre}/{especialidad}/{valoracion}"
         ) { backStackEntry ->
-
             val nombre = backStackEntry.arguments
                 ?.getString("nombre")
                 ?: ""
@@ -89,7 +88,6 @@ fun AppNavigation() {
         composable(
             route = "agendar/{nombre}/{especialidad}"
         ) { backStackEntry ->
-
             val nombre = backStackEntry.arguments
                 ?.getString("nombre")
                 ?: ""
@@ -123,7 +121,6 @@ fun AppNavigation() {
         composable(
             route = "confirmacion/{nombre}/{especialidad}/{fecha}/{horario}"
         ) { backStackEntry ->
-
             val nombre = backStackEntry.arguments
                 ?.getString("nombre")
                 ?: ""
