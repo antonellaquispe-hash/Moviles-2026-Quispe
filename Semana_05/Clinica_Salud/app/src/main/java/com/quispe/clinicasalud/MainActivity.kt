@@ -27,13 +27,24 @@ fun AppNavigation() {
         startDestination = "inicio"
     ) {
         composable("inicio") {
-            Inicio(
-                onMedicoSeleccionado = { nombre, especialidad, valoracion ->
-                    navController.navigate(
-                        "perfil/${Uri.encode(nombre)}/${Uri.encode(especialidad)}/$valoracion"
-                    )
+            AppDrawer(
+                destinoActual = "inicio",
+                onNavegar = { destino ->
+                    navController.navigate(destino) {
+                        popUpTo("inicio") {
+                            inclusive = true
+                        }
+                    }
                 }
-            )
+            ) {
+                Inicio(
+                    onMedicoSeleccionado = { nombre, especialidad, valoracion ->
+                        navController.navigate(
+                            "perfil/${Uri.encode(nombre)}/${Uri.encode(especialidad)}/$valoracion"
+                        )
+                    }
+                )
+            }
         }
 
         composable(
@@ -52,16 +63,27 @@ fun AppNavigation() {
                 ?.getString("valoracion")
                 ?: ""
 
-            Perfil(
-                nombre = nombre,
-                especialidad = especialidad,
-                valoracion = valoracion,
-                onAgendar = {
-                    navController.navigate(
-                        "agendar/${Uri.encode(nombre)}/${Uri.encode(especialidad)}"
-                    )
+            AppDrawer(
+                destinoActual = "inicio",
+                onNavegar = { destino ->
+                    navController.navigate(destino) {
+                        popUpTo("inicio") {
+                            inclusive = true
+                        }
+                    }
                 }
-            )
+            ) {
+                Perfil(
+                    nombre = nombre,
+                    especialidad = especialidad,
+                    valoracion = valoracion,
+                    onAgendar = {
+                        navController.navigate(
+                            "agendar/${Uri.encode(nombre)}/${Uri.encode(especialidad)}"
+                        )
+                    }
+                )
+            }
         }
 
         composable(
@@ -76,15 +98,26 @@ fun AppNavigation() {
                 ?.getString("especialidad")
                 ?: ""
 
-            AgendarCita(
-                nombre = nombre,
-                especialidad = especialidad,
-                onConfirmar = { fecha, horario ->
-                    navController.navigate(
-                        "confirmacion/${Uri.encode(nombre)}/${Uri.encode(especialidad)}/${Uri.encode(fecha)}/${Uri.encode(horario)}"
-                    )
+            AppDrawer(
+                destinoActual = "inicio",
+                onNavegar = { destino ->
+                    navController.navigate(destino) {
+                        popUpTo("inicio") {
+                            inclusive = true
+                        }
+                    }
                 }
-            )
+            ) {
+                AgendarCita(
+                    nombre = nombre,
+                    especialidad = especialidad,
+                    onConfirmar = { fecha, horario ->
+                        navController.navigate(
+                            "confirmacion/${Uri.encode(nombre)}/${Uri.encode(especialidad)}/${Uri.encode(fecha)}/${Uri.encode(horario)}"
+                        )
+                    }
+                )
+            }
         }
 
         composable(
@@ -107,19 +140,60 @@ fun AppNavigation() {
                 ?.getString("horario")
                 ?: ""
 
-            Confirmacion(
-                nombre = nombre,
-                especialidad = especialidad,
-                fecha = fecha,
-                horario = horario,
-                onFinalizar = {
-                    navController.navigate("inicio") {
+            AppDrawer(
+                destinoActual = "inicio",
+                onNavegar = { destino ->
+                    navController.navigate(destino) {
                         popUpTo("inicio") {
                             inclusive = true
                         }
                     }
                 }
-            )
+            ) {
+                Confirmacion(
+                    nombre = nombre,
+                    especialidad = especialidad,
+                    fecha = fecha,
+                    horario = horario,
+                    onFinalizar = {
+                        navController.navigate("inicio") {
+                            popUpTo("inicio") {
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
+            }
+        }
+
+        composable("citas") {
+            AppDrawer(
+                destinoActual = "citas",
+                onNavegar = { destino ->
+                    navController.navigate(destino) {
+                        popUpTo("inicio") {
+                            inclusive = true
+                        }
+                    }
+                }
+            ) {
+                MisCitas()
+            }
+        }
+
+        composable("historial") {
+            AppDrawer(
+                destinoActual = "historial",
+                onNavegar = { destino ->
+                    navController.navigate(destino) {
+                        popUpTo("inicio") {
+                            inclusive = true
+                        }
+                    }
+                }
+            ) {
+                HistorialMedico()
+            }
         }
     }
 }
