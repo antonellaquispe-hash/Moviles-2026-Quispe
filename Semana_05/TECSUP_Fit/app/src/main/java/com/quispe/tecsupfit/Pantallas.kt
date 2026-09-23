@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +22,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun Inicio(
-    onDetalle: () -> Unit
+    onClaseSeleccionada: (String, String) -> Unit
 ) {
     val filtros = listOf(
         "Hoy",
@@ -93,12 +92,19 @@ fun Inicio(
         )
 
         LazyColumn(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(clases) { clase ->
                 Card(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onClaseSeleccionada(
+                                clase.first,
+                                clase.second
+                            )
+                        }
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp)
@@ -115,20 +121,14 @@ fun Inicio(
                 }
             }
         }
-
-        Button(
-            onClick = onDetalle,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp)
-        ) {
-            Text("Ver detalle")
-        }
     }
 }
 
 @Composable
-fun DetalleClase() {
+fun DetalleClase(
+    nombre: String,
+    horario: String
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -139,8 +139,13 @@ fun DetalleClase() {
         )
 
         Text(
-            text = "Selecciona una clase para ver sus detalles.",
-            modifier = Modifier.padding(top = 20.dp)
+            text = nombre,
+            modifier = Modifier.padding(top = 24.dp)
+        )
+
+        Text(
+            text = "Horario: $horario",
+            modifier = Modifier.padding(top = 12.dp)
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.quispe.tecsupfit
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -30,14 +31,30 @@ fun AppNavigation() {
     ) {
         composable("inicio") {
             Inicio(
-                onDetalle = {
-                    navController.navigate("detalle")
+                onClaseSeleccionada = { nombre, horario ->
+                    navController.navigate(
+                        "detalle/${Uri.encode(nombre)}/${Uri.encode(horario)}"
+                    )
                 }
             )
         }
 
-        composable("detalle") {
-            DetalleClase()
+        composable(
+            route = "detalle/{nombre}/{horario}"
+        ) { backStackEntry ->
+
+            val nombre = backStackEntry.arguments
+                ?.getString("nombre")
+                ?: ""
+
+            val horario = backStackEntry.arguments
+                ?.getString("horario")
+                ?: ""
+
+            DetalleClase(
+                nombre = nombre,
+                horario = horario
+            )
         }
     }
 }
