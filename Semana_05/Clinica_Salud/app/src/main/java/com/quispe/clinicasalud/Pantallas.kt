@@ -23,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -115,12 +116,14 @@ fun Inicio(
         "Odontología"
     )
 
-    val medicos = listOf(
-        Triple("Dra. María López", "Cardiología", "4.9"),
-        Triple("Dr. Carlos Pérez", "Pediatría", "4.8"),
-        Triple("Dra. Ana Torres", "Dermatología", "4.7"),
-        Triple("Dr. Luis Ramírez", "Odontología", "4.9")
-    )
+    val medicos = remember {
+        listOf(
+            Medico("Dra. María López", "Cardiología", "4.9"),
+            Medico("Dr. Carlos Pérez", "Pediatría", "4.8"),
+            Medico("Dra. Ana Torres", "Dermatología", "4.7"),
+            Medico("Dr. Luis Ramírez", "Odontología", "4.9")
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -178,9 +181,9 @@ fun Inicio(
                         .fillMaxWidth()
                         .clickable {
                             onMedicoSeleccionado(
-                                medico.first,
-                                medico.second,
-                                medico.third
+                                medico.nombre,
+                                medico.especialidad,
+                                medico.valoracion
                             )
                         }
                 ) {
@@ -188,16 +191,16 @@ fun Inicio(
                         modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            text = medico.first
+                            text = medico.nombre
                         )
 
                         Text(
-                            text = medico.second,
+                            text = medico.especialidad,
                             modifier = Modifier.padding(top = 6.dp)
                         )
 
                         Text(
-                            text = "⭐ ${medico.third}",
+                            text = "⭐ ${medico.valoracion}",
                             modifier = Modifier.padding(top = 6.dp)
                         )
                     }
@@ -267,11 +270,11 @@ fun AgendarCita(
         "15:00"
     )
 
-    var fechaSeleccionada = androidx.compose.runtime.remember {
+    var fechaSeleccionada = remember {
         androidx.compose.runtime.mutableStateOf("")
     }
 
-    var horarioSeleccionado = androidx.compose.runtime.remember {
+    var horarioSeleccionado = remember {
         androidx.compose.runtime.mutableStateOf("")
     }
 
@@ -431,11 +434,25 @@ fun Confirmacion(
 
 @Composable
 fun MisCitas() {
-    val citas = listOf(
-        Triple("Dra. María López", "Lunes 28 - 09:00", "Confirmada"),
-        Triple("Dr. Carlos Pérez", "Martes 29 - 11:00", "Completada"),
-        Triple("Dra. Ana Torres", "Miércoles 30 - 15:00", "Confirmada")
-    )
+    val citas = remember {
+        listOf(
+            Cita(
+                "Dra. María López",
+                "Lunes 28 - 09:00",
+                "Confirmada"
+            ),
+            Cita(
+                "Dr. Carlos Pérez",
+                "Martes 29 - 11:00",
+                "Completada"
+            ),
+            Cita(
+                "Dra. Ana Torres",
+                "Miércoles 30 - 15:00",
+                "Confirmada"
+            )
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -458,20 +475,20 @@ fun MisCitas() {
                         modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            text = cita.first
+                            text = cita.medico
                         )
 
                         Text(
-                            text = cita.second,
+                            text = cita.detalle,
                             modifier = Modifier.padding(top = 6.dp)
                         )
 
                         Text(
-                            text = cita.third,
+                            text = cita.estado,
                             modifier = Modifier
                                 .padding(top = 10.dp)
                                 .background(
-                                    if (cita.third == "Confirmada") {
+                                    if (cita.estado == "Confirmada") {
                                         Color(0xFFDFF5E1)
                                     } else {
                                         Color(0xFFE0E0E0)
