@@ -17,6 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Sort
@@ -50,6 +51,7 @@ fun InicioScreen(
     onVerCarrito: () -> Unit,
     onVerFavoritos: () -> Unit,
     onVerPedidos: () -> Unit,
+    onVerPerfil: () -> Unit,
     onProductoClick: (Producto) -> Unit,
     onAgregarProducto: (Producto) -> Unit
 ) {
@@ -98,6 +100,15 @@ fun InicioScreen(
                     )
                 },
                 actions = {
+
+                    IconButton(
+                        onClick = onVerPerfil
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Perfil"
+                        )
+                    }
 
                     IconButton(
                         onClick = onVerPedidos
