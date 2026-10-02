@@ -87,7 +87,7 @@ fun ProductoCard(producto: Producto) {
 
                     DropdownMenuItem(
                         text = {
-                            Text("Favoritos")
+                            Text("♡  Favoritos")
                         },
                         onClick = {
                             expanded = false
@@ -96,7 +96,7 @@ fun ProductoCard(producto: Producto) {
 
                     DropdownMenuItem(
                         text = {
-                            Text("Compartir")
+                            Text("↗  Compartir")
                         },
                         onClick = {
                             expanded = false
@@ -105,7 +105,7 @@ fun ProductoCard(producto: Producto) {
 
                     DropdownMenuItem(
                         text = {
-                            Text("Reportar")
+                            Text("⚠  Reportar")
                         },
                         onClick = {
                             expanded = false
