@@ -41,6 +41,10 @@ fun TecsupStoreApp() {
         mutableStateOf("Inicio")
     }
 
+    var favoritos by remember {
+        mutableStateOf<List<Producto>>(emptyList())
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -61,6 +65,24 @@ fun TecsupStoreApp() {
 
             "Inicio" -> {
                 PantallaInicio(
+                    favoritos = favoritos,
+                    onAgregarFavorito = { producto ->
+
+                        if (!favoritos.contains(producto)) {
+                            favoritos = favoritos + producto
+                        }
+                    },
+                    onMenuClick = {
+                        scope.launch {
+                            drawerState.open()
+                        }
+                    }
+                )
+            }
+
+            "Favoritos" -> {
+                PantallaFavoritos(
+                    favoritos = favoritos,
                     onMenuClick = {
                         scope.launch {
                             drawerState.open()
@@ -72,17 +94,6 @@ fun TecsupStoreApp() {
             "Mis pedidos" -> {
                 PantallaSimple(
                     titulo = "Mis pedidos",
-                    onMenuClick = {
-                        scope.launch {
-                            drawerState.open()
-                        }
-                    }
-                )
-            }
-
-            "Favoritos" -> {
-                PantallaSimple(
-                    titulo = "Favoritos",
                     onMenuClick = {
                         scope.launch {
                             drawerState.open()
@@ -108,6 +119,8 @@ fun TecsupStoreApp() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PantallaInicio(
+    favoritos: List<Producto>,
+    onAgregarFavorito: (Producto) -> Unit,
     onMenuClick: () -> Unit
 ) {
 
@@ -151,6 +164,12 @@ fun PantallaInicio(
                     ) {
                         Text("☰")
                     }
+                },
+                actions = {
+                    Text(
+                        text = "♡ ${favoritos.size}",
+                        modifier = Modifier.padding(end = 16.dp)
+                    )
                 }
             )
         }
@@ -195,7 +214,73 @@ fun PantallaInicio(
 
                 items(productosFiltrados) { producto ->
 
-                    ProductoCard(producto)
+                    ProductoCard(
+                        producto = producto,
+                        onFavorito = {
+                            onAgregarFavorito(producto)
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PantallaFavoritos(
+    favoritos: List<Producto>,
+    onMenuClick: () -> Unit
+) {
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text("Favoritos")
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = onMenuClick
+                    ) {
+                        Text("☰")
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+
+        if (favoritos.isEmpty()) {
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                verticalArrangement = Arrangement.Center
+            ) {
+
+                Text(
+                    text = "No tienes productos favoritos.",
+                    modifier = Modifier.padding(24.dp)
+                )
+            }
+
+        } else {
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+
+                items(favoritos) { producto ->
+
+                    ProductoCard(
+                        producto = producto,
+                        onFavorito = {}
+                    )
                 }
             }
         }
