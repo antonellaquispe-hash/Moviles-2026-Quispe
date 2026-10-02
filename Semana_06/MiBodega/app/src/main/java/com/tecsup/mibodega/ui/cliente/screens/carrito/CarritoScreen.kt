@@ -21,12 +21,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ShoppingBasket
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -52,7 +59,10 @@ fun CarritoScreen(
     onEliminar: (Producto) -> Unit,
     onContinuarPedido: () -> Unit
 ) {
-    val subtotal = carrito.sumOf { it.producto.precio * it.cantidad }
+    val subtotal = carrito.sumOf {
+        it.producto.precio * it.cantidad
+    }
+
     val total = subtotal + COSTO_DELIVERY
 
     Column(
@@ -112,6 +122,7 @@ fun CarritoScreen(
                     items = carrito,
                     key = { it.producto.id }
                 ) { item ->
+
                     FilaCarrito(
                         item = item,
                         onIncrementar = {
@@ -180,6 +191,10 @@ private fun FilaCarrito(
     onDecrementar: () -> Unit,
     onEliminar: () -> Unit
 ) {
+    var mostrarDialogo by remember {
+        mutableStateOf(false)
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -236,13 +251,52 @@ private fun FilaCarrito(
         }
 
         IconButton(
-            onClick = onEliminar
+            onClick = {
+                mostrarDialogo = true
+            }
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,
                 contentDescription = "Eliminar producto"
             )
         }
+    }
+
+    if (mostrarDialogo) {
+        AlertDialog(
+            onDismissRequest = {
+                mostrarDialogo = false
+            },
+            title = {
+                Text(
+                    text = "Eliminar producto"
+                )
+            },
+            text = {
+                Text(
+                    text = "¿Estás seguro de que deseas eliminar ${item.producto.nombre} del carrito?"
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        mostrarDialogo = false
+                        onEliminar()
+                    }
+                ) {
+                    Text("Eliminar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        mostrarDialogo = false
+                    }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
     }
 }
 
