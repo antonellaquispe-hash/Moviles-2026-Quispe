@@ -66,10 +66,12 @@ fun TecsupStoreApp() {
             "Inicio" -> {
                 PantallaInicio(
                     favoritos = favoritos,
-                    onAgregarFavorito = { producto ->
+                    onCambiarFavorito = { producto ->
 
-                        if (!favoritos.contains(producto)) {
-                            favoritos = favoritos + producto
+                        favoritos = if (favoritos.contains(producto)) {
+                            favoritos - producto
+                        } else {
+                            favoritos + producto
                         }
                     },
                     onMenuClick = {
@@ -83,6 +85,10 @@ fun TecsupStoreApp() {
             "Favoritos" -> {
                 PantallaFavoritos(
                     favoritos = favoritos,
+                    onCambiarFavorito = { producto ->
+
+                        favoritos = favoritos - producto
+                    },
                     onMenuClick = {
                         scope.launch {
                             drawerState.open()
@@ -120,7 +126,7 @@ fun TecsupStoreApp() {
 @Composable
 fun PantallaInicio(
     favoritos: List<Producto>,
-    onAgregarFavorito: (Producto) -> Unit,
+    onCambiarFavorito: (Producto) -> Unit,
     onMenuClick: () -> Unit
 ) {
 
@@ -217,7 +223,7 @@ fun PantallaInicio(
                     ProductoCard(
                         producto = producto,
                         onFavorito = {
-                            onAgregarFavorito(producto)
+                            onCambiarFavorito(producto)
                         }
                     )
                 }
@@ -230,6 +236,7 @@ fun PantallaInicio(
 @Composable
 fun PantallaFavoritos(
     favoritos: List<Producto>,
+    onCambiarFavorito: (Producto) -> Unit,
     onMenuClick: () -> Unit
 ) {
 
@@ -279,7 +286,9 @@ fun PantallaFavoritos(
 
                     ProductoCard(
                         producto = producto,
-                        onFavorito = {}
+                        onFavorito = {
+                            onCambiarFavorito(producto)
+                        }
                     )
                 }
             }
