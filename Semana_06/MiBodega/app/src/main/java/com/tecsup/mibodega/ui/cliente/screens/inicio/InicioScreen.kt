@@ -30,7 +30,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -82,208 +81,220 @@ fun InicioScreen(
                         ignoreCase = true
                     )
         }
-        .sortedBy {
+        .sortedBy { producto ->
             if (ordenarAscendente) {
-                it.precio
+                producto.precio
             } else {
-                -it.precio
+                -producto.precio
             }
         }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Mi Bodega",
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                actions = {
-
-                    IconButton(
-                        onClick = onVerPerfil
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "Perfil"
-                        )
-                    }
-
-                    IconButton(
-                        onClick = onVerPedidos
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.List,
-                            contentDescription = "Mis pedidos"
-                        )
-                    }
-
-                    IconButton(
-                        onClick = onVerFavoritos
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Favorite,
-                            contentDescription = "Favoritos"
-                        )
-                    }
-
-                    BadgedBox(
-                        badge = {
-                            if (cantidadCarrito > 0) {
-                                Badge {
-                                    Text(
-                                        text = cantidadCarrito.toString()
-                                    )
-                                }
-                            }
-                        }
-                    ) {
-                        IconButton(
-                            onClick = onVerCarrito
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ShoppingCart,
-                                contentDescription = "Carrito"
-                            )
-                        }
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
+    Scaffold { paddingValues ->
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp)
         ) {
-
-            Spacer(
-                modifier = Modifier.height(10.dp)
-            )
-
-            OutlinedTextField(
-                value = textoBusqueda,
-                onValueChange = {
-                    textoBusqueda = it
-                },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = {
-                    Text("Buscar productos...")
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Buscar"
-                    )
-                },
-                singleLine = true
-            )
-
-            Spacer(
-                modifier = Modifier.height(12.dp)
-            )
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .horizontalScroll(
-                        rememberScrollState()
+                    .padding(
+                        start = 16.dp,
+                        end = 8.dp,
+                        top = 8.dp,
+                        bottom = 8.dp
                     ),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-
-                listaCategorias.forEach { categoria ->
-
-                    FilterChip(
-                        selected = categoriaSeleccionada == categoria,
-                        onClick = {
-                            categoriaSeleccionada = categoria
-                        },
-                        label = {
-                            Text(categoria)
-                        }
-                    )
-                }
-            }
-
-            Spacer(
-                modifier = Modifier.height(12.dp)
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
                 Text(
-                    text = "Productos",
+                    text = "Mi Bodega",
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
                 )
 
                 IconButton(
-                    onClick = {
-                        ordenarAscendente = !ordenarAscendente
-                    }
+                    onClick = onVerPerfil
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Sort,
-                        contentDescription = "Ordenar por precio"
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Perfil"
                     )
                 }
 
-                Text(
-                    text = if (ordenarAscendente) {
-                        "Menor precio"
-                    } else {
-                        "Mayor precio"
+                IconButton(
+                    onClick = onVerPedidos
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.List,
+                        contentDescription = "Mis pedidos"
+                    )
+                }
+
+                IconButton(
+                    onClick = onVerFavoritos
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = "Favoritos"
+                    )
+                }
+
+                BadgedBox(
+                    badge = {
+                        if (cantidadCarrito > 0) {
+                            Badge {
+                                Text(
+                                    text = cantidadCarrito.toString()
+                                )
+                            }
+                        }
                     }
-                )
+                ) {
+                    IconButton(
+                        onClick = onVerCarrito
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ShoppingCart,
+                            contentDescription = "Carrito"
+                        )
+                    }
+                }
             }
 
-            Spacer(
-                modifier = Modifier.height(8.dp)
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+            ) {
 
-            if (productosFiltrados.isEmpty()) {
+                Spacer(
+                    modifier = Modifier.height(4.dp)
+                )
 
-                Column(
+                OutlinedTextField(
+                    value = textoBusqueda,
+                    onValueChange = {
+                        textoBusqueda = it
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = {
+                        Text("Buscar productos...")
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Buscar"
+                        )
+                    },
+                    singleLine = true
+                )
+
+                Spacer(
+                    modifier = Modifier.height(12.dp)
+                )
+
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 40.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .horizontalScroll(
+                            rememberScrollState()
+                        ),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+
+                    listaCategorias.forEach { categoria ->
+
+                        FilterChip(
+                            selected = categoriaSeleccionada == categoria,
+                            onClick = {
+                                categoriaSeleccionada = categoria
+                            },
+                            label = {
+                                Text(categoria)
+                            }
+                        )
+                    }
+                }
+
+                Spacer(
+                    modifier = Modifier.height(12.dp)
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
                     Text(
-                        text = "No se encontraron productos."
+                        text = "Productos",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    IconButton(
+                        onClick = {
+                            ordenarAscendente = !ordenarAscendente
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Sort,
+                            contentDescription = "Ordenar por precio"
+                        )
+                    }
+
+                    Text(
+                        text = if (ordenarAscendente) {
+                            "Menor precio"
+                        } else {
+                            "Mayor precio"
+                        }
                     )
                 }
 
-            } else {
+                Spacer(
+                    modifier = Modifier.height(8.dp)
+                )
 
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(
-                        bottom = 20.dp
-                    ),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
+                if (productosFiltrados.isEmpty()) {
 
-                    items(productosFiltrados) { producto ->
-
-                        ProductoInicioCard(
-                            producto = producto,
-                            onClick = {
-                                onProductoClick(producto)
-                            },
-                            onAgregar = {
-                                onAgregarProducto(producto)
-                            }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 40.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "No se encontraron productos."
                         )
+                    }
+
+                } else {
+
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(
+                            bottom = 20.dp
+                        ),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+
+                        items(productosFiltrados) { producto ->
+
+                            ProductoInicioCard(
+                                producto = producto,
+                                onClick = {
+                                    onProductoClick(producto)
+                                },
+                                onAgregar = {
+                                    onAgregarProducto(producto)
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -301,6 +312,7 @@ private fun ProductoInicioCard(
         modifier = Modifier.fillMaxWidth(),
         onClick = onClick
     ) {
+
         Column(
             modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
