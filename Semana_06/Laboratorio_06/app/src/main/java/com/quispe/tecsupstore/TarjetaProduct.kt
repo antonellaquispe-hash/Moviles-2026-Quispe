@@ -27,7 +27,10 @@ data class Producto(
 )
 
 @Composable
-fun ProductoCard(producto: Producto) {
+fun ProductoCard(
+    producto: Producto,
+    onFavorito: () -> Unit
+) {
 
     var expanded by remember {
         mutableStateOf(false)
@@ -72,6 +75,7 @@ fun ProductoCard(producto: Producto) {
                         expanded = true
                     }
                 ) {
+
                     Text(
                         text = "⋮",
                         style = MaterialTheme.typography.headlineMedium
@@ -91,6 +95,7 @@ fun ProductoCard(producto: Producto) {
                         },
                         onClick = {
                             expanded = false
+                            onFavorito()
                         }
                     )
 
