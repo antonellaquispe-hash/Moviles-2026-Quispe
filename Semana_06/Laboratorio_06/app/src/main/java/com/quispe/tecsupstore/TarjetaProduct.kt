@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -61,16 +63,55 @@ fun ProductoCard(producto: Producto) {
                 )
             }
 
-            IconButton(
-                onClick = {
-                    expanded = !expanded
-                }
+            Column(
+                horizontalAlignment = Alignment.End
             ) {
 
-                Text(
-                    text = "⋮",
-                    style = MaterialTheme.typography.headlineMedium
-                )
+                IconButton(
+                    onClick = {
+                        expanded = true
+                    }
+                ) {
+                    Text(
+                        text = "⋮",
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = {
+                        expanded = false
+                    }
+                ) {
+
+                    DropdownMenuItem(
+                        text = {
+                            Text("Favoritos")
+                        },
+                        onClick = {
+                            expanded = false
+                        }
+                    )
+
+                    DropdownMenuItem(
+                        text = {
+                            Text("Compartir")
+                        },
+                        onClick = {
+                            expanded = false
+                        }
+                    )
+
+                    DropdownMenuItem(
+                        text = {
+                            Text("Reportar")
+                        },
+                        onClick = {
+                            expanded = false
+                        }
+                    )
+                }
             }
         }
     }
