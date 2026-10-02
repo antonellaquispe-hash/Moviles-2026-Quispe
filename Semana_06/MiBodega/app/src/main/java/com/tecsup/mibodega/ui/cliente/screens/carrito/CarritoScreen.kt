@@ -21,11 +21,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ShoppingBasket
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,11 +43,6 @@ import com.tecsup.mibodega.ui.theme.VerdeBodega
 
 private const val COSTO_DELIVERY = 4.00
 
-/**
- * Pantalla 5: Mi carrito (mockup "Cliente").
- * No guarda estado propio: el carrito viene de ClienteApp y cualquier
- * cambio (sumar, restar, eliminar) se avisa hacia arriba con callbacks.
- */
 @Composable
 fun CarritoScreen(
     carrito: List<ItemCarrito>,
@@ -65,47 +60,111 @@ fun CarritoScreen(
             .fillMaxSize()
             .safeDrawingPadding()
     ) {
-        EncabezadoCarrito(onVolver = onVolver)
+        EncabezadoCarrito(
+            onVolver = onVolver
+        )
 
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 20.dp),
-            contentPadding = PaddingValues(vertical = 8.dp)
-        ) {
-            items(carrito, key = { it.producto.id }) { item ->
-                FilaCarrito(
-                    item = item,
-                    onIncrementar = { onIncrementar(item.producto) },
-                    onDecrementar = { onDecrementar(item.producto) },
-                    onEliminar = { onEliminar(item.producto) }
-                )
-                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+        if (carrito.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ShoppingBasket,
+                        contentDescription = null,
+                        tint = VerdeBodega,
+                        modifier = Modifier.size(72.dp)
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(16.dp)
+                    )
+
+                    Text(
+                        text = "Tu carrito está vacío",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(8.dp)
+                    )
+
+                    Text(
+                        text = "Agrega productos para realizar tu pedido.",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 20.dp),
+                contentPadding = PaddingValues(vertical = 8.dp)
+            ) {
+                items(
+                    items = carrito,
+                    key = { it.producto.id }
+                ) { item ->
+                    FilaCarrito(
+                        item = item,
+                        onIncrementar = {
+                            onIncrementar(item.producto)
+                        },
+                        onDecrementar = {
+                            onDecrementar(item.producto)
+                        },
+                        onEliminar = {
+                            onEliminar(item.producto)
+                        }
+                    )
+
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
             }
         }
 
-        ResumenYBoton(
-            subtotal = subtotal,
-            delivery = COSTO_DELIVERY,
-            total = total,
-            onContinuarPedido = onContinuarPedido
-        )
+        if (carrito.isNotEmpty()) {
+            ResumenYBoton(
+                subtotal = subtotal,
+                delivery = COSTO_DELIVERY,
+                total = total,
+                onContinuarPedido = onContinuarPedido
+            )
+        }
     }
 }
 
-// Sub-composables PRIVADOS: solo los usa esta pantalla.
-
 @Composable
-private fun EncabezadoCarrito(onVolver: () -> Unit) {
+private fun EncabezadoCarrito(
+    onVolver: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp),
+            .padding(
+                horizontal = 8.dp,
+                vertical = 4.dp
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = onVolver) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+        IconButton(
+            onClick = onVolver
+        ) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Volver"
+            )
         }
+
         Text(
             text = "Mi carrito",
             style = MaterialTheme.typography.titleLarge,
@@ -122,50 +181,66 @@ private fun FilaCarrito(
     onEliminar: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Placeholder de imagen: reemplázalo por Image(painterResource(...))
         Box(
             modifier = Modifier
-                .size(56.dp)
-                .background(GrisClaro, RoundedCornerShape(10.dp)),
+                .size(72.dp)
+                .background(
+                    color = GrisClaro,
+                    shape = RoundedCornerShape(12.dp)
+                ),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.ShoppingBasket,
-                contentDescription = item.producto.nombre,
+                contentDescription = null,
                 tint = VerdeBodega,
-                modifier = Modifier.size(26.dp)
+                modifier = Modifier.size(36.dp)
             )
         }
 
-        Spacer(Modifier.width(12.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = item.producto.nombre,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-            Text(
-                text = "S/ %.2f".format(item.producto.precio),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-
-        SelectorCantidad(
-            cantidad = item.cantidad,
-            onIncrementar = onIncrementar,
-            onDecrementar = onDecrementar
+        Spacer(
+            modifier = Modifier.width(12.dp)
         )
 
-        IconButton(onClick = onEliminar) {
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = item.producto.nombre,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(
+                modifier = Modifier.height(4.dp)
+            )
+
+            Text(
+                text = "S/ %.2f".format(item.producto.precio),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
+
+            SelectorCantidad(
+                cantidad = item.cantidad,
+                onIncrementar = onIncrementar,
+                onDecrementar = onDecrementar
+            )
+        }
+
+        IconButton(
+            onClick = onEliminar
+        ) {
             Icon(
                 imageVector = Icons.Default.Delete,
-                contentDescription = "Eliminar ${item.producto.nombre}",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                contentDescription = "Eliminar producto"
             )
         }
     }
@@ -178,28 +253,47 @@ private fun ResumenYBoton(
     total: Double,
     onContinuarPedido: () -> Unit
 ) {
-    Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
-        FilaResumen(etiqueta = "Subtotal", valor = subtotal)
-        FilaResumen(etiqueta = "Costo de delivery", valor = delivery)
-
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "Total",
-                style = MaterialTheme.typography.titleMedium
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = 20.dp,
+                vertical = 16.dp
             )
-            Text(
-                text = "S/ %.2f".format(total),
-                style = MaterialTheme.typography.titleMedium,
-                color = VerdeBodega
-            )
-        }
+    ) {
+        FilaResumen(
+            etiqueta = "Subtotal",
+            valor = subtotal
+        )
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(
+            modifier = Modifier.height(8.dp)
+        )
+
+        FilaResumen(
+            etiqueta = "Delivery",
+            valor = delivery
+        )
+
+        Spacer(
+            modifier = Modifier.height(8.dp)
+        )
+
+        HorizontalDivider()
+
+        Spacer(
+            modifier = Modifier.height(8.dp)
+        )
+
+        FilaResumen(
+            etiqueta = "Total",
+            valor = total,
+            negrita = true
+        )
+
+        Spacer(
+            modifier = Modifier.height(16.dp)
+        )
 
         BotonPrimario(
             texto = "Continuar pedido",
@@ -209,29 +303,49 @@ private fun ResumenYBoton(
 }
 
 @Composable
-private fun FilaResumen(etiqueta: String, valor: Double) {
+private fun FilaResumen(
+    etiqueta: String,
+    valor: Double,
+    negrita: Boolean = false
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 2.dp),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = etiqueta, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(text = "S/ %.2f".format(valor), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            text = etiqueta,
+            fontWeight = if (negrita) {
+                FontWeight.Bold
+            } else {
+                FontWeight.Normal
+            }
+        )
+
+        Text(
+            text = "S/ %.2f".format(valor),
+            fontWeight = if (negrita) {
+                FontWeight.Bold
+            } else {
+                FontWeight.Normal
+            }
+        )
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(
+    showBackground = true,
+    showSystemUi = true
+)
 @Composable
 private fun CarritoPreview() {
-    val carritoEjemplo = listOf(
-        ItemCarrito(listaProductosFake[4], 1), // Coca-Cola
-        ItemCarrito(listaProductosFake[0], 2), // Arroz Costeño
-        ItemCarrito(listaProductosFake[2], 1)  // Leche Gloria
-    )
     BodegaTheme {
         CarritoScreen(
-            carrito = carritoEjemplo,
+            carrito = listOf(
+                ItemCarrito(
+                    producto = listaProductosFake.first(),
+                    cantidad = 2
+                )
+            ),
             onVolver = {},
             onIncrementar = {},
             onDecrementar = {},
@@ -240,4 +354,3 @@ private fun CarritoPreview() {
         )
     }
 }
-
