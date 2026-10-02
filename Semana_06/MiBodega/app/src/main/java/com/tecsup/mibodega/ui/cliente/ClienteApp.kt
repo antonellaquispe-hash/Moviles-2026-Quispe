@@ -41,6 +41,14 @@ fun ClienteApp() {
         mutableStateOf<List<ItemCarrito>>(emptyList())
     }
 
+    var tipoEntrega by remember {
+        mutableStateOf("Delivery")
+    }
+
+    var costoEntrega by remember {
+        mutableStateOf(4.00)
+    }
+
     NavHost(
         navController = navController,
         startDestination = Rutas.BIENVENIDA
@@ -75,7 +83,9 @@ fun ClienteApp() {
 
         composable(Rutas.INICIO) {
             InicioScreen(
-                cantidadCarrito = carrito.sumOf { it.cantidad },
+                cantidadCarrito = carrito.sumOf {
+                    it.cantidad
+                },
                 onVerCarrito = {
                     navController.navigate(Rutas.CARRITO)
                 },
@@ -117,6 +127,7 @@ fun ClienteApp() {
                     navController.popBackStack()
                 },
                 onAgregarAlCarrito = { productoSeleccionado, cantidad ->
+
                     carrito = agregarOSumarProducto(
                         carrito = carrito,
                         producto = productoSeleccionado,
@@ -135,6 +146,7 @@ fun ClienteApp() {
                     navController.popBackStack()
                 },
                 onIncrementar = { producto ->
+
                     carrito = carrito.map {
                         if (it.producto.id == producto.id) {
                             it.copy(
@@ -146,6 +158,7 @@ fun ClienteApp() {
                     }
                 },
                 onDecrementar = { producto ->
+
                     carrito = carrito.mapNotNull {
                         when {
                             it.producto.id != producto.id -> {
@@ -165,6 +178,7 @@ fun ClienteApp() {
                     }
                 },
                 onEliminar = { producto ->
+
                     carrito = carrito.filterNot {
                         it.producto.id == producto.id
                     }
@@ -180,19 +194,36 @@ fun ClienteApp() {
                 onVolver = {
                     navController.popBackStack()
                 },
-                onContinuar = {
-                    navController.navigate(Rutas.CONFIRMACION)
+                onContinuar = { tipo, costo ->
+
+                    tipoEntrega = tipo
+                    costoEntrega = costo
+
+                    navController.navigate(
+                        Rutas.CONFIRMACION
+                    )
                 }
             )
         }
 
         composable(Rutas.CONFIRMACION) {
             ConfirmacionScreen(
+                carrito = carrito,
+                tipoEntrega = tipoEntrega,
+                costoEntrega = costoEntrega,
                 onVolver = {
                     navController.popBackStack()
                 },
                 onFinalizar = {
-                    navController.navigate(Rutas.INICIO) {
+
+                    carrito = emptyList()
+
+                    tipoEntrega = "Delivery"
+                    costoEntrega = 4.00
+
+                    navController.navigate(
+                        Rutas.INICIO
+                    ) {
                         popUpTo(Rutas.INICIO) {
                             inclusive = true
                         }
@@ -209,12 +240,11 @@ private fun agregarOSumarProducto(
     cantidad: Int
 ): List<ItemCarrito> {
 
-    val itemExistente =
-        carrito.find {
-            it.producto.id == producto.id
-        }
+    val existe = carrito.any {
+        it.producto.id == producto.id
+    }
 
-    return if (itemExistente != null) {
+    return if (existe) {
 
         carrito.map {
             if (it.producto.id == producto.id) {
