@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.tecsup.mibodega.ui.cliente.modelo.ItemCarrito
+import com.tecsup.mibodega.ui.cliente.modelo.Pedido
 import com.tecsup.mibodega.ui.cliente.modelo.Producto
 import com.tecsup.mibodega.ui.cliente.modelo.listaProductosFake
 import com.tecsup.mibodega.ui.cliente.screens.bienvenida.BienvenidaScreen
@@ -18,13 +19,19 @@ import com.tecsup.mibodega.ui.cliente.screens.carrito.CarritoScreen
 import com.tecsup.mibodega.ui.cliente.screens.confirmacion.ConfirmacionScreen
 import com.tecsup.mibodega.ui.cliente.screens.detalle.DetalleProductoScreen
 import com.tecsup.mibodega.ui.cliente.screens.entrega.DatosEntregaScreen
+import com.tecsup.mibodega.ui.cliente.screens.favoritos.FavoritosScreen
 import com.tecsup.mibodega.ui.cliente.screens.inicio.InicioScreen
+import com.tecsup.mibodega.ui.cliente.screens.login.LoginScreen
+import com.tecsup.mibodega.ui.cliente.screens.pedidos.PedidosScreen
 import com.tecsup.mibodega.ui.cliente.screens.registro.RegistroScreen
 
 private object Rutas {
     const val BIENVENIDA = "bienvenida"
+    const val LOGIN = "login"
     const val REGISTRO = "registro"
     const val INICIO = "inicio"
+    const val FAVORITOS = "favoritos"
+    const val PEDIDOS = "pedidos"
     const val DETALLE = "detalle/{productoId}"
     const val CARRITO = "carrito"
     const val ENTREGA = "entrega"
@@ -39,6 +46,14 @@ fun ClienteApp() {
 
     var carrito by remember {
         mutableStateOf<List<ItemCarrito>>(emptyList())
+    }
+
+    var favoritos by remember {
+        mutableStateOf<List<Producto>>(emptyList())
+    }
+
+    var pedidos by remember {
+        mutableStateOf<List<Pedido>>(emptyList())
     }
 
     var tipoEntrega by remember {
@@ -60,8 +75,24 @@ fun ClienteApp() {
                     navController.navigate(Rutas.REGISTRO)
                 },
                 onIniciarSesion = {
+                    navController.navigate(Rutas.LOGIN)
                 },
                 onTerminos = {
+                }
+            )
+        }
+
+        composable(Rutas.LOGIN) {
+            LoginScreen(
+                onVolver = {
+                    navController.popBackStack()
+                },
+                onIngresar = {
+                    navController.navigate(Rutas.INICIO) {
+                        popUpTo(Rutas.BIENVENIDA) {
+                            inclusive = true
+                        }
+                    }
                 }
             )
         }
@@ -89,6 +120,12 @@ fun ClienteApp() {
                 onVerCarrito = {
                     navController.navigate(Rutas.CARRITO)
                 },
+                onVerFavoritos = {
+                    navController.navigate(Rutas.FAVORITOS)
+                },
+                onVerPedidos = {
+                    navController.navigate(Rutas.PEDIDOS)
+                },
                 onProductoClick = { producto ->
                     navController.navigate(
                         Rutas.detalle(producto.id)
@@ -100,6 +137,41 @@ fun ClienteApp() {
                         producto = producto,
                         cantidad = 1
                     )
+                }
+            )
+        }
+
+        composable(Rutas.FAVORITOS) {
+            FavoritosScreen(
+                favoritos = favoritos,
+                onVolver = {
+                    navController.popBackStack()
+                },
+                onEliminarFavorito = { producto ->
+                    favoritos = favoritos.filterNot {
+                        it.id == producto.id
+                    }
+                },
+                onAgregarCarrito = { producto ->
+                    carrito = agregarOSumarProducto(
+                        carrito = carrito,
+                        producto = producto,
+                        cantidad = 1
+                    )
+                },
+                onProductoClick = { producto ->
+                    navController.navigate(
+                        Rutas.detalle(producto.id)
+                    )
+                }
+            )
+        }
+
+        composable(Rutas.PEDIDOS) {
+            PedidosScreen(
+                pedidos = pedidos,
+                onVolver = {
+                    navController.popBackStack()
                 }
             )
         }
@@ -123,6 +195,23 @@ fun ClienteApp() {
 
             DetalleProductoScreen(
                 producto = producto,
+                esFavorito = favoritos.any {
+                    it.id == producto.id
+                },
+                onCambiarFavorito = { productoSeleccionado ->
+
+                    favoritos = if (
+                        favoritos.any {
+                            it.id == productoSeleccionado.id
+                        }
+                    ) {
+                        favoritos.filterNot {
+                            it.id == productoSeleccionado.id
+                        }
+                    } else {
+                        favoritos + productoSeleccionado
+                    }
+                },
                 onVolver = {
                     navController.popBackStack()
                 },
@@ -215,6 +304,22 @@ fun ClienteApp() {
                     navController.popBackStack()
                 },
                 onFinalizar = {
+
+                    val subtotal = carrito.sumOf {
+                        it.producto.precio * it.cantidad
+                    }
+
+                    val total = subtotal + costoEntrega
+
+                    val nuevoPedido = Pedido(
+                        id = pedidos.size + 1,
+                        productos = carrito,
+                        tipoEntrega = tipoEntrega,
+                        costoEntrega = costoEntrega,
+                        total = total
+                    )
+
+                    pedidos = pedidos + nuevoPedido
 
                     carrito = emptyList()
 
