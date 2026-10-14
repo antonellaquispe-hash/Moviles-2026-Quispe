@@ -18,7 +18,7 @@ interface PedidoDao {
     suspend fun insertarPedido(pedido: Pedido): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertarDetalles(detalles: List<DetallePedido>)
+    suspend fun insertarDetalles(detalles: List<DetallePedido>): List<Long>
 
     @Transaction
     suspend fun crearPedido(
@@ -49,7 +49,7 @@ interface PedidoDao {
     fun observarUno(id: Int): Flow<PedidoConDetalle?>
 
     @Query("UPDATE pedidos SET estado = :estado WHERE id = :id")
-    suspend fun cambiarEstado(id: Int, estado: String)
+    suspend fun cambiarEstado(id: Int, estado: String): Int
 
     @Query("SELECT COUNT(*) FROM pedidos WHERE estado = :estado")
     fun contarPorEstado(estado: String): Flow<Int>
