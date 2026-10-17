@@ -350,6 +350,7 @@ fun NavCafe(
             val pedido by pedidoFlow.collectAsState(initial = null)
 
             if (pedido != null) {
+
                 DetallePedidoAdminScreen(
                     pedido = pedido!!,
                     onCambiarEstado = { estado ->
@@ -358,10 +359,14 @@ fun NavCafe(
                             estado
                         )
                     },
+                    onCancelar = {
+                        pedidosAdminViewModel.cancelar(pedidoId)
+                    },
                     onVolver = {
                         navController.popBackStack()
                     }
                 )
+
             } else {
                 PantallaMensaje(
                     titulo = "Detalle del pedido",
