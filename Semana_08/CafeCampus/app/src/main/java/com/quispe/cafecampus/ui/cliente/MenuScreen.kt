@@ -13,11 +13,11 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,11 +34,14 @@ fun MenuScreen(
     vm: MenuViewModel,
     nombreUsuario: String,
     onProducto: (Int) -> Unit,
-    onCerrarSesion: () -> Unit
+    onCerrarSesion: () -> Unit,
+    onVerCarrito: () -> Unit = {},
+    onVerMisPedidos: () -> Unit = {}
 ) {
     val productos by vm.productos.collectAsState()
     val carrito by vm.carrito.collectAsState()
     val cantidad = carrito.sumOf { it.cantidad }
+    val total = carrito.sumOf { it.subtotal }
 
     Scaffold(
         topBar = {
@@ -82,7 +85,7 @@ fun MenuScreen(
                 ) {
                     Column {
                         Text(
-                            "Tu cafetería del campus",
+                            text = "Tu cafetería del campus",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -93,6 +96,50 @@ fun MenuScreen(
                         text = "🛒 $cantidad",
                         style = MaterialTheme.typography.titleLarge
                     )
+                }
+            }
+
+            Button(
+                onClick = onVerMisPedidos,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Mis pedidos")
+            }
+
+            if (carrito.isNotEmpty()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "Tu carrito",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text("$cantidad producto(s)")
+                            Text(
+                                text = "S/ ${"%.2f".format(total)}",
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        Button(
+                            onClick = onVerCarrito,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Ver carrito y confirmar")
+                        }
+                    }
                 }
             }
 
@@ -110,7 +157,9 @@ fun MenuScreen(
             } else {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 155.dp),
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f),
                     contentPadding = PaddingValues(bottom = 24.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -121,7 +170,9 @@ fun MenuScreen(
                     ) { producto ->
                         com.quispe.cafecampus.ui.components.ProductoCard(
                             producto = producto,
-                            onClick = { onProducto(producto.id) }
+                            onClick = {
+                                onProducto(producto.id)
+                            }
                         )
                     }
                 }

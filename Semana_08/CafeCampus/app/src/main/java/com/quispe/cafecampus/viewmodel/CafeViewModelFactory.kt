@@ -11,13 +11,19 @@ class CafeViewModelFactory(
     override fun <T : ViewModel> create(
         modelClass: Class<T>
     ): T {
-        if (modelClass.isAssignableFrom(MenuViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return MenuViewModel(repository) as T
-        }
+        @Suppress("UNCHECKED_CAST")
+        return when {
+            modelClass.isAssignableFrom(MenuViewModel::class.java) -> {
+                MenuViewModel(repository) as T
+            }
 
-        throw IllegalArgumentException(
-            "ViewModel desconocido: ${modelClass.name}"
-        )
+            modelClass.isAssignableFrom(PedidosClienteViewModel::class.java) -> {
+                PedidosClienteViewModel(repository) as T
+            }
+
+            else -> throw IllegalArgumentException(
+                "ViewModel desconocido: ${modelClass.name}"
+            )
+        }
     }
 }
