@@ -68,7 +68,8 @@ class MainActivity : ComponentActivity() {
                 )
 
                 NavCafe(
-                    sesionViewModel = sesionViewModel
+                    sesionViewModel = sesionViewModel,
+                    repository = repository
                 )
             }
         }
