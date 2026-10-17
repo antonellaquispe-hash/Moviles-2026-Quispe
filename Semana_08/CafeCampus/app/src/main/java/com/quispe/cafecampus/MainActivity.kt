@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -23,50 +25,56 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            CafeCampusTheme {
-                val database = remember {
-                    CafeDatabase.obtenerInstancia(applicationContext)
-                }
+            val database = remember {
+                CafeDatabase.obtenerInstancia(applicationContext)
+            }
 
-                val repository = remember {
-                    CafeRepositoryRoom(
-                        usuarioDao = database.usuarioDao(),
-                        productoDao = database.productoDao(),
-                        pedidoDao = database.pedidoDao()
-                    )
-                }
+            val repository = remember {
+                CafeRepositoryRoom(
+                    usuarioDao = database.usuarioDao(),
+                    productoDao = database.productoDao(),
+                    pedidoDao = database.pedidoDao()
+                )
+            }
 
-                val preferenciasStore = remember {
-                    PreferenciasStore(applicationContext)
-                }
+            val preferenciasStore = remember {
+                PreferenciasStore(applicationContext)
+            }
 
-                val factory = remember {
-                    object : ViewModelProvider.Factory {
-                        override fun <T : ViewModel> create(
-                            modelClass: Class<T>
-                        ): T {
-                            if (modelClass.isAssignableFrom(
-                                    SesionViewModel::class.java
-                                )
-                            ) {
-                                @Suppress("UNCHECKED_CAST")
-                                return SesionViewModel(
-                                    repository,
-                                    preferenciasStore
-                                ) as T
-                            }
-
-                            throw IllegalArgumentException(
-                                "ViewModel desconocido: ${modelClass.name}"
+            val factory = remember {
+                object : ViewModelProvider.Factory {
+                    override fun <T : ViewModel> create(
+                        modelClass: Class<T>
+                    ): T {
+                        if (
+                            modelClass.isAssignableFrom(
+                                SesionViewModel::class.java
                             )
+                        ) {
+                            @Suppress("UNCHECKED_CAST")
+                            return SesionViewModel(
+                                repository,
+                                preferenciasStore
+                            ) as T
                         }
+
+                        throw IllegalArgumentException(
+                            "ViewModel desconocido: ${modelClass.name}"
+                        )
                     }
                 }
+            }
 
-                val sesionViewModel: SesionViewModel = viewModel(
-                    factory = factory
-                )
+            val sesionViewModel: SesionViewModel = viewModel(
+                factory = factory
+            )
 
+            val modoOscuro by sesionViewModel.modoOscuro.collectAsState()
+
+            CafeCampusTheme(
+                darkTheme = modoOscuro,
+                dynamicColor = false
+            ) {
                 NavCafe(
                     sesionViewModel = sesionViewModel,
                     repository = repository,

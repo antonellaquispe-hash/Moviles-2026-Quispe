@@ -3,15 +3,15 @@ package com.quispe.cafecampus.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.quispe.cafecampus.data.local.entity.Usuario
 import com.quispe.cafecampus.data.prefs.PreferenciasStore
 import com.quispe.cafecampus.data.repository.CafeRepository
-import com.quispe.cafecampus.data.local.entity.Usuario
 import com.quispe.cafecampus.model.Rol
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
 
 class SesionViewModel(
@@ -28,9 +28,28 @@ class SesionViewModel(
     val modoOscuro: StateFlow<Boolean> = preferenciasStore.modoOscuro
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.Eagerly,
             initialValue = false
         )
+
+    val recibirPedidos: StateFlow<Boolean> = preferenciasStore.recibirPedidos
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = true
+        )
+
+    fun cambiarModoOscuro(activado: Boolean) {
+        viewModelScope.launch {
+            preferenciasStore.guardarModoOscuro(activado)
+        }
+    }
+
+    fun cambiarRecepcionPedidos(activado: Boolean) {
+        viewModelScope.launch {
+            preferenciasStore.guardarRecibirPedidos(activado)
+        }
+    }
 
     fun login(correo: String, clave: String, rolSeleccionado: Rol) {
         viewModelScope.launch {
@@ -50,14 +69,16 @@ class SesionViewModel(
                 }
 
                 if (usuario.rol != rolSeleccionado.name) {
-                    _error.value = "El rol seleccionado no corresponde a este usuario."
+                    _error.value =
+                        "El rol seleccionado no corresponde a este usuario."
                     return@launch
                 }
 
                 preferenciasStore.guardarPerfil(rolSeleccionado)
                 _usuarioActual.value = usuario
             } catch (e: Exception) {
-                _error.value = "No se pudo iniciar sesión. Inténtalo nuevamente."
+                _error.value =
+                    "No se pudo iniciar sesión. Inténtalo nuevamente."
             }
         }
     }

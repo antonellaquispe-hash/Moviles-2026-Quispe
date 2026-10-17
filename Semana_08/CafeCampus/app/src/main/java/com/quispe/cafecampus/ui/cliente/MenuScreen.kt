@@ -1,3 +1,4 @@
+
 package com.quispe.cafecampus.ui.cliente
 
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +34,7 @@ import com.quispe.cafecampus.viewmodel.MenuViewModel
 fun MenuScreen(
     vm: MenuViewModel,
     nombreUsuario: String,
+    recibirPedidos: Boolean,
     onProducto: (Int) -> Unit,
     onCerrarSesion: () -> Unit,
     onVerCarrito: () -> Unit = {},
@@ -99,6 +101,34 @@ fun MenuScreen(
                 }
             }
 
+            if (!recibirPedidos) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = "Cafetería cerrada",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+
+                        Text(
+                            text = "Por el momento no aceptamos pedidos. Puedes consultar el menú y revisar tus pedidos anteriores.",
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                    }
+                }
+            }
+
             Button(
                 onClick = onVerMisPedidos,
                 modifier = Modifier.fillMaxWidth()
@@ -135,9 +165,16 @@ fun MenuScreen(
 
                         Button(
                             onClick = onVerCarrito,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = recibirPedidos
                         ) {
-                            Text("Ver carrito y confirmar")
+                            Text(
+                                if (recibirPedidos) {
+                                    "Ver carrito y confirmar"
+                                } else {
+                                    "Pedidos temporalmente cerrados"
+                                }
+                            )
                         }
                     }
                 }

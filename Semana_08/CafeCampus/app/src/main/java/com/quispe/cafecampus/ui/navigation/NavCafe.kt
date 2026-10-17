@@ -1,3 +1,4 @@
+
 package com.quispe.cafecampus.ui.navigation
 
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +24,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.quispe.cafecampus.data.prefs.PreferenciasStore
 import com.quispe.cafecampus.data.repository.CafeRepository
-import com.quispe.cafecampus.model.EstadoPedido
 import com.quispe.cafecampus.model.Rol
 import com.quispe.cafecampus.ui.admin.AjustesScreen
 import com.quispe.cafecampus.ui.admin.DetallePedidoAdminScreen
@@ -50,7 +50,11 @@ fun NavCafe(
     preferenciasStore: PreferenciasStore
 ) {
     val navController = rememberNavController()
+
     val usuario by sesionViewModel.usuarioActual.collectAsState()
+    val recibirPedidos by sesionViewModel.recibirPedidos.collectAsState()
+    val modoOscuro by sesionViewModel.modoOscuro.collectAsState()
+
     val factory = CafeViewModelFactory(repository, preferenciasStore)
 
     val menuViewModel: MenuViewModel = viewModel(factory = factory)
@@ -67,6 +71,7 @@ fun NavCafe(
 
     LaunchedEffect(pedidoCreado) {
         val id = pedidoCreado
+
         if (id != null && id > 0L) {
             menuViewModel.vaciar()
             pedidosViewModel.limpiarPedidoCreado()
@@ -89,7 +94,9 @@ fun NavCafe(
                     }
 
                     navController.navigate(destino) {
-                        popUpTo(RutasCafe.LOGIN) { inclusive = true }
+                        popUpTo(RutasCafe.LOGIN) {
+                            inclusive = true
+                        }
                         launchSingleTop = true
                     }
                 }
@@ -100,15 +107,22 @@ fun NavCafe(
             MenuScreen(
                 vm = menuViewModel,
                 nombreUsuario = usuario?.nombre.orEmpty(),
+                recibirPedidos = recibirPedidos,
                 onProducto = { productoId ->
-                    navController.navigate(RutasCafe.detalleProducto(productoId))
+                    navController.navigate(
+                        RutasCafe.detalleProducto(productoId)
+                    )
                 },
                 onCerrarSesion = {
                     menuViewModel.vaciar()
                     pedidosViewModel.limpiarError()
                     sesionViewModel.cerrarSesion()
+
                     navController.navigate(RutasCafe.LOGIN) {
-                        popUpTo(RutasCafe.MENU) { inclusive = true }
+                        popUpTo(RutasCafe.MENU) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
                     }
                 },
                 onVerCarrito = {
@@ -122,26 +136,36 @@ fun NavCafe(
 
         composable(
             route = RutasCafe.DETALLE,
-            arguments = listOf(navArgument("productoId") {
-                type = NavType.IntType
-            })
+            arguments = listOf(
+                navArgument("productoId") {
+                    type = NavType.IntType
+                }
+            )
         ) { backStackEntry ->
             val productoId = backStackEntry.arguments?.getInt("productoId")
-            val producto = productos.firstOrNull { it.id == productoId }
+            val producto = productos.firstOrNull {
+                it.id == productoId
+            }
 
             if (producto != null) {
                 DetalleProductoScreen(
                     producto = producto,
                     vm = menuViewModel,
-                    onVolver = { navController.popBackStack() },
-                    onAgregado = { navController.popBackStack() }
+                    onVolver = {
+                        navController.popBackStack()
+                    },
+                    onAgregado = {
+                        navController.popBackStack()
+                    }
                 )
             } else {
                 PantallaMensaje(
                     titulo = "Producto no encontrado",
                     mensaje = "No se encontró el producto solicitado.",
                     textoBoton = "Volver al menú",
-                    onClick = { navController.popBackStack() }
+                    onClick = {
+                        navController.popBackStack()
+                    }
                 )
             }
         }
@@ -151,15 +175,19 @@ fun NavCafe(
                 items = carrito,
                 cargando = cargando,
                 error = error,
+                recibirPedidos = recibirPedidos,
                 onConfirmar = { horaRecojo, pago, nota ->
                     val clienteId = usuario?.id ?: 0
-                    pedidosViewModel.confirmarPedido(
-                        clienteId = clienteId,
-                        items = carrito,
-                        horaRecojo = horaRecojo,
-                        pago = pago,
-                        nota = nota
-                    )
+
+                    if (recibirPedidos) {
+                        pedidosViewModel.confirmarPedido(
+                            clienteId = clienteId,
+                            items = carrito,
+                            horaRecojo = horaRecojo,
+                            pago = pago,
+                            nota = nota
+                        )
+                    }
                 },
                 onVolver = {
                     pedidosViewModel.limpiarError()
@@ -170,9 +198,11 @@ fun NavCafe(
 
         composable(
             route = RutasCafe.SEGUIMIENTO,
-            arguments = listOf(navArgument("pedidoId") {
-                type = NavType.IntType
-            })
+            arguments = listOf(
+                navArgument("pedidoId") {
+                    type = NavType.IntType
+                }
+            )
         ) { backStackEntry ->
             val pedidoId = backStackEntry.arguments?.getInt("pedidoId") ?: 0
 
@@ -197,21 +227,27 @@ fun NavCafe(
                         text = "Pedido registrado",
                         style = MaterialTheme.typography.headlineSmall
                     )
+
                     Text("Número de pedido: $pedidoId")
+
                     Text(
                         text = "Estado: ${pedido?.pedido?.estado ?: "Consultando..."}",
                         style = MaterialTheme.typography.titleMedium
                     )
+
                     Button(
                         onClick = {
                             navController.navigate(RutasCafe.MENU) {
-                                popUpTo(RutasCafe.MENU) { inclusive = true }
+                                popUpTo(RutasCafe.MENU) {
+                                    inclusive = true
+                                }
                                 launchSingleTop = true
                             }
                         }
                     ) {
                         Text("Volver al menú")
                     }
+
                     Button(
                         onClick = {
                             navController.navigate(RutasCafe.MIS_PEDIDOS)
@@ -238,9 +274,13 @@ fun NavCafe(
                 pedidos = misPedidos,
                 cargando = cargando,
                 onVerPedido = { pedidoId ->
-                    navController.navigate(RutasCafe.seguimientoPedido(pedidoId))
+                    navController.navigate(
+                        RutasCafe.seguimientoPedido(pedidoId)
+                    )
                 },
-                onVolver = { navController.popBackStack() }
+                onVolver = {
+                    navController.popBackStack()
+                }
             )
         }
 
@@ -259,8 +299,11 @@ fun NavCafe(
                 },
                 onCerrarSesion = {
                     sesionViewModel.cerrarSesion()
+
                     navController.navigate(RutasCafe.LOGIN) {
-                        popUpTo(RutasCafe.ADMIN) { inclusive = true }
+                        popUpTo(RutasCafe.ADMIN) {
+                            inclusive = true
+                        }
                         launchSingleTop = true
                     }
                 }
@@ -270,7 +313,9 @@ fun NavCafe(
         composable(RutasCafe.ADMIN_MENU) {
             MenuAdminScreen(
                 viewModel = menuAdminViewModel,
-                onVolver = { navController.popBackStack() }
+                onVolver = {
+                    navController.popBackStack()
+                }
             )
         }
 
@@ -278,38 +323,53 @@ fun NavCafe(
             PedidosAdminScreen(
                 viewModel = pedidosAdminViewModel,
                 onVerDetalle = { pedidoId ->
-                    navController.navigate(RutasCafe.detallePedidoAdmin(pedidoId))
+                    navController.navigate(
+                        RutasCafe.detallePedidoAdmin(pedidoId)
+                    )
                 },
-                onVolver = { navController.popBackStack() }
+                onVolver = {
+                    navController.popBackStack()
+                }
             )
         }
 
         composable(
             route = RutasCafe.ADMIN_DETALLE_PEDIDO,
-            arguments = listOf(navArgument("pedidoId") {
-                type = NavType.IntType
-            })
+            arguments = listOf(
+                navArgument("pedidoId") {
+                    type = NavType.IntType
+                }
+            )
         ) { backStackEntry ->
             val pedidoId = backStackEntry.arguments?.getInt("pedidoId") ?: 0
+
             val pedidoFlow = androidx.compose.runtime.remember(pedidoId) {
                 repository.observarPedido(pedidoId)
             }
+
             val pedido by pedidoFlow.collectAsState(initial = null)
 
             if (pedido != null) {
                 DetallePedidoAdminScreen(
                     pedido = pedido!!,
                     onCambiarEstado = { estado ->
-                        pedidosAdminViewModel.cambiarEstado(pedidoId, estado)
+                        pedidosAdminViewModel.cambiarEstado(
+                            pedidoId,
+                            estado
+                        )
                     },
-                    onVolver = { navController.popBackStack() }
+                    onVolver = {
+                        navController.popBackStack()
+                    }
                 )
             } else {
                 PantallaMensaje(
                     titulo = "Detalle del pedido",
                     mensaje = "Cargando pedido o el pedido ya no existe.",
                     textoBoton = "Volver a pedidos",
-                    onClick = { navController.popBackStack() }
+                    onClick = {
+                        navController.popBackStack()
+                    }
                 )
             }
         }
@@ -317,11 +377,20 @@ fun NavCafe(
         composable(RutasCafe.ADMIN_AJUSTES) {
             AjustesScreen(
                 nombreAdmin = usuario?.nombre.orEmpty(),
-                onVolver = { navController.popBackStack() },
+                modoOscuro = modoOscuro,
+                recibirPedidos = recibirPedidos,
+                onModoOscuroChange = sesionViewModel::cambiarModoOscuro,
+                onRecibirPedidosChange = sesionViewModel::cambiarRecepcionPedidos,
+                onVolver = {
+                    navController.popBackStack()
+                },
                 onCerrarSesion = {
                     sesionViewModel.cerrarSesion()
+
                     navController.navigate(RutasCafe.LOGIN) {
-                        popUpTo(RutasCafe.ADMIN) { inclusive = true }
+                        popUpTo(RutasCafe.ADMIN) {
+                            inclusive = true
+                        }
                         launchSingleTop = true
                     }
                 }
@@ -352,10 +421,12 @@ private fun PantallaMensaje(
                 text = titulo,
                 style = MaterialTheme.typography.headlineSmall
             )
+
             Text(
                 text = mensaje,
                 modifier = Modifier.padding(vertical = 12.dp)
             )
+
             Button(onClick = onClick) {
                 Text(textoBoton)
             }

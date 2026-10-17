@@ -1,3 +1,4 @@
+
 package com.quispe.cafecampus.ui.cliente
 
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +39,7 @@ fun ConfirmarPedidoScreen(
     items: List<ItemCarrito>,
     cargando: Boolean,
     error: String?,
+    recibirPedidos: Boolean,
     onConfirmar: (String, String, String) -> Unit,
     onVolver: () -> Unit
 ) {
@@ -83,6 +85,21 @@ fun ConfirmarPedidoScreen(
                 fontWeight = FontWeight.Bold
             )
 
+            if (!recibirPedidos) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
+                ) {
+                    Text(
+                        text = "Cafetería cerrada: no es posible confirmar pedidos en este momento.",
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+            }
+
             if (items.isEmpty()) {
                 Card(
                     modifier = Modifier.fillMaxWidth()
@@ -122,7 +139,11 @@ fun ConfirmarPedidoScreen(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    Text("${item.cantidad} x S/ ${"%.2f".format(item.producto.precio)}")
+                                    Text(
+                                        "${item.cantidad} x S/ ${
+                                            "%.2f".format(item.producto.precio)
+                                        }"
+                                    )
                                     Text(
                                         text = "S/ ${"%.2f".format(item.subtotal)}",
                                         fontWeight = FontWeight.Bold
@@ -176,10 +197,10 @@ fun ConfirmarPedidoScreen(
                 OutlinedButton(
                     onClick = { mostrarHoras = true },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = !cargando
+                    enabled = !cargando && recibirPedidos
                 ) {
                     Text(
-                        text = if (horaRecojo.isBlank()) {
+                        if (horaRecojo.isBlank()) {
                             "Seleccionar hora"
                         } else {
                             horaRecojo
@@ -213,10 +234,10 @@ fun ConfirmarPedidoScreen(
                 OutlinedButton(
                     onClick = { mostrarPagos = true },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = !cargando
+                    enabled = !cargando && recibirPedidos
                 ) {
                     Text(
-                        text = if (pago.isBlank()) {
+                        if (pago.isBlank()) {
                             "Seleccionar método de pago"
                         } else {
                             pago
@@ -265,7 +286,8 @@ fun ConfirmarPedidoScreen(
                     onConfirmar(horaRecojo, pago, nota)
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = items.isNotEmpty() &&
+                enabled = recibirPedidos &&
+                        items.isNotEmpty() &&
                         horaRecojo.isNotBlank() &&
                         pago.isNotBlank() &&
                         !cargando
