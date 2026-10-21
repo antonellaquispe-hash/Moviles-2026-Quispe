@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import com.quispe.cafecampus.data.local.relation.PedidoConDetalle
 import com.quispe.cafecampus.model.EstadoPedido
 import com.quispe.cafecampus.ui.components.CafeBottomBar
+import com.quispe.cafecampus.ui.components.EstadoVacio
 import com.quispe.cafecampus.ui.components.PedidoCard
 import com.quispe.cafecampus.ui.navigation.ITEMS_CLIENTE
 import com.quispe.cafecampus.ui.navigation.RutasCafe
@@ -47,6 +48,7 @@ fun MisPedidosScreen(
     pedidos: List<PedidoConDetalle>,
     cargando: Boolean,
     onVerPedido: (Int) -> Unit,
+    onRepetir: (PedidoConDetalle) -> Unit = {},
     onVolver: () -> Unit,
     onNavegar: (String) -> Unit = {}
 ) {
@@ -180,24 +182,15 @@ fun MisPedidosScreen(
                             .padding(24.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = if (pestaña == 0) {
-                                    "Todavía no tienes pedidos activos"
-                                } else {
-                                    "Aún no tienes historial de pedidos"
-                                },
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-
-                            Text(
-                                text = "Cuando realices una compra, aparecerá aquí.",
-                                modifier = Modifier.padding(top = 8.dp),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+                        EstadoVacio(
+                            ilustracion = if (pestaña == 0) "🧾" else "📦",
+                            titulo = if (pestaña == 0) {
+                                "Todavía no tienes pedidos activos"
+                            } else {
+                                "Aún no tienes historial de pedidos"
+                            },
+                            mensaje = "Cuando realices una compra, aparecerá aquí."
+                        )
                     }
                 }
 
@@ -217,7 +210,13 @@ fun MisPedidosScreen(
                         ) { pedido ->
                             PedidoCard(
                                 pedido = pedido,
-                                onClick = { onVerPedido(pedido.pedido.id) }
+                                modifier = Modifier.animateItem(),
+                                onClick = { onVerPedido(pedido.pedido.id) },
+                                onRepetir = if (pestaña == 1) {
+                                    { onRepetir(pedido) }
+                                } else {
+                                    null
+                                }
                             )
                         }
                     }
