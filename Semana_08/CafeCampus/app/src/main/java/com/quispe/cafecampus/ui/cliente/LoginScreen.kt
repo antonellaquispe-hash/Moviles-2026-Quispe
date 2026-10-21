@@ -47,7 +47,8 @@ import com.quispe.cafecampus.viewmodel.SesionViewModel
 @Composable
 fun LoginScreen(
     viewModel: SesionViewModel,
-    onLoginExitoso: (Rol) -> Unit
+    onLoginExitoso: (Rol) -> Unit,
+    onIrARegistro: () -> Unit = {}
 ) {
     var correo by remember { mutableStateOf("") }
     var clave by remember { mutableStateOf("") }
@@ -196,7 +197,7 @@ fun LoginScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            TextButton(onClick = { }) {
+            TextButton(onClick = onIrARegistro) {
                 Text(
                     text = "Regístrate",
                     color = MaterialTheme.colorScheme.primary
