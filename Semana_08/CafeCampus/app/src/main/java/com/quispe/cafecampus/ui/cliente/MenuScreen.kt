@@ -1,6 +1,11 @@
 
 package com.quispe.cafecampus.ui.cliente
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +24,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Restaurant
@@ -52,6 +58,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.quispe.cafecampus.data.local.entity.Producto
 import com.quispe.cafecampus.ui.components.CafeBottomBar
+import com.quispe.cafecampus.ui.components.EstadoVacio
 import com.quispe.cafecampus.ui.components.ProductoCard
 import com.quispe.cafecampus.ui.navigation.ITEMS_CLIENTE
 import com.quispe.cafecampus.ui.navigation.RutasCafe
@@ -70,29 +77,13 @@ fun MenuScreen(
     onNavegar: (String) -> Unit = {}
 ) {
     val productos by vm.productos.collectAsState()
+    val productosFiltrados by vm.productosFiltrados.collectAsState()
+    val categorias by vm.categorias.collectAsState()
+    val busqueda by vm.busqueda.collectAsState()
+    val categoria by vm.categoriaSeleccionada.collectAsState()
     val carrito by vm.carrito.collectAsState()
     val cantidad = carrito.sumOf { it.cantidad }
     val total = carrito.sumOf { it.subtotal }
-
-    var busqueda by remember { mutableStateOf("") }
-    var categoria by remember { mutableStateOf("Todos") }
-
-    val categorias = remember(productos) {
-        listOf("Todos") + productos.map { it.categoria }.distinct()
-    }
-
-    val productosFiltrados = remember(productos, busqueda, categoria) {
-        productos.filter { producto ->
-            val coincideCategoria = categoria == "Todos" ||
-                producto.categoria == categoria
-
-            val coincideBusqueda = busqueda.isBlank() ||
-                producto.nombre.contains(busqueda, ignoreCase = true) ||
-                producto.descripcion.contains(busqueda, ignoreCase = true)
-
-            coincideCategoria && coincideBusqueda
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -149,7 +140,7 @@ fun MenuScreen(
         ) {
             OutlinedTextField(
                 value = busqueda,
-                onValueChange = { busqueda = it },
+                onValueChange = { vm.actualizarBusqueda(it) },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("Buscar en el menú...") },
                 leadingIcon = {
@@ -157,6 +148,16 @@ fun MenuScreen(
                         imageVector = Icons.Filled.Search,
                         contentDescription = null
                     )
+                },
+                trailingIcon = {
+                    if (busqueda.isNotBlank()) {
+                        IconButton(onClick = { vm.limpiarBusqueda() }) {
+                            Icon(
+                                imageVector = Icons.Filled.Close,
+                                contentDescription = "Limpiar busqueda"
+                            )
+                        }
+                    }
                 },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
@@ -166,18 +167,24 @@ fun MenuScreen(
             )
 
             if (!recibirPedidos) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
-                    )
+                AnimatedVisibility(
+                    visible = !recibirPedidos,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
                 ) {
-                    Text(
-                        text = "Cafetería cerrada. Por el momento no aceptamos pedidos.",
-                        modifier = Modifier.padding(14.dp),
-                        color = MaterialTheme.colorScheme.onErrorContainer
-                    )
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        )
+                    ) {
+                        Text(
+                            text = "Cafetería cerrada. Por el momento no aceptamos pedidos.",
+                            modifier = Modifier.padding(14.dp),
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                    }
                 }
             }
 
@@ -187,7 +194,7 @@ fun MenuScreen(
                 items(categorias) { item ->
                     FilterChip(
                         selected = categoria == item,
-                        onClick = { categoria = item },
+                        onClick = { vm.seleccionarCategoria(item) },
                         label = { Text(item) },
                         shape = RoundedCornerShape(10.dp),
                         colors = FilterChipDefaults.filterChipColors(
@@ -253,15 +260,19 @@ fun MenuScreen(
                         .weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = if (productos.isEmpty()) {
-                            "Cargando productos..."
-                        } else {
-                            "No hay productos que coincidan con tu búsqueda."
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    if (productos.isEmpty()) {
+                        EstadoVacio(
+                            ilustracion = "☕",
+                            titulo = "Cargando productos",
+                            mensaje = "Estamos trayendo el menú de la cafetería."
+                        )
+                    } else {
+                        EstadoVacio(
+                            ilustracion = "🔍",
+                            titulo = "Sin resultados",
+                            mensaje = "No hay productos que coincidan con tu búsqueda."
+                        )
+                    }
                 }
             } else {
                 LazyVerticalGrid(
