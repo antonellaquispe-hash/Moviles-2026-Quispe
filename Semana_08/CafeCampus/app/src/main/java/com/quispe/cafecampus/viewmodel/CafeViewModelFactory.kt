@@ -39,6 +39,14 @@ class CafeViewModelFactory(
                 PedidosAdminViewModel(repository) as T
             }
 
+            modelClass.isAssignableFrom(RegistroViewModel::class.java) -> {
+                RegistroViewModel(repository) as T
+            }
+
+            modelClass.isAssignableFrom(ReporteAdminViewModel::class.java) -> {
+                ReporteAdminViewModel(repository) as T
+            }
+
             else -> throw IllegalArgumentException(
                 "ViewModel desconocido: ${modelClass.name}"
             )

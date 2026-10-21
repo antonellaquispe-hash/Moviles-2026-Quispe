@@ -1,5 +1,6 @@
 package com.quispe.cafecampus.ui.components
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +30,7 @@ fun ProductoCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .animateContentSize()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(

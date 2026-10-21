@@ -35,14 +35,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.quispe.cafecampus.model.PedidoPorHora
 import com.quispe.cafecampus.ui.components.CafeBottomBar
 import com.quispe.cafecampus.ui.components.CafeButton
+import com.quispe.cafecampus.ui.components.EstadoVacio
 import com.quispe.cafecampus.ui.navigation.ITEMS_ADMIN
 import com.quispe.cafecampus.ui.navigation.RutasCafe
 import com.quispe.cafecampus.ui.theme.EstadoListo
 import com.quispe.cafecampus.ui.theme.EstadoPreparando
 import com.quispe.cafecampus.viewmodel.PanelAdminViewModel
-import com.quispe.cafecampus.viewmodel.PedidoPorHora
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,6 +55,7 @@ fun PanelScreen(
     onVerPedidos: () -> Unit,
     onAjustes: () -> Unit,
     onCerrarSesion: () -> Unit,
+    onVerReporte: () -> Unit = {},
     onPrepararPedido: (Int) -> Unit = {},
     onNavegar: (String) -> Unit = {}
 ) {
@@ -229,11 +231,10 @@ fun PanelScreen(
                         MaterialTheme.colorScheme.outlineVariant
                     )
                 ) {
-                    Text(
-                        text = "No hay pedidos nuevos por ahora.",
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    EstadoVacio(
+                        ilustracion = "✅",
+                        titulo = "Todo al día",
+                        mensaje = "No hay pedidos nuevos por ahora."
                     )
                 }
             } else {
@@ -297,6 +298,12 @@ fun PanelScreen(
             }
 
             Spacer(modifier = Modifier.height(4.dp))
+
+            CafeButton(
+                text = "Reporte del día",
+                onClick = onVerReporte,
+                esContorno = true
+            )
 
             CafeButton(
                 text = "Gestionar menú",

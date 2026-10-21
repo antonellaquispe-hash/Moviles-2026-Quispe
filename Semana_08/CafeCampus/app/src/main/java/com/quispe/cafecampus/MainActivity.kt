@@ -1,10 +1,14 @@
 
 package com.quispe.cafecampus
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -15,10 +19,14 @@ import com.quispe.cafecampus.data.repository.CafeRepositoryRoom
 import com.quispe.cafecampus.model.Rol
 import com.quispe.cafecampus.ui.navigation.NavCafe
 import com.quispe.cafecampus.ui.theme.CafeTheme
+import com.quispe.cafecampus.util.NotificacionesPedido
 import com.quispe.cafecampus.viewmodel.CafeViewModelFactory
 import com.quispe.cafecampus.viewmodel.SesionViewModel
 
 class MainActivity : ComponentActivity() {
+
+    private val permisoNotificaciones =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +66,16 @@ class MainActivity : ComponentActivity() {
                 usuario?.rol == Rol.CLIENTE.name -> Rol.CLIENTE
                 perfilGuardado == Rol.ADMIN -> Rol.ADMIN
                 else -> Rol.CLIENTE
+            }
+
+            // Permiso para avisar cuando cambia el estado de un pedido.
+            LaunchedEffect(Unit) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                    !NotificacionesPedido.tienePermiso(this@MainActivity)
+                ) {
+                    NotificacionesPedido.crearCanal(this@MainActivity)
+                    permisoNotificaciones.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
             }
 
             CafeTheme(

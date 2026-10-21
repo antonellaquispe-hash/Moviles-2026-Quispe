@@ -32,20 +32,25 @@ import com.quispe.cafecampus.ui.admin.FormularioProductoScreen
 import com.quispe.cafecampus.ui.admin.MenuAdminScreen
 import com.quispe.cafecampus.ui.admin.PanelScreen
 import com.quispe.cafecampus.ui.admin.PedidosAdminScreen
+import com.quispe.cafecampus.ui.admin.ReporteScreen
 import com.quispe.cafecampus.ui.cliente.ConfirmarPedidoScreen
 import com.quispe.cafecampus.ui.cliente.DetalleProductoScreen
 import com.quispe.cafecampus.ui.cliente.LoginScreen
 import com.quispe.cafecampus.ui.cliente.MenuScreen
 import com.quispe.cafecampus.ui.cliente.MisPedidosScreen
 import com.quispe.cafecampus.ui.cliente.PerfilScreen
+import com.quispe.cafecampus.ui.cliente.RegistroScreen
 import com.quispe.cafecampus.ui.cliente.SeguimientoScreen
 import com.quispe.cafecampus.ui.cliente.SplashScreen
+import com.quispe.cafecampus.ui.notificaciones.AvisoEstadoPedido
 import com.quispe.cafecampus.viewmodel.CafeViewModelFactory
 import com.quispe.cafecampus.viewmodel.MenuAdminViewModel
 import com.quispe.cafecampus.viewmodel.MenuViewModel
 import com.quispe.cafecampus.viewmodel.PanelAdminViewModel
 import com.quispe.cafecampus.viewmodel.PedidosAdminViewModel
 import com.quispe.cafecampus.viewmodel.PedidosClienteViewModel
+import com.quispe.cafecampus.viewmodel.RegistroViewModel
+import com.quispe.cafecampus.viewmodel.ReporteAdminViewModel
 import com.quispe.cafecampus.viewmodel.SesionViewModel
 
 @Composable
@@ -69,12 +74,18 @@ fun NavCafe(
     val panelAdminViewModel: PanelAdminViewModel = viewModel(factory = factory)
     val menuAdminViewModel: MenuAdminViewModel = viewModel(factory = factory)
     val pedidosAdminViewModel: PedidosAdminViewModel = viewModel(factory = factory)
+    val registroViewModel: RegistroViewModel = viewModel(factory = factory)
+    val reporteAdminViewModel: ReporteAdminViewModel = viewModel(factory = factory)
 
     val productos by menuViewModel.productos.collectAsState()
     val carrito by menuViewModel.carrito.collectAsState()
     val pedidoCreado by pedidosViewModel.pedidoCreado.collectAsState()
     val cargando by pedidosViewModel.cargando.collectAsState()
     val error by pedidosViewModel.error.collectAsState()
+    val misPedidos by pedidosViewModel.misPedidos.collectAsState()
+
+    // Aviso local cuando el administrador cambia el estado de un pedido.
+    AvisoEstadoPedido(pedidos = misPedidos)
 
     LaunchedEffect(pedidoCreado) {
         val id = pedidoCreado
@@ -130,6 +141,21 @@ fun NavCafe(
                         }
                         launchSingleTop = true
                     }
+                },
+                onIrARegistro = {
+                    navController.navigate(RutasCafe.REGISTRO)
+                }
+            )
+        }
+
+        composable(RutasCafe.REGISTRO) {
+            RegistroScreen(
+                viewModel = registroViewModel,
+                onRegistrado = {
+                    navController.popBackStack()
+                },
+                onVolver = {
+                    navController.popBackStack()
                 }
             )
         }
@@ -273,8 +299,6 @@ fun NavCafe(
                 }
             }
 
-            val misPedidos by pedidosViewModel.misPedidos.collectAsState()
-
             MisPedidosScreen(
                 pedidos = misPedidos,
                 cargando = cargando,
@@ -282,6 +306,10 @@ fun NavCafe(
                     navController.navigate(
                         RutasCafe.seguimientoPedido(pedidoId)
                     )
+                },
+                onRepetir = { pedido ->
+                    menuViewModel.repetirPedido(pedido)
+                    navController.navigate(RutasCafe.CONFIRMAR_PEDIDO)
                 },
                 onVolver = {
                     navController.popBackStack()
@@ -340,6 +368,9 @@ fun NavCafe(
                 },
                 onAjustes = {
                     navController.navigate(RutasCafe.ADMIN_AJUSTES)
+                },
+                onVerReporte = {
+                    navController.navigate(RutasCafe.ADMIN_REPORTE)
                 },
                 onCerrarSesion = {
                     sesionViewModel.cerrarSesion()
@@ -452,6 +483,15 @@ fun NavCafe(
                     }
                 )
             }
+        }
+
+        composable(RutasCafe.ADMIN_REPORTE) {
+            ReporteScreen(
+                viewModel = reporteAdminViewModel,
+                onVolver = {
+                    navController.popBackStack()
+                }
+            )
         }
 
         composable(RutasCafe.ADMIN_NUEVO_PRODUCTO) {

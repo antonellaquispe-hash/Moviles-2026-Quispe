@@ -1,6 +1,12 @@
 
 package com.quispe.cafecampus.ui.cliente
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -147,7 +153,20 @@ fun SeguimientoScreen(
                 Column(
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    StepperEstado(estado = estado)
+                    // Animacion del stepper: la transicion entre estados
+                    // del pedido se ve al instante.
+                    AnimatedContent(
+                        targetState = estado,
+                        transitionSpec = {
+                            (fadeIn(tween(320)) + slideInVertically { it / 4 })
+                                .togetherWith(
+                                    fadeOut(tween(220))
+                                )
+                        },
+                        label = "stepperEstado"
+                    ) { estadoActual ->
+                        StepperEstado(estado = estadoActual)
+                    }
                 }
             }
 
