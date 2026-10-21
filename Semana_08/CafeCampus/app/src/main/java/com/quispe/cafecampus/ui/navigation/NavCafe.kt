@@ -101,18 +101,24 @@ fun NavCafe(
     LaunchedEffect(perfilGuardado) {
         val perfil = perfilGuardado ?: return@LaunchedEffect
 
+        // Solo se navega si seguimos en el login: si el login acaba de
+        // terminar, su propia navegacion ya llevo al grafo del perfil y
+        // navegar otra vez dejaria la pila de navegacion duplicada.
+        if (navController.currentDestination?.route != RutasCafe.LOGIN) {
+            return@LaunchedEffect
+        }
+
         val destino = if (perfil == Rol.ADMIN) {
             RutasCafe.ADMIN
         } else {
             RutasCafe.MENU
         }
 
-        if (navController.currentDestination?.route != destino) {
-            sesionViewModel.cargarPerfilGuardado()
-            navController.navigate(destino) {
-                popUpTo(RutasCafe.LOGIN) { inclusive = true }
-                launchSingleTop = true
-            }
+        sesionViewModel.cargarPerfilGuardado()
+
+        navController.navigate(destino) {
+            popUpTo(RutasCafe.LOGIN) { inclusive = true }
+            launchSingleTop = true
         }
     }
 

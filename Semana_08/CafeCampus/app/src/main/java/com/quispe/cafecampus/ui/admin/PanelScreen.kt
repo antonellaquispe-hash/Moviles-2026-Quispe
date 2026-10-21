@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -238,10 +236,14 @@ fun PanelScreen(
                     )
                 }
             } else {
-                LazyColumn(
+                // Nota: esta pantalla ya es scrolleable (verticalScroll), asi que
+                // la lista se arma con Column y no con LazyColumn. Un LazyColumn
+                // dentro de un Column scrolleable recibe altura infinita y
+                // Compose lanza la excepcion que cerraba la app.
+                Column(
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(pedidosNuevos, key = { it.pedido.id }) { pedido ->
+                    pedidosNuevos.forEach { pedido ->
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
