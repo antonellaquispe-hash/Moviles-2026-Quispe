@@ -1,6 +1,7 @@
 
 package com.quispe.cafecampus.ui.cliente
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,29 +10,33 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.quispe.cafecampus.model.ItemCarrito
+import com.quispe.cafecampus.ui.components.CafeButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,8 +51,6 @@ fun ConfirmarPedidoScreen(
     var horaRecojo by remember { mutableStateOf("") }
     var pago by remember { mutableStateOf("") }
     var nota by remember { mutableStateOf("") }
-    var mostrarHoras by remember { mutableStateOf(false) }
-    var mostrarPagos by remember { mutableStateOf(false) }
 
     val horas = listOf(
         "10:00", "10:30", "11:00", "11:30",
@@ -56,19 +59,18 @@ fun ConfirmarPedidoScreen(
         "16:00", "16:30", "17:00"
     )
 
-    val metodosPago = listOf(
-        "Efectivo",
-        "Yape",
-        "Plin",
-        "Tarjeta"
-    )
+    val metodosPago = listOf("Caja", "Yape", "Plin")
 
-    val total = items.sumOf { it.subtotal }
+    val subtotal = items.sumOf { it.subtotal }
+    val total = subtotal
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Confirmar pedido") }
+                title = { Text("Confirmar pedido") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
             )
         }
     ) { padding ->
@@ -76,25 +78,21 @@ fun ConfirmarPedidoScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(
-                text = "Resumen de tu compra",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-
             if (!recibirPedidos) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.errorContainer
                     )
                 ) {
                     Text(
                         text = "Cafetería cerrada: no es posible confirmar pedidos en este momento.",
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(14.dp),
                         color = MaterialTheme.colorScheme.onErrorContainer
                     )
                 }
@@ -102,7 +100,8 @@ fun ConfirmarPedidoScreen(
 
             if (items.isEmpty()) {
                 Card(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
                         text = "Tu carrito está vacío. Regresa al menú para agregar productos.",
@@ -110,166 +109,168 @@ fun ConfirmarPedidoScreen(
                     )
                 }
             } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .weight(1f, fill = false)
-                        .fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    border = BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.outlineVariant
+                    )
                 ) {
-                    items(
-                        items = items,
-                        key = { it.producto.id }
-                    ) { item ->
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
-                            )
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(12.dp),
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                    Column(
+                        modifier = Modifier.padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Text(
+                            text = "Tu pedido",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        items.forEach { item ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.Top
                             ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "${item.cantidad} x ${item.producto.nombre}",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+
+                                    if (item.nota.isNotBlank()) {
+                                        Text(
+                                            text = "Nota: ${item.nota}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+
                                 Text(
-                                    text = item.producto.nombre,
-                                    fontWeight = FontWeight.SemiBold
+                                    text = "S/ %.2f".format(item.subtotal),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold
                                 )
-
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        "${item.cantidad} x S/ ${
-                                            "%.2f".format(item.producto.precio)
-                                        }"
-                                    )
-                                    Text(
-                                        text = "S/ ${"%.2f".format(item.subtotal)}",
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-
-                                if (item.nota.isNotBlank()) {
-                                    Text(
-                                        text = "Nota: ${item.nota}",
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
                             }
                         }
                     }
                 }
+
+                Text(
+                    text = "Hora de recogida",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold
+                )
+
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(horas) { hora ->
+                        FilterChip(
+                            selected = horaRecojo == hora,
+                            onClick = { horaRecojo = hora },
+                            label = { Text(hora) },
+                            shape = RoundedCornerShape(10.dp),
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor =
+                                    MaterialTheme.colorScheme.primaryContainer,
+                                selectedLabelColor =
+                                    MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        )
+                    }
+                }
+
+                Text(
+                    text = "Forma de pago",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold
+                )
+
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(metodosPago) { metodo ->
+                        FilterChip(
+                            selected = pago == metodo,
+                            onClick = { pago = metodo },
+                            label = { Text(metodo) },
+                            shape = RoundedCornerShape(10.dp),
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor =
+                                    MaterialTheme.colorScheme.primaryContainer,
+                                selectedLabelColor =
+                                    MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        )
+                    }
+                }
+
+                OutlinedTextField(
+                    value = nota,
+                    onValueChange = { nota = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Nota para tu pedido (opcional)") },
+                    placeholder = { Text("Ej. Sin azúcar, por favor") },
+                    shape = RoundedCornerShape(12.dp),
+                    maxLines = 3
+                )
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    border = BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.outlineVariant
                     )
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                    Column(
+                        modifier = Modifier.padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        Text(
-                            text = "Total a pagar",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "S/ ${"%.2f".format(total)}",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            }
-
-            Text(
-                text = "Hora de recojo",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-
-            Column {
-                OutlinedButton(
-                    onClick = { mostrarHoras = true },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = !cargando && recibirPedidos
-                ) {
-                    Text(
-                        if (horaRecojo.isBlank()) {
-                            "Seleccionar hora"
-                        } else {
-                            horaRecojo
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Subtotal",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = "S/ %.2f".format(subtotal),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                         }
-                    )
-                }
 
-                DropdownMenu(
-                    expanded = mostrarHoras,
-                    onDismissRequest = { mostrarHoras = false }
-                ) {
-                    horas.forEach { hora ->
-                        DropdownMenuItem(
-                            text = { Text(hora) },
-                            onClick = {
-                                horaRecojo = hora
-                                mostrarHoras = false
-                            }
-                        )
-                    }
-                }
-            }
-
-            Text(
-                text = "Método de pago",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-
-            Column {
-                OutlinedButton(
-                    onClick = { mostrarPagos = true },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = !cargando && recibirPedidos
-                ) {
-                    Text(
-                        if (pago.isBlank()) {
-                            "Seleccionar método de pago"
-                        } else {
-                            pago
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Total",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "S/ %.2f".format(total),
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
-                    )
-                }
-
-                DropdownMenu(
-                    expanded = mostrarPagos,
-                    onDismissRequest = { mostrarPagos = false }
-                ) {
-                    metodosPago.forEach { metodo ->
-                        DropdownMenuItem(
-                            text = { Text(metodo) },
-                            onClick = {
-                                pago = metodo
-                                mostrarPagos = false
-                            }
-                        )
                     }
                 }
             }
-
-            OutlinedTextField(
-                value = nota,
-                onValueChange = { nota = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Nota para tu pedido (opcional)") },
-                placeholder = { Text("Ej. Sin azúcar, por favor") },
-                enabled = !cargando,
-                maxLines = 3
-            )
 
             if (error != null) {
                 Text(
@@ -281,33 +282,26 @@ fun ConfirmarPedidoScreen(
 
             Spacer(modifier = Modifier.height(2.dp))
 
-            Button(
+            CafeButton(
+                text = if (cargando) "Registrando pedido..." else "Confirmar pedido",
                 onClick = {
                     onConfirmar(horaRecojo, pago, nota)
                 },
-                modifier = Modifier.fillMaxWidth(),
                 enabled = recibirPedidos &&
-                        items.isNotEmpty() &&
-                        horaRecojo.isNotBlank() &&
-                        pago.isNotBlank() &&
-                        !cargando
-            ) {
-                Text(
-                    text = if (cargando) {
-                        "Registrando pedido..."
-                    } else {
-                        "Confirmar pedido"
-                    }
-                )
-            }
+                    items.isNotEmpty() &&
+                    horaRecojo.isNotBlank() &&
+                    pago.isNotBlank() &&
+                    !cargando
+            )
 
-            OutlinedButton(
+            CafeButton(
+                text = "Seguir pidiendo",
                 onClick = onVolver,
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !cargando
-            ) {
-                Text("Volver al menú")
-            }
+                enabled = !cargando,
+                esContorno = true
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

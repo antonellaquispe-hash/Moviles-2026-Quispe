@@ -1,6 +1,10 @@
+
 package com.quispe.cafecampus.ui.cliente
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,20 +12,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.AssistChip
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -30,11 +41,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.quispe.cafecampus.data.local.entity.Producto
+import com.quispe.cafecampus.ui.components.CafeButton
+import com.quispe.cafecampus.ui.components.EstadoChip
 import com.quispe.cafecampus.ui.components.ProductoIcono
+import com.quispe.cafecampus.model.EstadoPedido
 import com.quispe.cafecampus.viewmodel.MenuViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,10 +68,16 @@ fun DetalleProductoScreen(
             TopAppBar(
                 title = { Text("Detalle del producto") },
                 navigationIcon = {
-                    OutlinedButton(onClick = onVolver) {
-                        Text("Volver")
+                    IconButton(onClick = onVolver) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver"
+                        )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
             )
         }
     ) { padding ->
@@ -65,88 +85,130 @@ fun DetalleProductoScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(20.dp),
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
+            Box(
+                modifier = Modifier
+                    .size(140.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer),
+                contentAlignment = Alignment.Center
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    ProductoIcono(icono = producto.icono)
-
-                    Text(
-                        text = producto.nombre,
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Text(
-                        text = producto.descripcion,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-
-                    Text(
-                        text = "S/ %.2f".format(producto.precio),
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    if (disponible) {
-                        AssistChip(
-                            onClick = {},
-                            label = { Text("Disponible") }
-                        )
-                    } else {
-                        AssistChip(
-                            onClick = {},
-                            enabled = false,
-                            label = { Text("Agotado") }
-                        )
-                    }
-                }
+                ProductoIcono(icono = producto.icono, tamano = 110.dp)
             }
-
-            Text(
-                text = "Cantidad",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedButton(
-                    onClick = { if (cantidad > 1) cantidad-- },
-                    enabled = disponible && cantidad > 1
-                ) {
-                    Text("−")
-                }
-
                 Text(
-                    text = cantidad.toString(),
-                    modifier = Modifier.padding(horizontal = 28.dp),
-                    style = MaterialTheme.typography.headlineSmall
+                    text = producto.nombre,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f)
                 )
 
-                Button(
-                    onClick = { cantidad++ },
-                    enabled = disponible
+                Text(
+                    text = "S/ %.2f".format(producto.precio),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(18.dp)
+                )
+
+                Text(
+                    text = "4.8 (124 reseñas)",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                EstadoChip(
+                    estado = if (disponible) {
+                        EstadoPedido.LISTO
+                    } else {
+                        EstadoPedido.CANCELADO
+                    },
+                    texto = if (disponible) "Disponible" else "Agotado"
+                )
+            }
+
+            Text(
+                text = producto.descripcion,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+            ) {
+                Column(
+                    modifier = Modifier.padding(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("+")
+                    Text(
+                        text = "Cantidad",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(
+                            onClick = { if (cantidad > 1) cantidad-- },
+                            enabled = disponible && cantidad > 1,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Remove,
+                                contentDescription = "Quitar uno"
+                            )
+                        }
+
+                        Text(
+                            text = cantidad.toString(),
+                            modifier = Modifier.padding(horizontal = 28.dp),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        IconButton(
+                            onClick = { cantidad++ },
+                            enabled = disponible,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Add,
+                                contentDescription = "Agregar uno"
+                            )
+                        }
+                    }
                 }
             }
 
@@ -154,38 +216,53 @@ fun DetalleProductoScreen(
                 value = nota,
                 onValueChange = { nota = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Observaciones (opcional)") },
+                label = { Text("Nota para la cocina") },
                 placeholder = { Text("Ej. Sin azúcar, poca salsa...") },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text
-                ),
+                shape = RoundedCornerShape(12.dp),
                 minLines = 2,
                 enabled = disponible
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(2.dp))
 
-            Text(
-                text = "Subtotal: S/ %.2f".format(producto.precio * cantidad),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Total",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
 
-            Button(
+                    Text(
+                        text = "S/ %.2f".format(producto.precio * cantidad),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            CafeButton(
+                text = if (disponible) "Agregar al pedido" else "Producto agotado",
                 onClick = {
                     vm.agregar(producto, cantidad, nota)
                     onAgregado()
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(54.dp),
-                enabled = disponible,
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Text(
-                    if (disponible) "Agregar al pedido" else "Producto agotado"
-                )
-            }
+                enabled = disponible
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
