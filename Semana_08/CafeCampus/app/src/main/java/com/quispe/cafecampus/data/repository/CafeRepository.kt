@@ -6,10 +6,16 @@ import com.quispe.cafecampus.data.local.entity.Usuario
 import com.quispe.cafecampus.data.local.relation.PedidoConDetalle
 import com.quispe.cafecampus.model.EstadoPedido
 import com.quispe.cafecampus.model.ItemCarrito
+import com.quispe.cafecampus.model.PedidoPorHora
+import com.quispe.cafecampus.model.ReporteDelDia
 import kotlinx.coroutines.flow.Flow
 
 interface CafeRepository {
     suspend fun login(correo: String, clave: String): Usuario?
+
+    // Registro de usuarios
+    suspend fun crearUsuario(usuario: Usuario): Long
+    suspend fun existeUsuarioPorCorreo(correo: String): Boolean
 
     fun observarProductos(): Flow<List<Producto>>
     suspend fun guardarProducto(p: Producto)
@@ -31,4 +37,8 @@ interface CafeRepository {
 
     fun observarVentasHoy(inicioDia: Long): Flow<Double>
     fun observarCantidadPorEstado(estado: EstadoPedido): Flow<Int>
+
+    // Analitica del dia
+    fun observarPedidosPorHora(inicioDia: Long): Flow<List<PedidoPorHora>>
+    fun observarReporteDelDia(inicioDia: Long): Flow<ReporteDelDia>
 }

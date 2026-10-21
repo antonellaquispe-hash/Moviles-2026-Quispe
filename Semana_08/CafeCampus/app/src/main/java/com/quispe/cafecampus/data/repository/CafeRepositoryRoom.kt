@@ -11,7 +11,10 @@ import com.quispe.cafecampus.data.local.entity.Usuario
 import com.quispe.cafecampus.data.local.relation.PedidoConDetalle
 import com.quispe.cafecampus.model.EstadoPedido
 import com.quispe.cafecampus.model.ItemCarrito
+import com.quispe.cafecampus.model.PedidoPorHora
+import com.quispe.cafecampus.model.ReporteDelDia
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 
 class CafeRepositoryRoom(
     private val usuarioDao: UsuarioDao,
@@ -21,6 +24,14 @@ class CafeRepositoryRoom(
 
     override suspend fun login(correo: String, clave: String): Usuario? {
         return usuarioDao.login(correo.trim(), clave)
+    }
+
+    override suspend fun crearUsuario(usuario: Usuario): Long {
+        return usuarioDao.insertar(usuario)
+    }
+
+    override suspend fun existeUsuarioPorCorreo(correo: String): Boolean {
+        return usuarioDao.existePorCorreo(correo.trim()) > 0
     }
 
     override fun observarProductos(): Flow<List<Producto>> {
@@ -106,5 +117,25 @@ class CafeRepositoryRoom(
         estado: EstadoPedido
     ): Flow<Int> {
         return pedidoDao.cantidadPorEstado(estado.name)
+    }
+
+    override fun observarPedidosPorHora(
+        inicioDia: Long
+    ): Flow<List<PedidoPorHora>> {
+        return pedidoDao.observarPedidosPorHora(inicioDia)
+    }
+
+    override fun observarReporteDelDia(inicioDia: Long): Flow<ReporteDelDia> {
+        return combine(
+            pedidoDao.observarProductoMasVendido(inicioDia),
+            pedidoDao.observarTotalesPorFormaPago(inicioDia)
+        ) { masVendido, totales ->
+            ReporteDelDia(
+                productoMasVendido = masVendido,
+                totalesPorFormaPago = totales,
+                totalVendido = totales.sumOf { it.total },
+                cantidadPedidos = totales.sumOf { it.cantidad }
+            )
+        }
     }
 }

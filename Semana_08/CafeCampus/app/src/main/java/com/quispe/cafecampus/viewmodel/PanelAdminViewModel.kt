@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.quispe.cafecampus.data.local.relation.PedidoConDetalle
 import com.quispe.cafecampus.data.repository.CafeRepository
 import com.quispe.cafecampus.model.EstadoPedido
+import com.quispe.cafecampus.model.PedidoPorHora
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -104,30 +105,25 @@ class PanelAdminViewModel(
             initialValue = emptyList()
         )
 
-    val pedidosPorHora: StateFlow<List<PedidoPorHora>> = todosLosPedidos
-        .map { pedidos ->
-            val inicio = inicioDelDia()
-            val fin = inicio + 24L * 60L * 60L * 1000L
-            val deHoy = pedidos.filter {
-                it.pedido.fecha in inicio until fin
+    /**
+     * Grafico real: la cantidad por hora sale de una consulta Room
+     * (GROUP BY hora), no de datos fijos.
+     */
+    val pedidosPorHora: StateFlow<List<PedidoPorHora>> =
+        repository.observarPedidosPorHora(inicioDelDia())
+            .map { filas ->
+                HORAS.map { hora ->
+                    PedidoPorHora(
+                        hora = hora,
+                        cantidad = filas.firstOrNull { it.hora == hora }?.cantidad ?: 0
+                    )
+                }
             }
-
-            HORAS.map { hora ->
-                PedidoPorHora(
-                    hora = hora,
-                    cantidad = deHoy.count { pedido ->
-                        val calendario = Calendar.getInstance().apply {
-                            timeInMillis = pedido.pedido.fecha
-                        }
-                        calendario.get(Calendar.HOUR_OF_DAY) == hora
-                    }
-                )
-            }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = HORAS.map { PedidoPorHora(it, 0) }
-        )
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = HORAS.map { PedidoPorHora(it, 0) }
+            )
 
     private fun inicioDelDia(): Long {
         return Calendar.getInstance().apply {
@@ -142,8 +138,3 @@ class PanelAdminViewModel(
         val HORAS = listOf(8, 10, 12, 14, 16, 18)
     }
 }
-
-data class PedidoPorHora(
-    val hora: Int,
-    val cantidad: Int
-)
