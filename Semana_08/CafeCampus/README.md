@@ -46,6 +46,25 @@ Reglas aplicadas:
 - El **Repository** conoce los DAOs; no expone entidades de UI ni usa Context de pantalla.
 - **Lectura que actualiza la pantalla → `Flow`. Escritura o acción única → `suspend`.**
 
+## Mejoras de la Fase 2 (CON IA)
+
+| Mejora | Qué hace | Capas |
+|---|---|---|
+| Buscar en el menú | Barra de búsqueda que filtra por nombre mientras escribes | ViewModel + View |
+| Repetir pedido | Botón en el historial que vuelve a cargar el carrito | ViewModel + View |
+| Gráfico real por hora | El panel agrupa los pedidos con una consulta Room | DAO + Repository + ViewModel + View |
+| Registro de estudiante | Pantalla de cuenta nueva con validaciones y correo único | DAO + Repository + ViewModel + View |
+| Animaciones y estados vacíos | Stepper animado, transiciones e ilustraciones | View |
+| Reporte del día | Producto más vendido y total por forma de pago | DAO + Repository + ViewModel + View |
+
+### Aviso local de cambio de estado
+
+Función propia de la app: cuando el administrador cambia el estado de un pedido, el
+estudiante recibe un aviso local en el dispositivo. No necesita servidor: el
+`Flow` de Room ya notifica el cambio y la capa View (`AvisoEstadoPedido`) dispara la
+notificación comparando el estado actual con el anterior. Requiere el permiso
+`POST_NOTIFICATIONS` en Android 13 o superior.
+
 ## Estructura del proyecto
 
 ```text
@@ -74,12 +93,17 @@ Semana_08/CafeCampus/
 │   └── ui/
 │       ├── theme/ (Color, Type, Theme)
 │       ├── components/ (AppTopBar, CafeButton, CafeTextField, CafeBottomBar,
-│       │                EstadoChip, ProductoCard, ProductoIcono, PedidoCard, StepperEstado)
+│       │                EstadoChip, ProductoCard, ProductoIcono, PedidoCard, StepperEstado,
+│       │                EstadoVacio)
 │       ├── navigation/ (Rutas, NavCafe, ItemsNavegacion)
-│       ├── cliente/ (SplashScreen, LoginScreen, MenuScreen, DetalleProductoScreen,
-│       │              ConfirmarPedidoScreen, SeguimientoScreen, MisPedidosScreen, PerfilScreen)
+│       ├── notificaciones/ (AvisoEstadoPedido)
+│       ├── cliente/ (SplashScreen, LoginScreen, RegistroScreen, MenuScreen,
+│       │              DetalleProductoScreen, ConfirmarPedidoScreen, SeguimientoScreen,
+│       │              MisPedidosScreen, PerfilScreen)
 │       └── admin/ (PanelScreen, PedidosAdminScreen, DetallePedidoAdminScreen,
-│                   MenuAdminScreen, FormularioProductoScreen, AjustesScreen)
+│                   MenuAdminScreen, FormularioProductoScreen, AjustesScreen,
+│                   ReporteScreen)
+├── util/ (NotificacionesPedido)
 └── gradle/libs.versions.toml
 ```
 
