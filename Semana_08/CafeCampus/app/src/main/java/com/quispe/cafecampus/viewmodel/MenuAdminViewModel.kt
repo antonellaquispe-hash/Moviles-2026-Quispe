@@ -19,6 +19,14 @@ class MenuAdminViewModel(
             initialValue = emptyList()
         )
 
+    fun guardar(producto: Producto) = guardarProducto(producto)
+
+    fun eliminar(producto: Producto) = eliminarProducto(producto)
+
+    fun alternarDisponibilidad(producto: Producto) {
+        cambiarDisponibilidad(producto, !producto.disponible)
+    }
+
     fun guardarProducto(producto: Producto) {
         viewModelScope.launch {
             repository.guardarProducto(producto)

@@ -52,7 +52,7 @@ interface PedidoDao {
     suspend fun cambiarEstado(id: Int, estado: String): Int
 
     @Query("SELECT COUNT(*) FROM pedidos WHERE estado = :estado")
-    fun contarPorEstado(estado: String): Flow<Int>
+    fun cantidadPorEstado(estado: String): Flow<Int>
 
     @Query("SELECT COALESCE(SUM(total), 0.0) FROM pedidos WHERE fecha >= :inicio AND estado != 'CANCELADO'")
     fun ventasDesde(inicio: Long): Flow<Double>

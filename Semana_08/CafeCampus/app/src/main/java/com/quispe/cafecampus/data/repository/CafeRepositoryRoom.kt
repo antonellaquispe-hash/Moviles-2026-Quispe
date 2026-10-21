@@ -105,6 +105,6 @@ class CafeRepositoryRoom(
     override fun observarCantidadPorEstado(
         estado: EstadoPedido
     ): Flow<Int> {
-        return pedidoDao.contarPorEstado(estado.name)
+        return pedidoDao.cantidadPorEstado(estado.name)
     }
 }

@@ -40,7 +40,7 @@ abstract class CafeDatabase : RoomDatabase() {
                 INSTANCE ?: Room.databaseBuilder(
                     context.applicationContext,
                     CafeDatabase::class.java,
-                    "cafecampus_database"
+                    "cafecampus.db"
                 ).build().also { INSTANCE = it }
             }
         }

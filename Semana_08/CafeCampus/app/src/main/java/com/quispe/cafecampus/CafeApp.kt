@@ -22,7 +22,7 @@ class CafeApp : Application() {
         super.onCreate()
 
         applicationScope.launch {
-            DatosIniciales.insertarSiVacio(database)
+            DatosIniciales.sembrar(database)
         }
     }
 }

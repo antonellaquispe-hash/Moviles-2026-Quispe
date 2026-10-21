@@ -7,9 +7,9 @@ import com.quispe.cafecampus.model.Rol
 
 object DatosIniciales {
 
-    suspend fun insertarSiVacio(database: CafeDatabase) {
-        if (database.productoDao().contar() == 0) {
-            database.productoDao().insertarTodos(
+    suspend fun sembrar(db: CafeDatabase) {
+        if (db.usuarioDao().contar() == 0) {
+            db.productoDao().insertarTodos(
                 listOf(
                     Producto(
                         nombre = "Café americano",
@@ -55,10 +55,8 @@ object DatosIniciales {
                     )
                 )
             )
-        }
 
-        if (database.usuarioDao().contar() == 0) {
-            database.usuarioDao().insertar(
+            db.usuarioDao().insertar(
                 Usuario(
                     nombre = "Juan",
                     correo = "juan@campus.test",
@@ -67,7 +65,7 @@ object DatosIniciales {
                 )
             )
 
-            database.usuarioDao().insertar(
+            db.usuarioDao().insertar(
                 Usuario(
                     nombre = "Administrador",
                     correo = "admin@cafe.test",

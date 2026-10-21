@@ -51,6 +51,14 @@ class PedidosClienteViewModel(
         }
     }
 
+    fun confirmar(
+        clienteId: Int,
+        items: List<ItemCarrito>,
+        horaRecojo: String,
+        pago: String,
+        nota: String
+    ) = confirmarPedido(clienteId, items, horaRecojo, pago, nota)
+
     fun confirmarPedido(
         clienteId: Int,
         items: List<ItemCarrito>,
@@ -99,6 +107,8 @@ class PedidosClienteViewModel(
             }
         }
     }
+
+    fun pedido(pedidoId: Int): StateFlow<PedidoConDetalle?> = _pedidoActual
 
     fun observarPedido(pedidoId: Int) {
         if (pedidoId <= 0) return

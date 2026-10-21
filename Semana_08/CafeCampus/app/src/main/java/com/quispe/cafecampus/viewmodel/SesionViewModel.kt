@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -37,6 +39,33 @@ class SesionViewModel(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
             initialValue = true
+        )
+
+    private val _perfilResuelto = MutableStateFlow(false)
+    val perfilResuelto: StateFlow<Boolean> = _perfilResuelto.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            preferenciasStore.perfilActivo.first()
+            _perfilResuelto.value = true
+        }
+    }
+
+    val perfilActivo: StateFlow<String> = preferenciasStore.perfilActivo
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = ""
+        )
+
+    val perfilGuardado: StateFlow<Rol?> = perfilActivo
+        .map { valor ->
+            runCatching { Rol.valueOf(valor) }.getOrNull()
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = null
         )
 
     fun cambiarModoOscuro(activado: Boolean) {
@@ -88,6 +117,34 @@ class SesionViewModel(
             preferenciasStore.cerrarSesion()
             _usuarioActual.value = null
             _error.value = null
+        }
+    }
+
+    fun cambiarPerfil(rol: Rol) {
+        viewModelScope.launch {
+            preferenciasStore.guardarPerfil(rol)
+            _usuarioActual.value = null
+            _error.value = null
+        }
+    }
+
+    fun cargarPerfilGuardado() {
+        viewModelScope.launch {
+            val perfil = preferenciasStore.perfilActivo.first()
+            if (perfil.isNotBlank()) {
+                val usuario = runCatching {
+                    repository.login(
+                        if (perfil == Rol.ADMIN.name) {
+                            "admin@cafe.test"
+                        } else {
+                            "juan@campus.test"
+                        },
+                        if (perfil == Rol.ADMIN.name) "admin" else "1234"
+                    )
+                }.getOrNull()
+
+                _usuarioActual.value = usuario
+            }
         }
     }
 
