@@ -10,12 +10,14 @@ object RutasCafe {
     const val ADMIN_PEDIDOS = "admin/pedidos"
     const val ADMIN_DETALLE_PEDIDO = "admin/pedido/{pedidoId}"
     const val ADMIN_AJUSTES = "admin/ajustes"
+    const val ADMIN_REPORTE = "admin/reporte"
     const val ADMIN_FORMULARIO_PRODUCTO = "admin/producto/{productoId}"
     const val ADMIN_NUEVO_PRODUCTO = "admin/producto/nuevo"
     const val CONFIRMAR_PEDIDO = "confirmar-pedido"
     const val SEGUIMIENTO = "seguimiento/{pedidoId}"
     const val MIS_PEDIDOS = "mis-pedidos"
     const val CLIENTE_PERFIL = "cliente/perfil"
+    const val REGISTRO = "registro"
 
     fun detalleProducto(productoId: Int): String {
         return "detalle/$productoId"
