@@ -290,7 +290,10 @@ fun MenuScreen(
                     ) { producto ->
                         ProductoCard(
                             producto = producto,
-                            onClick = { onProducto(producto.id) }
+                            onClick = { onProducto(producto.id) },
+                            onAgregar = {
+                                vm.agregar(producto, 1, "")
+                            }
                         )
                     }
                 }

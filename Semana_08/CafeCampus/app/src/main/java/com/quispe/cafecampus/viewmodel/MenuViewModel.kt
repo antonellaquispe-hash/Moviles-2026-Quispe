@@ -33,17 +33,17 @@ class MenuViewModel(
     val busqueda: StateFlow<String> = _busqueda.asStateFlow()
 
     // Categoria seleccionada en los chips
-    private val _categoriaSeleccionada = MutableStateFlow("Todos")
+    private val _categoriaSeleccionada = MutableStateFlow(CATEGORIA_TODAS)
     val categoriaSeleccionada: StateFlow<String> = _categoriaSeleccionada.asStateFlow()
 
     val categorias: StateFlow<List<String>> = productos
         .map { lista ->
-            listOf("Todos") + lista.map { it.categoria }.distinct()
+            listOf(CATEGORIA_TODAS) + lista.map { it.categoria }.distinct()
         }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = listOf("Todos")
+            initialValue = listOf(CATEGORIA_TODAS)
         )
 
     /**
@@ -59,7 +59,7 @@ class MenuViewModel(
                     producto.nombre.contains(textoLimpio, ignoreCase = true) ||
                     producto.descripcion.contains(textoLimpio, ignoreCase = true)
 
-                val coincideCategoria = categoria == "Todos" ||
+                val coincideCategoria = categoria == CATEGORIA_TODAS ||
                     producto.categoria == categoria
 
                 coincideNombre && coincideCategoria
@@ -80,7 +80,7 @@ class MenuViewModel(
 
     fun limpiarBusqueda() {
         _busqueda.value = ""
-        _categoriaSeleccionada.value = "Todos"
+        _categoriaSeleccionada.value = CATEGORIA_TODAS
     }
 
     fun agregar(producto: Producto, cantidad: Int, nota: String) {
@@ -148,5 +148,9 @@ class MenuViewModel(
         }
 
         return lineasAgregadas
+    }
+
+    companion object {
+        const val CATEGORIA_TODAS = "Todo"
     }
 }
