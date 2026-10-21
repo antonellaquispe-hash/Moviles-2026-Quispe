@@ -1,5 +1,7 @@
+
 package com.quispe.cafecampus.ui.admin
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,17 +11,28 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Card
-import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,165 +41,149 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.quispe.cafecampus.data.local.entity.Producto
+import com.quispe.cafecampus.ui.components.CafeBottomBar
+import com.quispe.cafecampus.ui.components.EstadoChip
+import com.quispe.cafecampus.ui.components.ProductoIcono
+import com.quispe.cafecampus.ui.navigation.ITEMS_ADMIN
+import com.quispe.cafecampus.ui.navigation.RutasCafe
+import com.quispe.cafecampus.model.EstadoPedido
 import com.quispe.cafecampus.viewmodel.MenuAdminViewModel
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuAdminScreen(
     viewModel: MenuAdminViewModel,
-    onVolver: () -> Unit
+    onVolver: () -> Unit,
+    onNuevoProducto: () -> Unit = {},
+    onEditarProducto: (Int) -> Unit = {},
+    onNavegar: (String) -> Unit = {}
 ) {
     val productos by viewModel.productos.collectAsState()
-    var mostrarFormulario by remember { mutableStateOf(false) }
-    var productoEditar by remember { mutableStateOf<Producto?>(null) }
     var productoEliminar by remember { mutableStateOf<Producto?>(null) }
+    var categoria by remember { mutableStateOf("Todos") }
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
+    val categorias = remember(productos) {
+        listOf("Todos") + productos.map { it.categoria }.distinct()
+    }
+
+    val productosFiltrados = remember(productos, categoria) {
+        if (categoria == "Todos") {
+            productos
+        } else {
+            productos.filter { it.categoria == categoria }
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Gestión del menú") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onNuevoProducto,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Agregar producto"
+                )
+            }
+        },
+        bottomBar = {
+            CafeBottomBar(
+                items = ITEMS_ADMIN,
+                rutaActual = RutasCafe.ADMIN_MENU,
+                onNavegar = onNavegar
+            )
+        }
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(padding)
         ) {
-            Text(
-                text = "Gestión del menú",
-                style = MaterialTheme.typography.headlineSmall
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
+            LazyRow(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Button(
-                    onClick = {
-                        productoEditar = null
-                        mostrarFormulario = true
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Nuevo producto")
-                }
-
-                OutlinedButton(
-                    onClick = onVolver,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Volver")
+                items(categorias) { item ->
+                    FilterChip(
+                        selected = categoria == item,
+                        onClick = { categoria = item },
+                        label = { Text(item) },
+                        shape = RoundedCornerShape(10.dp),
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor =
+                                MaterialTheme.colorScheme.primaryContainer,
+                            selectedLabelColor =
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            if (productosFiltrados.isEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Todavía no hay productos registrados.",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
 
-            if (productos.isEmpty()) {
-                Text("Todavía no hay productos registrados.")
+                    Text(
+                        text = "Usa el botón + para agregar uno.",
+                        modifier = Modifier.padding(top = 8.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             } else {
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                        bottom = 88.dp
+                    )
                 ) {
-                    items(productos, key = { it.id }) { producto ->
-                        Card(modifier = Modifier.fillMaxWidth()) {
-                            Column(
-                                modifier = Modifier.padding(14.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Text(
-                                    text = "${producto.icono} ${producto.nombre}",
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-
-                                Text(producto.descripcion)
-                                Text("Categoría: ${producto.categoria}")
-                                Text(
-                                    String.format(
-                                        Locale("es", "PE"),
-                                        "Precio: S/ %.2f",
-                                        producto.precio
-                                    )
-                                )
-
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Checkbox(
-                                        checked = producto.disponible,
-                                        onCheckedChange = {
-                                            viewModel.cambiarDisponibilidad(
-                                                producto,
-                                                it
-                                            )
-                                        }
-                                    )
-                                    Text(
-                                        if (producto.disponible) {
-                                            "Disponible"
-                                        } else {
-                                            "No disponible"
-                                        }
-                                    )
-                                }
-
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    OutlinedButton(
-                                        onClick = {
-                                            productoEditar = producto
-                                            mostrarFormulario = true
-                                        },
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Text("Editar")
-                                    }
-
-                                    Button(
-                                        onClick = {
-                                            productoEliminar = producto
-                                        },
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Text("Eliminar")
-                                    }
-                                }
-                            }
-                        }
+                    items(productosFiltrados, key = { it.id }) { producto ->
+                        ProductoAdminCard(
+                            producto = producto,
+                            onEditar = { onEditarProducto(producto.id) },
+                            onEliminar = { productoEliminar = producto }
+                        )
                     }
                 }
             }
         }
     }
 
-    if (mostrarFormulario) {
-        FormularioProductoDialog(
-            producto = productoEditar,
-            onCerrar = {
-                mostrarFormulario = false
-                productoEditar = null
-            },
-            onGuardar = { producto ->
-                viewModel.guardarProducto(producto)
-                mostrarFormulario = false
-                productoEditar = null
-            }
-        )
-    }
-
     productoEliminar?.let { producto ->
         AlertDialog(
             onDismissRequest = { productoEliminar = null },
             title = { Text("Eliminar producto") },
-            text = {
-                Text("¿Deseas eliminar ${producto.nombre} del menú?")
-            },
+            text = { Text("¿Deseas eliminar ${producto.nombre} del menú?") },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        viewModel.eliminarProducto(producto)
+                        viewModel.eliminar(producto)
                         productoEliminar = null
                     }
                 ) {
@@ -194,9 +191,7 @@ fun MenuAdminScreen(
                 }
             },
             dismissButton = {
-                TextButton(
-                    onClick = { productoEliminar = null }
-                ) {
+                TextButton(onClick = { productoEliminar = null }) {
                     Text("Cancelar")
                 }
             }
@@ -205,119 +200,82 @@ fun MenuAdminScreen(
 }
 
 @Composable
-private fun FormularioProductoDialog(
-    producto: Producto?,
-    onCerrar: () -> Unit,
-    onGuardar: (Producto) -> Unit
+private fun ProductoAdminCard(
+    producto: Producto,
+    onEditar: () -> Unit,
+    onEliminar: () -> Unit
 ) {
-    var nombre by remember(producto) {
-        mutableStateOf(producto?.nombre.orEmpty())
-    }
-    var descripcion by remember(producto) {
-        mutableStateOf(producto?.descripcion.orEmpty())
-    }
-    var categoria by remember(producto) {
-        mutableStateOf(producto?.categoria.orEmpty())
-    }
-    var precio by remember(producto) {
-        mutableStateOf(producto?.precio?.toString().orEmpty())
-    }
-    var icono by remember(producto) {
-        mutableStateOf(producto?.icono ?: "☕")
-    }
-    var disponible by remember(producto) {
-        mutableStateOf(producto?.disponible ?: true)
-    }
-    var error by remember { mutableStateOf(false) }
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            ProductoIcono(
+                icono = producto.icono,
+                tamano = 44.dp,
+                conFondo = true
+            )
 
-    AlertDialog(
-        onDismissRequest = onCerrar,
-        title = {
-            Text(if (producto == null) "Nuevo producto" else "Editar producto")
-        },
-        text = {
             Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
-                OutlinedTextField(
-                    value = nombre,
-                    onValueChange = { nombre = it },
-                    label = { Text("Nombre") },
-                    singleLine = true
+                Text(
+                    text = producto.nombre,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold
                 )
-                OutlinedTextField(
-                    value = descripcion,
-                    onValueChange = { descripcion = it },
-                    label = { Text("Descripción") }
+
+                Text(
+                    text = producto.categoria,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                OutlinedTextField(
-                    value = categoria,
-                    onValueChange = { categoria = it },
-                    label = { Text("Categoría") },
-                    singleLine = true
+
+                Text(
+                    text = String.format(Locale("es", "PE"), "S/ %.2f", producto.precio),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
                 )
-                OutlinedTextField(
-                    value = precio,
-                    onValueChange = { precio = it },
-                    label = { Text("Precio") },
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    value = icono,
-                    onValueChange = { icono = it },
-                    label = { Text("Emoji del producto") },
-                    singleLine = true
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = disponible,
-                        onCheckedChange = { disponible = it }
-                    )
-                    Text("Disponible")
-                }
-                if (error) {
-                    Text(
-                        text = "Completa los campos y coloca un precio válido mayor que cero.",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    val precioNumerico = precio.toDoubleOrNull()
-                    if (
-                        nombre.isNotBlank() &&
-                        descripcion.isNotBlank() &&
-                        categoria.isNotBlank() &&
-                        icono.isNotBlank() &&
-                        precioNumerico != null &&
-                        precioNumerico > 0
-                    ) {
-                        onGuardar(
-                            Producto(
-                                id = producto?.id ?: 0,
-                                nombre = nombre.trim(),
-                                descripcion = descripcion.trim(),
-                                categoria = categoria.trim(),
-                                precio = precioNumerico,
-                                disponible = disponible,
-                                icono = icono.trim()
-                            )
-                        )
+
+                EstadoChip(
+                    estado = if (producto.disponible) {
+                        EstadoPedido.LISTO
                     } else {
-                        error = true
-                    }
-                }
-            ) {
-                Text("Guardar")
+                        EstadoPedido.CANCELADO
+                    },
+                    texto = if (producto.disponible) "Disponible" else "Agotado"
+                )
             }
-        },
-        dismissButton = {
-            TextButton(onClick = onCerrar) {
-                Text("Cancelar")
+
+            Column {
+                IconButton(onClick = onEditar) {
+                    Icon(
+                        imageVector = Icons.Filled.Edit,
+                        contentDescription = "Editar producto",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                IconButton(onClick = onEliminar) {
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = "Eliminar producto",
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
             }
         }
-    )
+    }
 }

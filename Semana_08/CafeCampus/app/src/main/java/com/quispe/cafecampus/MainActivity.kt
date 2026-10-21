@@ -8,14 +8,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.quispe.cafecampus.data.local.CafeDatabase
 import com.quispe.cafecampus.data.prefs.PreferenciasStore
 import com.quispe.cafecampus.data.repository.CafeRepositoryRoom
+import com.quispe.cafecampus.model.Rol
 import com.quispe.cafecampus.ui.navigation.NavCafe
-import com.quispe.cafecampus.ui.theme.CafeCampusTheme
+import com.quispe.cafecampus.ui.theme.CafeTheme
+import com.quispe.cafecampus.viewmodel.CafeViewModelFactory
 import com.quispe.cafecampus.viewmodel.SesionViewModel
 
 class MainActivity : ComponentActivity() {
@@ -42,27 +42,7 @@ class MainActivity : ComponentActivity() {
             }
 
             val factory = remember {
-                object : ViewModelProvider.Factory {
-                    override fun <T : ViewModel> create(
-                        modelClass: Class<T>
-                    ): T {
-                        if (
-                            modelClass.isAssignableFrom(
-                                SesionViewModel::class.java
-                            )
-                        ) {
-                            @Suppress("UNCHECKED_CAST")
-                            return SesionViewModel(
-                                repository,
-                                preferenciasStore
-                            ) as T
-                        }
-
-                        throw IllegalArgumentException(
-                            "ViewModel desconocido: ${modelClass.name}"
-                        )
-                    }
-                }
+                CafeViewModelFactory(repository, preferenciasStore)
             }
 
             val sesionViewModel: SesionViewModel = viewModel(
@@ -70,10 +50,19 @@ class MainActivity : ComponentActivity() {
             )
 
             val modoOscuro by sesionViewModel.modoOscuro.collectAsState()
+            val usuario by sesionViewModel.usuarioActual.collectAsState()
+            val perfilGuardado by sesionViewModel.perfilGuardado.collectAsState()
 
-            CafeCampusTheme(
-                darkTheme = modoOscuro,
-                dynamicColor = false
+            val rol = when {
+                usuario?.rol == Rol.ADMIN.name -> Rol.ADMIN
+                usuario?.rol == Rol.CLIENTE.name -> Rol.CLIENTE
+                perfilGuardado == Rol.ADMIN -> Rol.ADMIN
+                else -> Rol.CLIENTE
+            }
+
+            CafeTheme(
+                rol = rol,
+                darkTheme = modoOscuro
             ) {
                 NavCafe(
                     sesionViewModel = sesionViewModel,
