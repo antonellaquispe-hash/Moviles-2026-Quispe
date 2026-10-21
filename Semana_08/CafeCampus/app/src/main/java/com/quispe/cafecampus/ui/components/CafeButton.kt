@@ -15,17 +15,25 @@ fun CafeButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    esContorno: Boolean = false
 ) {
     Button(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
         enabled = enabled,
-        shape = RoundedCornerShape(14.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
-        )
+        shape = RoundedCornerShape(10.dp),
+        colors = if (esContorno) {
+            ButtonDefaults.outlinedButtonColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.primary
+            )
+        } else {
+            ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
+        }
     ) {
         Text(
             text = text,

@@ -1,6 +1,6 @@
-
 package com.quispe.cafecampus.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,15 +34,16 @@ fun PedidoCard(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -51,7 +52,7 @@ fun PedidoCard(
             ) {
                 Text(
                     text = "Pedido #${pedido.pedido.id}",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold
                 )
 
@@ -59,18 +60,19 @@ fun PedidoCard(
             }
 
             Text(
-                text = "Hora de recojo: ${pedido.pedido.horaRecojo}",
-                style = MaterialTheme.typography.bodyMedium
+                text = "Recojo: ${pedido.pedido.horaRecojo}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             if (pedido.detalles.isNotEmpty()) {
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     pedido.detalles.forEach { detalle ->
                         Text(
                             text = "${detalle.cantidad} x ${detalle.nombreProducto}",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
@@ -83,12 +85,12 @@ fun PedidoCard(
             ) {
                 Text(
                     text = "Total",
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodySmall
                 )
 
                 Text(
                     text = "S/ %.2f".format(pedido.pedido.total),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
                 )

@@ -9,13 +9,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.quispe.cafecampus.model.EstadoPedido
 
 @Composable
 fun EstadoChip(
     estado: EstadoPedido,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    texto: String? = null
 ) {
     val colorFondo = when (estado) {
         EstadoPedido.RECIBIDO -> Color(0xFFE3E8FF)
@@ -36,12 +38,13 @@ fun EstadoChip(
     Row(
         modifier = modifier
             .background(colorFondo, RoundedCornerShape(50))
-            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .padding(horizontal = 10.dp, vertical = 5.dp)
     ) {
         Text(
-            text = estado.etiqueta(),
+            text = texto ?: estado.etiqueta(),
             color = colorTexto,
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.SemiBold
         )
     }
 }
