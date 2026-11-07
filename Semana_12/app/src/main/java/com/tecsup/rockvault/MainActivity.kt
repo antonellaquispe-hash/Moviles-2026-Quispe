@@ -15,13 +15,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val viewModel = ViewModelProvider(this)[ListaViewModel::class.java]
+        val factory = ListaViewModel.Factory(AppContainer.itemRepository)
+        val viewModel = ViewModelProvider(this, factory)[ListaViewModel::class.java]
         setContent {
             RockVaultTheme {
                 val estado by viewModel.estado.collectAsState()
                 ListaScreen(
                     estado = estado,
-                    onReintentar = viewModel::cargarDatosPrueba
+                    onReintentar = viewModel::cargar
                 )
             }
         }
