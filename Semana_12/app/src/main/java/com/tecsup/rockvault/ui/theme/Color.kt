@@ -1,4 +1,4 @@
-package com.quispe.rockvault.ui.theme
+package com.tecsup.rockvault.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

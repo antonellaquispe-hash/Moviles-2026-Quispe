@@ -1,4 +1,4 @@
-package com.quispe.rockvault
+package com.tecsup.rockvault
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.quispe.rockvault.ui.theme.RockVaultTheme
+import com.tecsup.rockvault.ui.theme.RockVaultTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

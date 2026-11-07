@@ -4,14 +4,14 @@ plugins {
 }
 
 android {
-    namespace = "com.quispe.rockvault"
+    namespace = "com.tecsup.rockvault"
 
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.quispe.rockvault"
+        applicationId = "com.tecsup.rockvault"
         minSdk = 24
         targetSdk = 37
         versionCode = 1
@@ -55,3 +55,4 @@ testImplementation(libs.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }
+

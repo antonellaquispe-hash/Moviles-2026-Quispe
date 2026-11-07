@@ -1,4 +1,4 @@
-package com.quispe.rockvault
+package com.tecsup.rockvault
 
 import org.junit.Test
 
