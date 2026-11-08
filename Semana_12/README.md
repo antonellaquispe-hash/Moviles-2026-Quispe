@@ -75,19 +75,6 @@ service cloud.firestore {
 
 Room es la fuente de datos que observa la interfaz. Retrofit actualiza los registros guardados y conserva los favoritos durante la sincronización.
 
-## Capturas
-
-Las capturas deben tomarse después de iniciar sesión con las cuentas de prueba y cargar álbumes, para que las vistas de catálogo y detalle muestren las carátulas reales. Guarda las capturas verificadas en `docs/capturas/` con estos nombres:
-
-- `login.png`
-- `catalogo.png` (con carátulas visibles)
-- `detalle.png` (con información del álbum)
-- `favoritos.png` (con al menos un álbum marcado)
-- `panel-admin.png` (con la cuenta administradora)
-- `notificacion.png` (notificación de sincronización)
-
-No se incluyen capturas vacías ni imágenes de muestra. Añade las capturas obtenidas en un dispositivo o emulador con Firebase y sus cuentas de prueba configurados.
-
 ## Reparto de tareas
 
 | Área | Trabajo |
