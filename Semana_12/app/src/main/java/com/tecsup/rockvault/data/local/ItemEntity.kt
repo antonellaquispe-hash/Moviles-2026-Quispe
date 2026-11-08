@@ -11,5 +11,5 @@ data class ItemEntity(
     val subtitulo: String,
     val imagenUrl: String? = null,
     val esFavorito: Boolean = false,
-    @ColumnInfo(defaultValue = "'en'") val idioma: String = "es"
+    @ColumnInfo(defaultValue = "'en'") val idioma: String = "en"
 )

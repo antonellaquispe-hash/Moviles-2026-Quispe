@@ -49,7 +49,7 @@ fun ListaScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text("ROCKVAULT  /  LECTURAS", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onPrimary)
                     Text("Ideas que\nencienden", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onPrimary)
-                    Text("Artículos reales para descubrir", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimary.copy(alpha = .86f))
+                    Text("Publicaciones para descubrir", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimary.copy(alpha = .86f))
                 }
                 Text("✦", style = MaterialTheme.typography.displayMedium, color = MaterialTheme.colorScheme.onPrimary)
             }

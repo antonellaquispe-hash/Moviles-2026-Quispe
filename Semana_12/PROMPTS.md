@@ -62,3 +62,12 @@
 - Qué respondió (resumen): DEV permite filtrar por etiqueta; se puede mostrar contenido marcado como español y alternar el tema visual desde la aplicación.
 - Qué usamos / qué cambiamos y por qué: Filtramos por `tag=spanish` y por `language=es`, eliminamos del catálogo local las publicaciones de otro idioma y agregamos un selector persistente de modo claro u oscuro. El modo claro queda como opción inicial.
 - Qué aprendimos: La API de Forem incluye el idioma del artículo y admite filtros de etiqueta en el catálogo público.
+
+## Consulta 8
+
+- Fecha: 2026-11-07
+- Herramienta: Codex
+- Prompt: Ajustar la variante de la API para que coincida con el recurso asignado en el PDF y conservar el trabajo en la rama mejora-ia.
+- Qué respondió (resumen): El PDF asigna a Publicaciones uno de los recursos de JSONPlaceholder: `posts`, `albums` o `todos`.
+- Qué usamos / qué cambiamos y por qué: Cambiamos DEV Community por `GET /posts` y `GET /posts/{id}`, migramos la caché para retirar los artículos anteriores y mantuvimos Room, favoritos, navegación, idioma de la interfaz y temas visuales.
+- Qué aprendimos: La variante del grupo determina qué recurso y endpoints deben usarse, aunque la interfaz pueda tener mejoras propias.
