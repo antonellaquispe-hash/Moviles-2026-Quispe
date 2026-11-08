@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.tecsup.rockvault.data.repository.ItemRepository
+import com.tecsup.rockvault.notification.Notificador
 import com.tecsup.rockvault.ui.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +16,10 @@ data class ResumenAdmin(
     val totalFavoritos: Int
 )
 
-class AdminViewModel(private val itemRepository: ItemRepository) : ViewModel() {
+class AdminViewModel(
+    private val itemRepository: ItemRepository,
+    private val notificador: Notificador
+) : ViewModel() {
     private val _estado = MutableStateFlow<UiState<ResumenAdmin>>(UiState.Cargando)
     val estado: StateFlow<UiState<ResumenAdmin>> = _estado.asStateFlow()
     private val _mensaje = MutableStateFlow<String?>(null)
@@ -46,6 +50,7 @@ class AdminViewModel(private val itemRepository: ItemRepository) : ViewModel() {
             itemRepository.refrescar()
                 .onSuccess { cantidad ->
                     _mensaje.value = "Se sincronizaron $cantidad elementos"
+                    notificador.mostrar("Datos actualizados", "Se guardaron $cantidad elementos")
                     cargarTotales()
                 }
                 .onFailure { error ->
@@ -66,11 +71,14 @@ class AdminViewModel(private val itemRepository: ItemRepository) : ViewModel() {
         }
     }
 
-    class Factory(private val itemRepository: ItemRepository) : ViewModelProvider.Factory {
+    class Factory(
+        private val itemRepository: ItemRepository,
+        private val notificador: Notificador
+    ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             require(modelClass.isAssignableFrom(AdminViewModel::class.java))
-            return AdminViewModel(itemRepository) as T
+            return AdminViewModel(itemRepository, notificador) as T
         }
     }
 }

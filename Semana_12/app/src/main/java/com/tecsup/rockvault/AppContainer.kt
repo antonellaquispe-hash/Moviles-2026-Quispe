@@ -7,6 +7,8 @@ import com.tecsup.rockvault.data.local.AppDatabase
 import com.tecsup.rockvault.data.remote.RetrofitClient
 import com.tecsup.rockvault.data.repository.ItemRepository
 import com.tecsup.rockvault.data.repository.ItemRepositoryImpl
+import com.tecsup.rockvault.notification.Notificador
+import com.tecsup.rockvault.notification.NotificadorAndroid
 
 object AppContainer {
     val authRepository: AuthRepository by lazy { FirebaseAuthRepository() }
@@ -15,6 +17,8 @@ object AppContainer {
     private var repository: ItemRepository? = null
 
     fun database(context: Context): AppDatabase = AppDatabase.getInstance(context)
+
+    fun notificador(context: Context): Notificador = NotificadorAndroid(context.applicationContext)
 
     fun itemRepository(context: Context): ItemRepository = repository ?: synchronized(this) {
         repository ?: ItemRepositoryImpl(

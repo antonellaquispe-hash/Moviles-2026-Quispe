@@ -1,10 +1,15 @@
 package com.tecsup.rockvault
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,11 +21,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.tecsup.rockvault.domain.model.Rol
 import com.tecsup.rockvault.domain.model.Sesion
@@ -43,10 +50,17 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val repository = AppContainer.itemRepository(applicationContext)
-        val listaViewModel = ViewModelProvider(this, ListaViewModel.Factory(repository))[ListaViewModel::class.java]
+        val notificador = AppContainer.notificador(applicationContext)
+        val listaViewModel = ViewModelProvider(
+            this,
+            ListaViewModel.Factory(repository, notificador)
+        )[ListaViewModel::class.java]
         val detalleViewModel = ViewModelProvider(this, DetalleViewModel.Factory(repository))[DetalleViewModel::class.java]
         val favoritosViewModel = ViewModelProvider(this, FavoritosViewModel.Factory(repository))[FavoritosViewModel::class.java]
-        val adminViewModel = ViewModelProvider(this, AdminViewModel.Factory(repository))[AdminViewModel::class.java]
+        val adminViewModel = ViewModelProvider(
+            this,
+            AdminViewModel.Factory(repository, notificador)
+        )[AdminViewModel::class.java]
         val loginViewModel = ViewModelProvider(
             this,
             LoginViewModel.Factory(AppContainer.authRepository)
@@ -62,6 +76,26 @@ class MainActivity : ComponentActivity() {
                 val sesion = (estadoSesion as? UiState.Exito<Sesion>)?.datos
                 val esAdmin = sesion?.rol == Rol.ADMIN
                 val cantidadPestanas = if (esAdmin) 3 else 2
+                var solicitoPermiso by remember { mutableStateOf(false) }
+                val permisoNotificaciones = rememberLauncherForActivityResult(
+                    ActivityResultContracts.RequestPermission()
+                ) { concedido ->
+                    if (concedido) listaViewModel.cargar()
+                }
+                LaunchedEffect(sesion != null) {
+                    if (
+                        sesion != null &&
+                        Build.VERSION.SDK_INT >= 33 &&
+                        !solicitoPermiso &&
+                        ContextCompat.checkSelfPermission(
+                            this@MainActivity,
+                            Manifest.permission.POST_NOTIFICATIONS
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        solicitoPermiso = true
+                        permisoNotificaciones.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
                 if (pestanaSeleccionada >= cantidadPestanas) pestanaSeleccionada = 0
 
                 BackHandler(enabled = sesion != null && itemSeleccionado != null) {
