@@ -30,7 +30,6 @@ fun AdminScreen(
         modifier = modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Panel de administrador", style = MaterialTheme.typography.headlineMedium)
         when (estado) {
             UiState.Cargando -> Cargando(modifier = Modifier.weight(1f))
             is UiState.Error -> {
