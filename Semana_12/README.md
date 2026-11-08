@@ -5,7 +5,7 @@ Aplicación Android para consultar publicaciones, leer sus detalles y guardar fa
 ## Tema y variante
 
 - Tema: Publicaciones.
-- Variante: recurso `posts` de JSONPlaceholder (datos de demostración).
+- Variante: artículos públicos en español de DEV Community mediante la API de Forem.
 - Paquete Android: `com.tecsup.rockvault`.
 
 ## Funciones
@@ -13,7 +13,7 @@ Aplicación Android para consultar publicaciones, leer sus detalles y guardar fa
 - Inicio de sesión con correo y contraseña.
 - Lectura del rol `admin` o `usuario` desde `usuarios/{uid}` en Firestore.
 - Lista de publicaciones, detalle y favoritos locales.
-- Lista de publicaciones desde `GET /posts` y detalle desde `GET /posts/{id}`.
+- Lista de artículos y detalle con sus imágenes cuando están disponibles.
 - Tema claro blanco con morado y modo oscuro negro con morado, con preferencia guardada.
 - Datos guardados con Room para consultar el catálogo sin conexión.
 - Acceso al panel de administración solo para cuentas con rol `admin`.
@@ -75,12 +75,12 @@ service cloud.firestore {
 - `ui`: pantallas y ViewModels de login, catálogo, detalle, favoritos y administración.
 - `notification`: contrato e implementación Android para notificaciones.
 
-Room es la fuente de datos que observa la interfaz. Retrofit consulta `GET /posts` y obtiene el detalle con `GET /posts/{id}`. La sincronización reemplaza los registros descargados, conserva los favoritos y deja Room como fuente de datos de la interfaz.
+Room es la fuente de datos que observa la interfaz. Retrofit consulta publicaciones en español etiquetadas `spanish` con `GET /articles?per_page=30&top=365&tag=spanish`, verifica el idioma `es` y obtiene el contenido completo con `GET /articles/{id}`. La sincronización oculta publicaciones de otras fuentes, conserva favoritos en español y deja Room como fuente de datos de la interfaz.
 
 ## Reparto de tareas
 
 | Área | Trabajo |
 | --- | --- |
-| Trabajo individual | Estructura MVVM, consulta de JSONPlaceholder, persistencia Room, acceso Firebase, pantallas, favoritos, panel de administración, notificaciones y documentación |
+| Trabajo individual | Estructura MVVM, consulta de artículos DEV/Forem, persistencia Room, acceso Firebase, pantallas, favoritos, panel de administración, notificaciones y documentación |
 
 El laboratorio se desarrolla de manera individual.

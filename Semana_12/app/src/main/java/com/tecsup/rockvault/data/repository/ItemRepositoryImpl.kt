@@ -24,6 +24,7 @@ class ItemRepositoryImpl(
     override suspend fun refrescar(): Result<Int> = try {
         val idsFavoritos = itemDao.idsFavoritos().toSet()
         val nuevosItems = apiService.listarPublicaciones()
+            .filter { it.language == "es" }
             .mapNotNull { it.toDomain() }
             .map { it.copy(esFavorito = it.id in idsFavoritos) }
         if (nuevosItems.isNotEmpty()) {

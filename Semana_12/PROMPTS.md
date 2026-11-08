@@ -71,3 +71,12 @@
 - Qué respondió (resumen): El PDF asigna a Publicaciones uno de los recursos de JSONPlaceholder: `posts`, `albums` o `todos`.
 - Qué usamos / qué cambiamos y por qué: Cambiamos DEV Community por `GET /posts` y `GET /posts/{id}`, migramos la caché para retirar los artículos anteriores y mantuvimos Room, favoritos, navegación, idioma de la interfaz y temas visuales.
 - Qué aprendimos: La variante del grupo determina qué recurso y endpoints deben usarse, aunque la interfaz pueda tener mejoras propias.
+
+## Consulta 9
+
+- Fecha: 2026-11-07
+- Herramienta: Codex
+- Prompt: Volver a la versión con artículos reales e imágenes, conservar los temas claro y oscuro y no crear el commit todavía.
+- Qué respondió (resumen): La fuente DEV Community ofrece artículos reales, imágenes de portada y contenido en español; la UI y el guardado local pueden mantenerse.
+- Qué usamos / qué cambiamos y por qué: Restauramos la API de Forem con artículos etiquetados `spanish`, validamos `language=es` y ocultamos los registros antiguos de JSONPlaceholder usando el idioma guardado en Room. No se creó un commit.
+- Qué aprendimos: La elección entre cumplir exactamente la variante del PDF y mostrar publicaciones reales debe conservarse explícita en la documentación del proyecto.

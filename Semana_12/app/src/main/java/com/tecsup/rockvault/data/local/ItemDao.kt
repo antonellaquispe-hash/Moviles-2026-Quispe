@@ -7,10 +7,10 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ItemDao {
-    @Query("SELECT * FROM items ORDER BY titulo")
+    @Query("SELECT * FROM items WHERE idioma = 'es' ORDER BY titulo")
     fun todos(): Flow<List<ItemEntity>>
 
-    @Query("SELECT * FROM items WHERE esFavorito = 1 ORDER BY titulo")
+    @Query("SELECT * FROM items WHERE esFavorito = 1 AND idioma = 'es' ORDER BY titulo")
     fun favoritos(): Flow<List<ItemEntity>>
 
     @Query("SELECT id FROM items WHERE esFavorito = 1")
@@ -28,7 +28,7 @@ interface ItemDao {
     @Upsert
     suspend fun guardarTodos(items: List<ItemEntity>)
 
-    @Query("DELETE FROM items WHERE esFavorito = 0 AND id NOT IN (:ids)")
+    @Query("DELETE FROM items WHERE idioma != 'es' OR (esFavorito = 0 AND id NOT IN (:ids))")
     suspend fun podarCatalogo(ids: List<String>)
 
     @Query("UPDATE items SET esFavorito = NOT esFavorito WHERE id = :id")

@@ -6,7 +6,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "https://jsonplaceholder.typicode.com/"
+    private const val BASE_URL = "https://dev.to/api/"
     private val contentType = "application/json".toMediaType()
     private val json = Json {
         ignoreUnknownKeys = true
