@@ -16,7 +16,8 @@ fun ItemDto.toDomain(): Item? {
         id = id.toString(),
         titulo = titulo,
         subtitulo = resumen,
-        imagenUrl = coverImage ?: author?.profileImage
+        imagenUrl = coverImage ?: author?.profileImage,
+        idioma = language
     )
 }
 
@@ -25,7 +26,8 @@ fun ItemEntity.toDomain(): Item = Item(
     titulo = titulo,
     subtitulo = subtitulo,
     imagenUrl = imagenUrl,
-    esFavorito = esFavorito
+    esFavorito = esFavorito,
+    idioma = idioma
 )
 
 fun Item.toEntity(): ItemEntity = ItemEntity(
@@ -33,5 +35,6 @@ fun Item.toEntity(): ItemEntity = ItemEntity(
     titulo = titulo,
     subtitulo = subtitulo,
     imagenUrl = imagenUrl,
-    esFavorito = esFavorito
+    esFavorito = esFavorito,
+    idioma = idioma
 )

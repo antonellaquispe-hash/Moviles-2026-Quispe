@@ -23,24 +23,24 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = VaultAmberDeep,
+    primary = Color(0xFF7040B5),
     onPrimary = Color.White,
-    secondary = VaultPlum,
+    secondary = Color(0xFF8655C7),
     onSecondary = Color.White,
-    tertiary = VaultRose,
-    background = VaultPaper,
-    onBackground = VaultInk,
-    surface = VaultCard,
-    onSurface = VaultInk,
-    surfaceVariant = Color(0xFFEDE6DF),
-    onSurfaceVariant = VaultMuted,
-    outline = VaultLine,
+    tertiary = Color(0xFFB34E9A),
+    background = Color(0xFFFAF7FF),
+    onBackground = Color(0xFF21172D),
+    surface = Color.White,
+    onSurface = Color(0xFF21172D),
+    surfaceVariant = Color(0xFFF0E9F8),
+    onSurfaceVariant = Color(0xFF61566E),
+    outline = Color(0xFFD7CBE5),
     error = Color(0xFFB3261E)
 )
 
 @Composable
 fun RockVaultTheme(
-    darkTheme: Boolean = true,
+    darkTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
     MaterialTheme(

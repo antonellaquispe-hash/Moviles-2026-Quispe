@@ -38,8 +38,8 @@ class AdminViewModel(
                         totalFavoritos = itemRepository.cantidadFavoritos()
                     )
                 )
-            } catch (error: Exception) {
-                _estado.value = UiState.Error(error.localizedMessage ?: "No se pudieron cargar los totales")
+            } catch (_: Exception) {
+                _estado.value = UiState.Error("No se pudieron cargar los totales")
             }
         }
     }
@@ -53,8 +53,8 @@ class AdminViewModel(
                     notificador.mostrar("Datos actualizados", "Se guardaron $cantidad elementos")
                     cargarTotales()
                 }
-                .onFailure { error ->
-                    _mensaje.value = error.localizedMessage ?: "No se pudo sincronizar"
+                .onFailure {
+                    _mensaje.value = "No se pudo sincronizar. Inténtalo de nuevo."
                 }
         }
     }
@@ -65,8 +65,8 @@ class AdminViewModel(
                 itemRepository.limpiarCache()
                 _mensaje.value = "Caché limpiada"
                 cargarTotales()
-            } catch (error: Exception) {
-                _mensaje.value = error.localizedMessage ?: "No se pudo limpiar la caché"
+            } catch (_: Exception) {
+                _mensaje.value = "No se pudo limpiar la caché"
             }
         }
     }

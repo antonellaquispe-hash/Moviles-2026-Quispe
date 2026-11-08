@@ -24,7 +24,7 @@ class DetalleViewModel(
                 .onSuccess { item -> _estado.value = UiState.Exito(item) }
                 .onFailure { error ->
                     _estado.value = UiState.Error(
-                        error.message ?: "No se pudo cargar el detalle"
+                        "No se pudo cargar la publicación. Inténtalo de nuevo."
                     )
                 }
         }

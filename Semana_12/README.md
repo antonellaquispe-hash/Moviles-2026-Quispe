@@ -13,6 +13,8 @@ Aplicación Android para consultar publicaciones, leer sus detalles y guardar fa
 - Inicio de sesión con correo y contraseña.
 - Lectura del rol `admin` o `usuario` desde `usuarios/{uid}` en Firestore.
 - Lista de publicaciones, detalle y favoritos locales.
+- Publicaciones escritas en español.
+- Tema claro blanco con morado y modo oscuro negro con morado, con preferencia guardada.
 - Datos guardados con Room para consultar el catálogo sin conexión.
 - Acceso al panel de administración solo para cuentas con rol `admin`.
 - Totales de elementos y favoritos, sincronización y limpieza de caché en el panel.
@@ -73,7 +75,7 @@ service cloud.firestore {
 - `ui`: pantallas y ViewModels de login, catálogo, detalle, favoritos y administración.
 - `notification`: contrato e implementación Android para notificaciones.
 
-Room es la fuente de datos que observa la interfaz. Retrofit consulta artículos populares de los últimos 30 días con `GET /articles?per_page=30&top=30` y obtiene el contenido completo mediante `GET /articles/{id}`. La sincronización actualiza los registros y conserva los favoritos.
+Room es la fuente de datos que observa la interfaz. Retrofit consulta publicaciones en español etiquetadas `spanish` con `GET /articles?per_page=30&top=365&tag=spanish`, verifica el idioma `es` y obtiene el contenido completo con `GET /articles/{id}`. La sincronización oculta publicaciones de otros idiomas y conserva los favoritos en español.
 
 ## Reparto de tareas
 

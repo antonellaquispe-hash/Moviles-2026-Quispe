@@ -59,7 +59,7 @@ class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
         is FirebaseAuthInvalidCredentialsException, is FirebaseAuthInvalidUserException ->
             "Correo o contraseña incorrectos"
         is FirebaseNetworkException -> "No hay conexión a internet"
-        else -> error.localizedMessage ?: "No se pudo iniciar sesión"
+        else -> "No se pudo iniciar sesión. Inténtalo de nuevo."
     }
 
     class Factory(private val authRepository: AuthRepository) : ViewModelProvider.Factory {

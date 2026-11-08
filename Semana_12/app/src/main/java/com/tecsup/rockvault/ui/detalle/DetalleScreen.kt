@@ -86,7 +86,7 @@ private fun DetalleItem(
                     modifier = Modifier.fillMaxSize()
                 )
             } else {
-                Text("¶", style = MaterialTheme.typography.displayLarge, color = MaterialTheme.colorScheme.onPrimary)
+                Text("RV", style = MaterialTheme.typography.displayLarge, color = MaterialTheme.colorScheme.onPrimary)
             }
         }
         Text(
@@ -95,7 +95,7 @@ private fun DetalleItem(
             color = MaterialTheme.colorScheme.onBackground
         )
         Text(
-            text = "LECTURA  •  DEV COMMUNITY",
+            text = "PUBLICACIÓN  •  COMUNIDAD",
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.primary
         )

@@ -9,7 +9,8 @@ interface ApiService {
     @GET("articles")
     suspend fun listarPublicaciones(
         @Query("per_page") cantidad: Int = 30,
-        @Query("top") dias: Int = 30
+        @Query("top") dias: Int = 365,
+        @Query("tag") etiqueta: String = "spanish"
     ): List<ItemDto>
 
     @GET("articles/{id}")

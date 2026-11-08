@@ -14,6 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -55,9 +56,13 @@ class MainActivity : ComponentActivity() {
             this,
             LoginViewModel.Factory(AppContainer.authRepository)
         )[LoginViewModel::class.java]
+        val preferencias = getSharedPreferences("rockvault_preferencias", MODE_PRIVATE)
 
         setContent {
-            RockVaultTheme {
+            var modoOscuro by rememberSaveable {
+                mutableStateOf(preferencias.getBoolean("modo_oscuro", false))
+            }
+            RockVaultTheme(darkTheme = modoOscuro) {
                 val estadoSesion by loginViewModel.estado.collectAsState()
                 val estadoLista by listaViewModel.estado.collectAsState()
                 val avisoLista by listaViewModel.aviso.collectAsState()
@@ -115,7 +120,12 @@ class MainActivity : ComponentActivity() {
                         onSincronizar = adminViewModel::sincronizar,
                         onLimpiarCache = adminViewModel::limpiarCache,
                         onCargarTotales = adminViewModel::cargarTotales,
-                        onCerrarSesion = loginViewModel::cerrarSesion
+                        onCerrarSesion = loginViewModel::cerrarSesion,
+                        modoOscuro = modoOscuro,
+                        onAlternarTema = {
+                            modoOscuro = !modoOscuro
+                            preferencias.edit().putBoolean("modo_oscuro", modoOscuro).apply()
+                        }
                     )
                 }
             }

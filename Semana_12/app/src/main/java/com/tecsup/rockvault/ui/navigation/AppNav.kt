@@ -52,6 +52,8 @@ fun AppNav(
     onLimpiarCache: () -> Unit,
     onCargarTotales: () -> Unit,
     onCerrarSesion: () -> Unit,
+    modoOscuro: Boolean,
+    onAlternarTema: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val esAdmin = sesion.rol == Rol.ADMIN
@@ -79,11 +81,14 @@ fun AppNav(
                         )
                     },
                     actions = {
+                        TextButton(onClick = onAlternarTema) {
+                            Text(if (modoOscuro) "☀ Claro" else "☾ Oscuro", color = MaterialTheme.colorScheme.primary)
+                        }
                         TextButton(onClick = onCerrarSesion) {
-                            Text("Salir", color = MaterialTheme.colorScheme.primary)
+                            Text("Cerrar", color = MaterialTheme.colorScheme.primary)
                         }
                     },
-                    colors = androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.surface
                     )
                 )
@@ -112,7 +117,7 @@ fun AppNav(
                                 onCargarTotales()
                             },
                             icon = { Text("⚙") },
-                            label = { Text("Admin") }
+                            label = { Text("Gestión") }
                         )
                     }
                 }

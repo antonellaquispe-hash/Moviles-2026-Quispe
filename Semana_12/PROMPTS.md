@@ -53,3 +53,12 @@
 - Qué respondió (resumen): JSONPlaceholder sirve datos ficticios de demostración; Forem/DEV ofrece artículos públicos reales con autor, descripción, portada y contenido.
 - Qué usamos / qué cambiamos y por qué: Cambiamos la fuente a la API pública de DEV Community, usando `/articles?per_page=30&top=30` para mostrar artículos populares del último mes y `/articles/{id}` para su contenido. Adaptamos los DTO y mostramos portadas del artículo o imagen de perfil del autor cuando la publicación no tiene portada.
 - Qué aprendimos: La API de artículos devuelve datos reales escritos por autores y puede incluir una imagen de portada y el cuerpo del artículo.
+
+## Consulta 7
+
+- Fecha: 2026-11-07
+- Herramienta: Codex
+- Prompt: Traducir la interfaz a español y agregar un modo claro blanco con morado y un modo oscuro negro con morado.
+- Qué respondió (resumen): DEV permite filtrar por etiqueta; se puede mostrar contenido marcado como español y alternar el tema visual desde la aplicación.
+- Qué usamos / qué cambiamos y por qué: Filtramos por `tag=spanish` y por `language=es`, eliminamos del catálogo local las publicaciones de otro idioma y agregamos un selector persistente de modo claro u oscuro. El modo claro queda como opción inicial.
+- Qué aprendimos: La API de Forem incluye el idioma del artículo y admite filtros de etiqueta en el catálogo público.

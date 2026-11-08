@@ -11,6 +11,7 @@ data class ItemDto(
     @SerialName("cover_image") val coverImage: String? = null,
     @SerialName("body_html") val bodyHtml: String? = null,
     @SerialName("body_markdown") val bodyMarkdown: String? = null,
+    @SerialName("language") val language: String = "en",
     @SerialName("url") val url: String? = null,
     @SerialName("user") val author: AuthorDto? = null
 )
