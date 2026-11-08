@@ -44,3 +44,12 @@
 - Qué respondió (resumen): La API actual de iTunes no correspondía a Publicaciones. Firestore usa los campos `Administrador` y `Usuario`, mientras la app solo leía `rol`.
 - Qué usamos / qué cambiamos y por qué: Cambiamos Retrofit a JSONPlaceholder `GET /posts` y `GET /posts/{id}`, adaptamos DTO, mapeo, repositorio, textos e interfaz. La lectura del rol ahora reconoce `rol` y los campos existentes `Administrador` o `Usuario`. Creamos una base Room nueva para evitar que una actualización mezcle publicaciones con álbumes guardados anteriormente.
 - Qué aprendimos: El tema asignado define los endpoints de lista y detalle; el documento de Firestore debe leerse de acuerdo con los campos que realmente existen.
+
+## Consulta 6
+
+- Fecha: 2026-11-07
+- Herramienta: Codex
+- Prompt: Reemplazar los textos de prueba por publicaciones y contenido real, con fotos reales cuando existan.
+- Qué respondió (resumen): JSONPlaceholder sirve datos ficticios de demostración; Forem/DEV ofrece artículos públicos reales con autor, descripción, portada y contenido.
+- Qué usamos / qué cambiamos y por qué: Cambiamos la fuente a la API pública de DEV Community, usando `/articles?per_page=30&top=30` para mostrar artículos populares del último mes y `/articles/{id}` para su contenido. Adaptamos los DTO y mostramos portadas del artículo o imagen de perfil del autor cuando la publicación no tiene portada.
+- Qué aprendimos: La API de artículos devuelve datos reales escritos por autores y puede incluir una imagen de portada y el cuerpo del artículo.

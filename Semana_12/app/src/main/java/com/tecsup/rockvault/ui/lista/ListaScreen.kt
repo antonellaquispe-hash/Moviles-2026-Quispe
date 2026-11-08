@@ -43,8 +43,8 @@ fun ListaScreen(
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text("ROCKVAULT  •  PUBLICACIONES", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onPrimary)
-                    Text("Ideas, historias\ny opiniones", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onPrimary)
-                    Text("Lee y guarda tus favoritas", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimary.copy(alpha = .8f))
+                    Text("Artículos reales\nde la comunidad", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onPrimary)
+                    Text("Lee y guarda tus favoritos", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimary.copy(alpha = .8f))
                 }
                 Text("¶", style = MaterialTheme.typography.displayMedium, color = MaterialTheme.colorScheme.onPrimary)
             }

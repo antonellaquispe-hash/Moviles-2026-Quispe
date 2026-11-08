@@ -1,5 +1,6 @@
 package com.tecsup.rockvault.ui.detalle
 
+import android.text.Html
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -8,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -19,6 +22,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import com.tecsup.rockvault.domain.model.Item
 import com.tecsup.rockvault.ui.UiState
 import com.tecsup.rockvault.ui.components.Cargando
@@ -64,7 +69,7 @@ private fun DetalleItem(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Box(
@@ -72,15 +77,24 @@ private fun DetalleItem(
                 .background(Brush.linearGradient(listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.tertiary))),
             contentAlignment = Alignment.Center
         ) {
-            Text("¶", style = MaterialTheme.typography.displayLarge, color = MaterialTheme.colorScheme.onPrimary)
+            if (!item.imagenUrl.isNullOrBlank()) {
+                AsyncImage(
+                    model = item.imagenUrl,
+                    contentDescription = "Imagen de ${item.titulo}",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                Text("¶", style = MaterialTheme.typography.displayLarge, color = MaterialTheme.colorScheme.onPrimary)
+            }
         }
         Text(
             text = item.titulo,
             style = MaterialTheme.typography.headlineSmall
         )
         Text(
-            text = item.subtitulo,
-            style = MaterialTheme.typography.titleMedium
+            text = Html.fromHtml(item.subtitulo, Html.FROM_HTML_MODE_COMPACT).toString(),
+            style = MaterialTheme.typography.bodyLarge
         )
         Text(
             text = "Identificador: ${item.id}",

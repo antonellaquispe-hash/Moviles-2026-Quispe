@@ -5,7 +5,7 @@ Aplicación Android para consultar publicaciones, leer sus detalles y guardar fa
 ## Tema y variante
 
 - Tema: Publicaciones.
-- Variante: recurso `posts` de JSONPlaceholder.
+- Variante: artículos publicados de DEV Community mediante la API pública de Forem.
 - Paquete Android: `com.tecsup.rockvault`.
 
 ## Funciones
@@ -65,7 +65,7 @@ service cloud.firestore {
 
 ## Arquitectura
 
-- `data/remote`: cliente Retrofit, servicio JSONPlaceholder y DTO.
+- `data/remote`: cliente Retrofit, servicio de artículos DEV/Forem y DTO.
 - `data/local`: entidades, DAO y base de datos Room.
 - `data/repository`: contrato e implementación del catálogo.
 - `data/auth`: contrato e implementación de autenticación Firebase.
@@ -73,12 +73,12 @@ service cloud.firestore {
 - `ui`: pantallas y ViewModels de login, catálogo, detalle, favoritos y administración.
 - `notification`: contrato e implementación Android para notificaciones.
 
-Room es la fuente de datos que observa la interfaz. Retrofit consulta `GET /posts` y `GET /posts/{id}`, actualiza los registros guardados y conserva los favoritos durante la sincronización.
+Room es la fuente de datos que observa la interfaz. Retrofit consulta artículos populares de los últimos 30 días con `GET /articles?per_page=30&top=30` y obtiene el contenido completo mediante `GET /articles/{id}`. La sincronización actualiza los registros y conserva los favoritos.
 
 ## Reparto de tareas
 
 | Área | Trabajo |
 | --- | --- |
-| Trabajo individual | Estructura MVVM, consulta JSONPlaceholder, persistencia Room, acceso Firebase, pantallas, favoritos, panel Admin, notificaciones y documentación |
+| Trabajo individual | Estructura MVVM, consulta de artículos DEV/Forem, persistencia Room, acceso Firebase, pantallas, favoritos, panel Admin, notificaciones y documentación |
 
 El laboratorio se desarrolla de manera individual.
