@@ -1,12 +1,16 @@
 package com.tecsup.rockvault
 
 import android.content.Context
+import com.tecsup.rockvault.data.auth.AuthRepository
+import com.tecsup.rockvault.data.auth.FirebaseAuthRepository
 import com.tecsup.rockvault.data.local.AppDatabase
 import com.tecsup.rockvault.data.remote.RetrofitClient
 import com.tecsup.rockvault.data.repository.ItemRepository
 import com.tecsup.rockvault.data.repository.ItemRepositoryImpl
 
 object AppContainer {
+    val authRepository: AuthRepository by lazy { FirebaseAuthRepository() }
+
     @Volatile
     private var repository: ItemRepository? = null
 
