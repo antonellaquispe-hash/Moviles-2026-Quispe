@@ -1,5 +1,6 @@
 package com.tecsup.rockvault.ui.lista
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.PaddingValues
@@ -7,6 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Snackbar
@@ -34,19 +37,21 @@ fun ListaScreen(
     Column(modifier = modifier.fillMaxSize()) {
         Surface(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(26.dp),
+            shape = RoundedCornerShape(30.dp),
             color = MaterialTheme.colorScheme.primary
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(20.dp),
+                modifier = Modifier.fillMaxWidth().background(
+                    Brush.linearGradient(listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.tertiary))
+                ).padding(22.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("ROCKVAULT  •  PUBLICACIONES", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onPrimary)
-                    Text("Artículos reales\nde la comunidad", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onPrimary)
-                    Text("Lee y guarda tus favoritos", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimary.copy(alpha = .8f))
+                    Text("ROCKVAULT  /  LECTURAS", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onPrimary)
+                    Text("Ideas que\nencienden", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onPrimary)
+                    Text("Artículos reales para descubrir", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimary.copy(alpha = .86f))
                 }
-                Text("¶", style = MaterialTheme.typography.displayMedium, color = MaterialTheme.colorScheme.onPrimary)
+                Text("✦", style = MaterialTheme.typography.displayMedium, color = MaterialTheme.colorScheme.onPrimary)
             }
         }
         if (aviso != null) {

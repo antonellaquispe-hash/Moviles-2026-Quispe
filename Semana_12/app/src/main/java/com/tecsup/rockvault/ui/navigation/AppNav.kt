@@ -95,8 +95,8 @@ fun AppNav(
                     NavigationBarItem(
                         selected = destino == DestinoApp.CATALOGO,
                         onClick = { destino = DestinoApp.CATALOGO },
-                        icon = { Text("♫") },
-                        label = { Text("Catálogo") }
+                        icon = { Text("▦") },
+                        label = { Text("Lecturas") }
                     )
                     NavigationBarItem(
                         selected = destino == DestinoApp.FAVORITOS,

@@ -8,17 +8,18 @@ import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
     primary = VaultAmber,
-    onPrimary = VaultInk,
+    onPrimary = Color(0xFF21132F),
     secondary = VaultMint,
     onSecondary = VaultInk,
     tertiary = VaultRose,
-    background = Color(0xFF11131A),
-    onBackground = Color(0xFFF7F3EE),
-    surface = Color(0xFF1C1F28),
-    onSurface = Color(0xFFF7F3EE),
-    surfaceVariant = Color(0xFF292C36),
-    onSurfaceVariant = Color(0xFFC6C2CC),
-    outline = Color(0xFF464955)
+    background = Color(0xFF100B18),
+    onBackground = Color(0xFFF7F0FF),
+    surface = Color(0xFF1B1425),
+    onSurface = Color(0xFFF7F0FF),
+    surfaceVariant = Color(0xFF281D35),
+    onSurfaceVariant = Color(0xFFC9BED5),
+    outline = Color(0xFF49375E),
+    error = Color(0xFFFF8A9A)
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -39,7 +40,7 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun RockVaultTheme(
-    darkTheme: Boolean = false,
+    darkTheme: Boolean = true,
     content: @Composable () -> Unit
 ) {
     MaterialTheme(

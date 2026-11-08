@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.Alignment
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -90,16 +91,27 @@ private fun DetalleItem(
         }
         Text(
             text = item.titulo,
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onBackground
         )
         Text(
-            text = Html.fromHtml(item.subtitulo, Html.FROM_HTML_MODE_COMPACT).toString(),
-            style = MaterialTheme.typography.bodyLarge
+            text = "LECTURA  •  DEV COMMUNITY",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.primary
         )
-        Text(
-            text = "Identificador: ${item.id}",
-            style = MaterialTheme.typography.bodyMedium
-        )
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 3.dp
+        ) {
+            Text(
+                text = Html.fromHtml(item.subtitulo, Html.FROM_HTML_MODE_COMPACT).toString(),
+                modifier = Modifier.padding(20.dp),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
         OutlinedButton(onClick = onAlternarFavorito) {
             Text(text = if (item.esFavorito) "Quitar de favoritos" else "Agregar a favoritos")
         }

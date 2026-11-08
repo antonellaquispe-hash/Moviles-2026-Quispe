@@ -35,17 +35,17 @@ fun ItemCard(
     ElevatedCard(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(26.dp),
         colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 3.dp)
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(14.dp),
+            modifier = Modifier.fillMaxWidth().padding(15.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Box(
-                modifier = Modifier.size(76.dp).clip(RoundedCornerShape(18.dp))
+                modifier = Modifier.size(84.dp).clip(RoundedCornerShape(20.dp))
                     .background(
                         Brush.linearGradient(
                             listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.tertiary)
@@ -61,7 +61,7 @@ fun ItemCard(
                         modifier = Modifier.matchParentSize()
                     )
                 } else {
-                    Text("¶", color = MaterialTheme.colorScheme.onPrimary, style = MaterialTheme.typography.headlineMedium)
+                    Text("RV", color = MaterialTheme.colorScheme.onPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Black)
                 }
             }
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -69,7 +69,8 @@ fun ItemCard(
                     text = item.titulo,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    maxLines = 2
+                    maxLines = 2,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = item.subtitulo,

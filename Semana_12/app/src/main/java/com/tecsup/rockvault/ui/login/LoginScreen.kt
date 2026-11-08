@@ -67,11 +67,11 @@ fun LoginScreen(
                     ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("♫", style = MaterialTheme.typography.displaySmall, color = MaterialTheme.colorScheme.onPrimary)
+                    Text("RV", style = MaterialTheme.typography.displaySmall, color = MaterialTheme.colorScheme.onPrimary)
                 }
                 Spacer(Modifier.height(18.dp))
                 Text("RockVault", style = MaterialTheme.typography.headlineLarge)
-                Text("Entra a tu colección musical", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("Tu espacio para descubrir publicaciones", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(24.dp))
                 OutlinedTextField(
                     value = correo,
