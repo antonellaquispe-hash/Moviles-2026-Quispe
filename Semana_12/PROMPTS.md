@@ -42,5 +42,5 @@
 - Herramienta: Codex
 - Prompt: Corregir el tema porque el trabajo es individual y corresponde a Publicaciones; revisar la configuración Firebase mostrada en capturas.
 - Qué respondió (resumen): La API actual de iTunes no correspondía a Publicaciones. Firestore usa los campos `Administrador` y `Usuario`, mientras la app solo leía `rol`.
-- Qué usamos / qué cambiamos y por qué: Cambiamos Retrofit a JSONPlaceholder `GET /posts` y `GET /posts/{id}`, adaptamos DTO, mapeo, repositorio, textos e interfaz. La lectura del rol ahora reconoce `rol` y los campos existentes `Administrador` o `Usuario`.
+- Qué usamos / qué cambiamos y por qué: Cambiamos Retrofit a JSONPlaceholder `GET /posts` y `GET /posts/{id}`, adaptamos DTO, mapeo, repositorio, textos e interfaz. La lectura del rol ahora reconoce `rol` y los campos existentes `Administrador` o `Usuario`. Creamos una base Room nueva para evitar que una actualización mezcle publicaciones con álbumes guardados anteriormente.
 - Qué aprendimos: El tema asignado define los endpoints de lista y detalle; el documento de Firestore debe leerse de acuerdo con los campos que realmente existen.
