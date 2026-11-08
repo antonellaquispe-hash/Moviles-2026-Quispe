@@ -42,11 +42,11 @@ fun ListaScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("ROCKVAULT  •  COLECCIÓN", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onPrimary)
-                    Text("Tu próximo\nalbum favorito", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onPrimary)
-                    Text("Descubre sonidos nuevos", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimary.copy(alpha = .8f))
+                    Text("ROCKVAULT  •  PUBLICACIONES", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onPrimary)
+                    Text("Ideas, historias\ny opiniones", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onPrimary)
+                    Text("Lee y guarda tus favoritas", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimary.copy(alpha = .8f))
                 }
-                Text("♫", style = MaterialTheme.typography.displayMedium, color = MaterialTheme.colorScheme.onPrimary)
+                Text("¶", style = MaterialTheme.typography.displayMedium, color = MaterialTheme.colorScheme.onPrimary)
             }
         }
         if (aviso != null) {

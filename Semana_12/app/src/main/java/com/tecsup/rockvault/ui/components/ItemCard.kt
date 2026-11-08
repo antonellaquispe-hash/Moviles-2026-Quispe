@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.tecsup.rockvault.domain.model.Item
 
 @Composable
@@ -53,16 +52,7 @@ fun ItemCard(
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                if (!item.imagenUrl.isNullOrBlank()) {
-                    AsyncImage(
-                        model = item.imagenUrl,
-                        contentDescription = "Carátula de ${item.titulo}",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.matchParentSize()
-                    )
-                } else {
-                    Text("♫", color = MaterialTheme.colorScheme.onPrimary, style = MaterialTheme.typography.headlineMedium)
-                }
+                Text("¶", color = MaterialTheme.colorScheme.onPrimary, style = MaterialTheme.typography.headlineMedium)
             }
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(

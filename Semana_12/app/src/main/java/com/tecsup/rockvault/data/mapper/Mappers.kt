@@ -5,13 +5,12 @@ import com.tecsup.rockvault.data.remote.dto.ItemDto
 import com.tecsup.rockvault.domain.model.Item
 
 fun ItemDto.toDomain(): Item? {
-    val id = collectionId ?: return null
-    val titulo = collectionName?.takeIf { it.isNotBlank() } ?: return null
+    val id = id ?: return null
+    val titulo = title.takeIf { it.isNotBlank() } ?: return null
     return Item(
         id = id.toString(),
         titulo = titulo,
-        subtitulo = artistName,
-        imagenUrl = artworkUrl
+        subtitulo = body
     )
 }
 

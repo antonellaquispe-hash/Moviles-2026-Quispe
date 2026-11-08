@@ -23,7 +23,7 @@ class ItemRepositoryImpl(
 
     override suspend fun refrescar(): Result<Int> = try {
         val idsFavoritos = itemDao.idsFavoritos().toSet()
-        val nuevosItems = apiService.buscarAlbumes("rock").results
+        val nuevosItems = apiService.listarPublicaciones()
             .mapNotNull { it.toDomain() }
             .map { it.copy(esFavorito = it.id in idsFavoritos) }
         itemDao.guardarTodos(nuevosItems.map { it.toEntity() })
@@ -37,9 +37,8 @@ class ItemRepositoryImpl(
     override suspend fun obtenerDetalle(id: String): Result<Item> {
         val itemGuardado = itemDao.porId(id)
         return try {
-            val detalle = apiService.buscarAlbumPorId(id).results
-                .mapNotNull { it.toDomain() }
-                .firstOrNull() ?: throw NoSuchElementException("No se encontró el álbum")
+            val detalle = apiService.obtenerPublicacion(id).toDomain()
+                ?: throw NoSuchElementException("No se encontró la publicación")
             val itemActualizado = detalle.copy(esFavorito = itemGuardado?.esFavorito ?: false)
             itemDao.guardarTodos(listOf(itemActualizado.toEntity()))
             Result.success(itemActualizado)

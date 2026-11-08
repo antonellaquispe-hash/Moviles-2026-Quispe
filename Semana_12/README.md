@@ -1,18 +1,18 @@
 # RockVault
 
-Aplicación Android para buscar álbumes de rock, consultar sus detalles y guardar favoritos. El proyecto del laboratorio integra Jetpack Compose, MVVM, Retrofit, Room, Firebase Authentication, Firestore y notificaciones locales.
+Aplicación Android para consultar publicaciones, leer sus detalles y guardar favoritas. El proyecto del laboratorio integra Jetpack Compose, MVVM, Retrofit, Room, Firebase Authentication, Firestore y notificaciones locales.
 
 ## Tema y variante
 
-- Tema: álbumes musicales.
-- Variante: búsqueda de álbumes de rock con iTunes Search API, usando `term=rock` y `entity=album`.
+- Tema: Publicaciones.
+- Variante: recurso `posts` de JSONPlaceholder.
 - Paquete Android: `com.tecsup.rockvault`.
 
 ## Funciones
 
 - Inicio de sesión con correo y contraseña.
 - Lectura del rol `admin` o `usuario` desde `usuarios/{uid}` en Firestore.
-- Catálogo de álbumes, detalle y favoritos locales.
+- Lista de publicaciones, detalle y favoritos locales.
 - Datos guardados con Room para consultar el catálogo sin conexión.
 - Acceso al panel de administración solo para cuentas con rol `admin`.
 - Totales de elementos y favoritos, sincronización y limpieza de caché en el panel.
@@ -46,7 +46,7 @@ El APK de depuración queda en `app/build/outputs/apk/debug/app-debug.apk`. Para
 2. Crea una cuenta de administrador y una cuenta de usuario. Usa las credenciales de prueba de tu equipo y no las guardes en este repositorio.
 3. En Firestore, crea la colección `usuarios`.
 4. Para cada cuenta, crea un documento cuyo ID sea exactamente el UID que aparece en Authentication.
-5. Agrega los campos `nombre` (texto) y `rol` (texto). Usa `admin` para la cuenta administradora y `usuario` para la cuenta normal.
+5. Según los documentos actuales, el perfil administrador usa el campo `Administrador` con valor `admin`, y el perfil normal usa el campo `Usuario` con valor `usuario`. La app también reconoce el formato `rol` con valor `admin` o `usuario`.
 6. Confirma que el archivo Firebase esté dentro de `app/` y corresponda al mismo proyecto y paquete Android.
 
 Reglas sugeridas para que cada persona autenticada lea su propio perfil:
@@ -65,7 +65,7 @@ service cloud.firestore {
 
 ## Arquitectura
 
-- `data/remote`: cliente Retrofit, servicio iTunes y DTO.
+- `data/remote`: cliente Retrofit, servicio JSONPlaceholder y DTO.
 - `data/local`: entidades, DAO y base de datos Room.
 - `data/repository`: contrato e implementación del catálogo.
 - `data/auth`: contrato e implementación de autenticación Firebase.
@@ -73,14 +73,12 @@ service cloud.firestore {
 - `ui`: pantallas y ViewModels de login, catálogo, detalle, favoritos y administración.
 - `notification`: contrato e implementación Android para notificaciones.
 
-Room es la fuente de datos que observa la interfaz. Retrofit actualiza los registros guardados y conserva los favoritos durante la sincronización.
+Room es la fuente de datos que observa la interfaz. Retrofit consulta `GET /posts` y `GET /posts/{id}`, actualiza los registros guardados y conserva los favoritos durante la sincronización.
 
 ## Reparto de tareas
 
 | Área | Trabajo |
 | --- | --- |
-| Aplicación y datos | Estructura MVVM, consulta iTunes, persistencia Room, detalle y favoritos |
-| Acceso y administración | Firebase Authentication, perfiles y roles Firestore, navegación y panel Admin |
-| Interfaz y entrega | Pantallas Compose, estados, notificaciones, documentación y validación en dispositivo |
+| Trabajo individual | Estructura MVVM, consulta JSONPlaceholder, persistencia Room, acceso Firebase, pantallas, favoritos, panel Admin, notificaciones y documentación |
 
-El equipo debe asociar estas áreas con los nombres de sus integrantes al preparar la entrega.
+El laboratorio se desarrolla de manera individual.

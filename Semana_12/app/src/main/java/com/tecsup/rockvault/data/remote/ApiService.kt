@@ -1,20 +1,13 @@
 package com.tecsup.rockvault.data.remote
 
-import com.tecsup.rockvault.data.remote.dto.RespuestaItunesDto
+import com.tecsup.rockvault.data.remote.dto.ItemDto
 import retrofit2.http.GET
-import retrofit2.http.Query
+import retrofit2.http.Path
 
 interface ApiService {
-    @GET("search")
-    suspend fun buscarAlbumes(
-        @Query("term") termino: String,
-        @Query("entity") entidad: String = "album",
-        @Query("limit") limite: Int = 25,
-        @Query("country") pais: String = "US"
-    ): RespuestaItunesDto
+    @GET("posts")
+    suspend fun listarPublicaciones(): List<ItemDto>
 
-    @GET("lookup")
-    suspend fun buscarAlbumPorId(
-        @Query("id") id: String
-    ): RespuestaItunesDto
+    @GET("posts/{id}")
+    suspend fun obtenerPublicacion(@Path("id") id: String): ItemDto
 }

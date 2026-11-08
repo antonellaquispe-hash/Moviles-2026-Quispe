@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.Alignment
 import androidx.compose.material3.Button
@@ -20,7 +19,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.tecsup.rockvault.domain.model.Item
 import com.tecsup.rockvault.ui.UiState
 import com.tecsup.rockvault.ui.components.Cargando
@@ -74,16 +72,7 @@ private fun DetalleItem(
                 .background(Brush.linearGradient(listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.tertiary))),
             contentAlignment = Alignment.Center
         ) {
-            if (!item.imagenUrl.isNullOrBlank()) {
-                AsyncImage(
-                    model = item.imagenUrl,
-                    contentDescription = "Carátula de ${item.titulo}",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            } else {
-                Text("♫", style = MaterialTheme.typography.displayLarge, color = MaterialTheme.colorScheme.onPrimary)
-            }
+            Text("¶", style = MaterialTheme.typography.displayLarge, color = MaterialTheme.colorScheme.onPrimary)
         }
         Text(
             text = item.titulo,

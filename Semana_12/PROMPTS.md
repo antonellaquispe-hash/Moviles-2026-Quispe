@@ -35,3 +35,12 @@
 - Qué respondió (resumen): Propuso una paleta cálida, tarjetas con imágenes reales de álbumes y una pantalla de acceso más cuidada; el PDF solicita acceso compartido y funciones diferenciadas por rol.
 - Qué usamos / qué cambiamos y por qué: Aplicamos una paleta ámbar, ciruela y coral, refinamos login, tarjetas, detalle y panel, y conectamos las carátulas reales con Coil. Se eligió Coil 2.7.0 para mantener compatibilidad con Kotlin 2.2.10.
 - Qué aprendimos: La interfaz puede compartir catálogo y favoritos mientras muestra el acceso al panel solo a la cuenta administradora.
+
+## Consulta 5
+
+- Fecha: 2026-11-07
+- Herramienta: Codex
+- Prompt: Corregir el tema porque el trabajo es individual y corresponde a Publicaciones; revisar la configuración Firebase mostrada en capturas.
+- Qué respondió (resumen): La API actual de iTunes no correspondía a Publicaciones. Firestore usa los campos `Administrador` y `Usuario`, mientras la app solo leía `rol`.
+- Qué usamos / qué cambiamos y por qué: Cambiamos Retrofit a JSONPlaceholder `GET /posts` y `GET /posts/{id}`, adaptamos DTO, mapeo, repositorio, textos e interfaz. La lectura del rol ahora reconoce `rol` y los campos existentes `Administrador` o `Usuario`.
+- Qué aprendimos: El tema asignado define los endpoints de lista y detalle; el documento de Firestore debe leerse de acuerdo con los campos que realmente existen.

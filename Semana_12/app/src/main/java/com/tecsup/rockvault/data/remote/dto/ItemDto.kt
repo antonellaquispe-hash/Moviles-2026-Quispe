@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ItemDto(
-    @SerialName("collectionId") val collectionId: Long? = null,
-    @SerialName("collectionName") val collectionName: String? = null,
-    @SerialName("artistName") val artistName: String = "",
-    @SerialName("artworkUrl100") val artworkUrl: String? = null
+    @SerialName("id") val id: Int? = null,
+    @SerialName("userId") val userId: Int? = null,
+    @SerialName("title") val title: String = "",
+    @SerialName("body") val body: String = ""
 )

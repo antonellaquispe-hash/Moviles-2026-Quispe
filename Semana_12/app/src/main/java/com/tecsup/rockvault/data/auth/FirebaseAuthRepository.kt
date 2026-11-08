@@ -40,7 +40,10 @@ class FirebaseAuthRepository(
 
     private suspend fun leerSesion(uid: String, correo: String): Sesion {
         val documento = firestore.collection("usuarios").document(uid).get().await()
-        val rol = if (documento.getString("rol") == "admin") Rol.ADMIN else Rol.USUARIO
+        val rolFirestore = documento.getString("rol")
+            ?: documento.getString("Administrador")
+            ?: documento.getString("Usuario")
+        val rol = if (rolFirestore == "admin") Rol.ADMIN else Rol.USUARIO
         return Sesion(uid, correo, rol)
     }
 }
