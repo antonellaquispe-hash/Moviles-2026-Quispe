@@ -31,10 +31,21 @@ class ItemRepositoryImpl(
         Result.failure(exception)
     }
 
-    override suspend fun obtenerDetalle(id: String): Result<Item> =
-        _items.value.firstOrNull { it.id == id }
-            ?.let { Result.success(it) }
-            ?: Result.failure(NoSuchElementException("No se encontró el álbum"))
+    override suspend fun obtenerDetalle(id: String): Result<Item> = try {
+        val detalle = apiService.buscarAlbumPorId(id).results
+            .mapNotNull { it.toDomain() }
+            .firstOrNull() ?: throw NoSuchElementException("No se encontró el álbum")
+        val itemActualizado = detalle.copy(
+            esFavorito = _favoritos.value.any { it.id == detalle.id }
+        )
+        _items.value = _items.value
+            .filterNot { it.id == itemActualizado.id } + itemActualizado
+        Result.success(itemActualizado)
+    } catch (exception: CancellationException) {
+        throw exception
+    } catch (exception: Exception) {
+        Result.failure(exception)
+    }
 
     override suspend fun alternarFavorito(id: String) {
         _items.value = _items.value.map { item ->

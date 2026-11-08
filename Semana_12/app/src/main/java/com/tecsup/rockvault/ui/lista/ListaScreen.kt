@@ -23,6 +23,7 @@ import com.tecsup.rockvault.ui.components.ErrorView
 fun ListaScreen(
     estado: UiState<List<Item>>,
     onReintentar: () -> Unit,
+    onItemClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -41,6 +42,7 @@ fun ListaScreen(
             )
             is UiState.Exito -> ListaDeItems(
                 items = estado.datos,
+                onItemClick = onItemClick,
                 modifier = Modifier.weight(1f)
             )
             UiState.Vacio -> Text(
@@ -54,6 +56,7 @@ fun ListaScreen(
 @Composable
 private fun ListaDeItems(
     items: List<Item>,
+    onItemClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -62,7 +65,10 @@ private fun ListaDeItems(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(items, key = Item::id) { item ->
-            ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+            ElevatedCard(
+                onClick = { onItemClick(item.id) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = item.titulo,

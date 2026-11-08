@@ -12,4 +12,9 @@ interface ApiService {
         @Query("limit") limite: Int = 25,
         @Query("country") pais: String = "US"
     ): RespuestaItunesDto
+
+    @GET("lookup")
+    suspend fun buscarAlbumPorId(
+        @Query("id") id: String
+    ): RespuestaItunesDto
 }
