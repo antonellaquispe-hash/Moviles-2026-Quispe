@@ -34,18 +34,20 @@ class ItemRepositoryImpl(
         Result.failure(exception)
     }
 
-    override suspend fun obtenerDetalle(id: String): Result<Item> = try {
-        val detalle = apiService.buscarAlbumPorId(id).results
-            .mapNotNull { it.toDomain() }
-            .firstOrNull() ?: throw NoSuchElementException("No se encontró el álbum")
-        val esFavorito = itemDao.porId(id)?.esFavorito ?: false
-        val itemActualizado = detalle.copy(esFavorito = esFavorito)
-        itemDao.guardarTodos(listOf(itemActualizado.toEntity()))
-        Result.success(itemActualizado)
-    } catch (exception: CancellationException) {
-        throw exception
-    } catch (exception: Exception) {
-        Result.failure(exception)
+    override suspend fun obtenerDetalle(id: String): Result<Item> {
+        val itemGuardado = itemDao.porId(id)
+        return try {
+            val detalle = apiService.buscarAlbumPorId(id).results
+                .mapNotNull { it.toDomain() }
+                .firstOrNull() ?: throw NoSuchElementException("No se encontró el álbum")
+            val itemActualizado = detalle.copy(esFavorito = itemGuardado?.esFavorito ?: false)
+            itemDao.guardarTodos(listOf(itemActualizado.toEntity()))
+            Result.success(itemActualizado)
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (exception: Exception) {
+            itemGuardado?.let { Result.success(it.toDomain()) } ?: Result.failure(exception)
+        }
     }
 
     override suspend fun alternarFavorito(id: String) {

@@ -65,8 +65,10 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     if (itemSeleccionado == null && pestanaSeleccionada == 0) {
                         val estado by listaViewModel.estado.collectAsState()
+                        val aviso by listaViewModel.aviso.collectAsState()
                         ListaScreen(
                             estado = estado,
+                            aviso = aviso,
                             onReintentar = listaViewModel::cargar,
                             onItemClick = { id ->
                                 itemSeleccionado = id

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,6 +23,7 @@ import com.tecsup.rockvault.ui.components.ItemCard
 @Composable
 fun ListaScreen(
     estado: UiState<List<Item>>,
+    aviso: String?,
     onReintentar: () -> Unit,
     onItemClick: (String) -> Unit,
     onAlternarFavorito: (String) -> Unit,
@@ -33,6 +35,11 @@ fun ListaScreen(
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
         )
+        if (aviso != null) {
+            Snackbar(modifier = Modifier.padding(horizontal = 16.dp)) {
+                Text(text = aviso)
+            }
+        }
 
         when (estado) {
             UiState.Cargando -> Cargando(modifier = Modifier.weight(1f))

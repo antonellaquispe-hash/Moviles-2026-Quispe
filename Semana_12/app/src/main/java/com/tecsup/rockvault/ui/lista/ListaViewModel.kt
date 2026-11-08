@@ -16,6 +16,8 @@ class ListaViewModel(
 ) : ViewModel() {
     private val _estado = MutableStateFlow<UiState<List<Item>>>(UiState.Cargando)
     val estado: StateFlow<UiState<List<Item>>> = _estado.asStateFlow()
+    private val _aviso = MutableStateFlow<String?>(null)
+    val aviso: StateFlow<String?> = _aviso.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -37,6 +39,7 @@ class ListaViewModel(
             }
             itemRepository.refrescar()
                 .onSuccess {
+                    _aviso.value = null
                     if (itemRepository.cantidadGuardada() == 0) {
                         _estado.value = UiState.Vacio
                     }
@@ -46,6 +49,8 @@ class ListaViewModel(
                         _estado.value = UiState.Error(
                             error.message ?: "No se pudo cargar la lista"
                         )
+                    } else {
+                        _aviso.value = "Sin conexión: mostrando datos guardados"
                     }
                 }
         }
