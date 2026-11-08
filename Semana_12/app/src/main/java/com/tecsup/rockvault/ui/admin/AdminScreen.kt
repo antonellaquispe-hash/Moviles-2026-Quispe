@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -44,11 +45,17 @@ fun AdminScreen(
                 }
             }
         }
-        if (mensaje != null) Text(mensaje)
+        if (mensaje != null) {
+            Text(mensaje, color = MaterialTheme.colorScheme.secondary)
+        }
         Button(onClick = onSincronizar, modifier = Modifier.fillMaxWidth()) {
             Text("Sincronizar")
         }
-        OutlinedButton(onClick = onLimpiarCache, modifier = Modifier.fillMaxWidth()) {
+        OutlinedButton(
+            onClick = onLimpiarCache,
+            modifier = Modifier.fillMaxWidth(),
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp)
+        ) {
             Text("Limpiar caché")
         }
     }
@@ -56,7 +63,11 @@ fun AdminScreen(
 
 @Composable
 private fun TarjetaTotal(titulo: String, total: Int, modifier: Modifier = Modifier) {
-    Card(modifier = modifier) {
+    Card(
+        modifier = modifier,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(titulo, style = MaterialTheme.typography.titleMedium)
             Text(total.toString(), style = MaterialTheme.typography.headlineLarge)

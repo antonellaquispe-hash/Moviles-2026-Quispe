@@ -2,11 +2,13 @@ package com.tecsup.rockvault.ui.navigation
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -62,28 +64,34 @@ fun AppNav(
 
     Scaffold(
         modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        when {
-                            itemSeleccionado != null -> "Detalle"
-                            destino == DestinoApp.FAVORITOS -> "Favoritos"
-                            destino == DestinoApp.ADMIN -> "Administración"
-                            else -> "RockVault"
+            Surface(color = MaterialTheme.colorScheme.surface) {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            when {
+                                itemSeleccionado != null -> "Detalle"
+                                destino == DestinoApp.FAVORITOS -> "Favoritos"
+                                destino == DestinoApp.ADMIN -> "Administración"
+                                else -> "RockVault"
+                            }
+                        )
+                    },
+                    actions = {
+                        TextButton(onClick = onCerrarSesion) {
+                            Text("Salir", color = MaterialTheme.colorScheme.primary)
                         }
+                    },
+                    colors = androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface
                     )
-                },
-                actions = {
-                    TextButton(onClick = onCerrarSesion) {
-                        Text("Cerrar sesión")
-                    }
-                }
-            )
+                )
+            }
         },
         bottomBar = {
             if (itemSeleccionado == null) {
-                NavigationBar {
+                NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
                     NavigationBarItem(
                         selected = destino == DestinoApp.CATALOGO,
                         onClick = { destino = DestinoApp.CATALOGO },

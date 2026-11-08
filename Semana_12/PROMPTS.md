@@ -26,3 +26,12 @@
 - Qué respondió (resumen): El PDF contempla `ui/navigation/AppNav.kt`; la navegación estaba centralizada en MainActivity y podía separarse en un componente de navegación.
 - Qué usamos / qué cambiamos y por qué: Creamos AppNav para reunir la navegación por rol, detalle, favoritos y administración. Centralizamos el título y el cierre de sesión en una barra superior y quitamos títulos repetidos en las pantallas.
 - Qué aprendimos: Mantener la selección de pantallas en el paquete navigation hace que MainActivity se enfoque en preparar ViewModels y sesión.
+
+## Consulta 4
+
+- Fecha: 2026-11-07
+- Herramienta: Codex
+- Prompt: Mejorar la vista con más color y aclarar si el PDF solicita pantallas distintas para administrador y usuario.
+- Qué respondió (resumen): Propuso una paleta cálida, tarjetas con imágenes reales de álbumes y una pantalla de acceso más cuidada; el PDF solicita acceso compartido y funciones diferenciadas por rol.
+- Qué usamos / qué cambiamos y por qué: Aplicamos una paleta ámbar, ciruela y coral, refinamos login, tarjetas, detalle y panel, y conectamos las carátulas reales con Coil. Se eligió Coil 2.7.0 para mantener compatibilidad con Kotlin 2.2.10.
+- Qué aprendimos: La interfaz puede compartir catálogo y favoritos mientras muestra el acceso al panel solo a la cuenta administradora.
