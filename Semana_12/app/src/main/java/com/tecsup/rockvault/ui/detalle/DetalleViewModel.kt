@@ -30,6 +30,14 @@ class DetalleViewModel(
         }
     }
 
+    fun alternarFavorito() {
+        val item = (_estado.value as? UiState.Exito)?.datos ?: return
+        viewModelScope.launch {
+            itemRepository.alternarFavorito(item.id)
+            _estado.value = UiState.Exito(item.copy(esFavorito = !item.esFavorito))
+        }
+    }
+
     class Factory(
         private val itemRepository: ItemRepository
     ) : ViewModelProvider.Factory {

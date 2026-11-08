@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +21,7 @@ fun DetalleScreen(
     estado: UiState<Item>,
     onVolver: () -> Unit,
     onReintentar: () -> Unit,
+    onAlternarFavorito: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -39,6 +41,7 @@ fun DetalleScreen(
             )
             is UiState.Exito -> DetalleItem(
                 item = estado.datos,
+                onAlternarFavorito = onAlternarFavorito,
                 modifier = Modifier.weight(1f)
             )
             UiState.Vacio -> Text(text = "No hay detalle para mostrar")
@@ -49,6 +52,7 @@ fun DetalleScreen(
 @Composable
 private fun DetalleItem(
     item: Item,
+    onAlternarFavorito: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -67,5 +71,8 @@ private fun DetalleItem(
             text = "Identificador: ${item.id}",
             style = MaterialTheme.typography.bodyMedium
         )
+        OutlinedButton(onClick = onAlternarFavorito) {
+            Text(text = if (item.esFavorito) "Quitar de favoritos" else "Agregar a favoritos")
+        }
     }
 }

@@ -51,6 +51,12 @@ class ListaViewModel(
         }
     }
 
+    fun alternarFavorito(id: String) {
+        viewModelScope.launch {
+            itemRepository.alternarFavorito(id)
+        }
+    }
+
     class Factory(
         private val itemRepository: ItemRepository
     ) : ViewModelProvider.Factory {
