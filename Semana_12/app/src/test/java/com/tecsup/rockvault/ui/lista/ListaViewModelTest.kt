@@ -9,6 +9,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import okhttp3.ResponseBody.Companion.toResponseBody
+import retrofit2.HttpException
+import retrofit2.Response
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Rule
@@ -33,16 +36,42 @@ class ListaViewModelTest {
     }
 
     @Test
-    fun refrescarSinDatosYConErrorMuestraError() = runTest(mainDispatcherRule.dispatcher) {
+    fun refrescarSinDatosYConErrorHttpMuestraCodigoDelServidor() = runTest(mainDispatcherRule.dispatcher) {
         val repository = FakeItemRepository().apply {
-            resultadoRefresco = Result.failure(IllegalStateException("Error de API"))
+            resultadoRefresco = Result.failure(
+                HttpException(Response.error<String>(503, "Error".toResponseBody()))
+            )
         }
         val viewModel = ListaViewModel(repository, FakeNotificador())
 
         advanceUntilIdle()
 
-        assertEquals(UiState.Error("Error de API"), viewModel.estado.value)
+        assertEquals(UiState.Error("El servidor respondió con error 503"), viewModel.estado.value)
         assertNull(viewModel.aviso.value)
+    }
+
+    @Test
+    fun refrescarSinDatosYSinConexionMuestraMensajeDeRed() = runTest(mainDispatcherRule.dispatcher) {
+        val repository = FakeItemRepository().apply {
+            resultadoRefresco = Result.failure(java.io.IOException("network"))
+        }
+        val viewModel = ListaViewModel(repository, FakeNotificador())
+
+        advanceUntilIdle()
+
+        assertEquals(UiState.Error("No hay conexión a internet"), viewModel.estado.value)
+    }
+
+    @Test
+    fun refrescarSinDatosYConErrorDesconocidoMuestraMensajeGenerico() = runTest(mainDispatcherRule.dispatcher) {
+        val repository = FakeItemRepository().apply {
+            resultadoRefresco = Result.failure(IllegalStateException("detalle interno"))
+        }
+        val viewModel = ListaViewModel(repository, FakeNotificador())
+
+        advanceUntilIdle()
+
+        assertEquals(UiState.Error("Ocurrió un error inesperado"), viewModel.estado.value)
     }
 
     @Test
