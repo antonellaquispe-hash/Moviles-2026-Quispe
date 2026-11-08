@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val repository = AppContainer.itemRepository
+        val repository = AppContainer.itemRepository(applicationContext)
         val listaFactory = ListaViewModel.Factory(repository)
         val listaViewModel = ViewModelProvider(this, listaFactory)[ListaViewModel::class.java]
         val detalleFactory = DetalleViewModel.Factory(repository)
@@ -55,4 +55,5 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 

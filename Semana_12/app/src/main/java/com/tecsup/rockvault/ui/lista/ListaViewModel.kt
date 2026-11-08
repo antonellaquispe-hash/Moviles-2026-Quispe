@@ -9,7 +9,6 @@ import com.tecsup.rockvault.ui.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class ListaViewModel(
@@ -19,25 +18,35 @@ class ListaViewModel(
     val estado: StateFlow<UiState<List<Item>>> = _estado.asStateFlow()
 
     init {
+        viewModelScope.launch {
+            itemRepository.items.collect { items ->
+                if (items.isNotEmpty()) {
+                    _estado.value = UiState.Exito(items)
+                } else if (_estado.value is UiState.Exito) {
+                    _estado.value = UiState.Vacio
+                }
+            }
+        }
         cargar()
     }
 
     fun cargar() {
         viewModelScope.launch {
-            _estado.value = UiState.Cargando
+            if (itemRepository.cantidadGuardada() == 0) {
+                _estado.value = UiState.Cargando
+            }
             itemRepository.refrescar()
                 .onSuccess {
-                    val items = itemRepository.items.first()
-                    _estado.value = if (items.isEmpty()) {
-                        UiState.Vacio
-                    } else {
-                        UiState.Exito(items)
+                    if (itemRepository.cantidadGuardada() == 0) {
+                        _estado.value = UiState.Vacio
                     }
                 }
                 .onFailure { error ->
-                    _estado.value = UiState.Error(
-                        error.message ?: "No se pudo cargar la lista"
-                    )
+                    if (itemRepository.cantidadGuardada() == 0) {
+                        _estado.value = UiState.Error(
+                            error.message ?: "No se pudo cargar la lista"
+                        )
+                    }
                 }
         }
     }

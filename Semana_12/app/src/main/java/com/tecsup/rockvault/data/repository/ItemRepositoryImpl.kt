@@ -1,29 +1,32 @@
 package com.tecsup.rockvault.data.repository
 
+import com.tecsup.rockvault.data.local.ItemDao
 import com.tecsup.rockvault.data.mapper.toDomain
+import com.tecsup.rockvault.data.mapper.toEntity
 import com.tecsup.rockvault.data.remote.ApiService
 import com.tecsup.rockvault.domain.model.Item
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 
 class ItemRepositoryImpl(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val itemDao: ItemDao
 ) : ItemRepository {
-    private val _items = MutableStateFlow<List<Item>>(emptyList())
-    private val _favoritos = MutableStateFlow<List<Item>>(emptyList())
+    override val items: Flow<List<Item>> = itemDao.todos().map { entities ->
+        entities.map { it.toDomain() }
+    }
 
-    override val items: Flow<List<Item>> = _items.asStateFlow()
-    override val favoritos: Flow<List<Item>> = _favoritos.asStateFlow()
+    override val favoritos: Flow<List<Item>> = itemDao.favoritos().map { entities ->
+        entities.map { it.toDomain() }
+    }
 
     override suspend fun refrescar(): Result<Int> = try {
-        val idsFavoritos = _favoritos.value.mapTo(mutableSetOf()) { it.id }
+        val idsFavoritos = itemDao.idsFavoritos().toSet()
         val nuevosItems = apiService.buscarAlbumes("rock").results
             .mapNotNull { it.toDomain() }
             .map { it.copy(esFavorito = it.id in idsFavoritos) }
-        _items.value = nuevosItems
-        _favoritos.value = nuevosItems.filter { it.esFavorito }
+        itemDao.guardarTodos(nuevosItems.map { it.toEntity() })
         Result.success(nuevosItems.size)
     } catch (exception: CancellationException) {
         throw exception
@@ -35,11 +38,9 @@ class ItemRepositoryImpl(
         val detalle = apiService.buscarAlbumPorId(id).results
             .mapNotNull { it.toDomain() }
             .firstOrNull() ?: throw NoSuchElementException("No se encontró el álbum")
-        val itemActualizado = detalle.copy(
-            esFavorito = _favoritos.value.any { it.id == detalle.id }
-        )
-        _items.value = _items.value
-            .filterNot { it.id == itemActualizado.id } + itemActualizado
+        val esFavorito = itemDao.porId(id)?.esFavorito ?: false
+        val itemActualizado = detalle.copy(esFavorito = esFavorito)
+        itemDao.guardarTodos(listOf(itemActualizado.toEntity()))
         Result.success(itemActualizado)
     } catch (exception: CancellationException) {
         throw exception
@@ -48,18 +49,14 @@ class ItemRepositoryImpl(
     }
 
     override suspend fun alternarFavorito(id: String) {
-        _items.value = _items.value.map { item ->
-            if (item.id == id) item.copy(esFavorito = !item.esFavorito) else item
-        }
-        _favoritos.value = _items.value.filter { it.esFavorito }
+        itemDao.alternarFavorito(id)
     }
 
-    override suspend fun cantidadGuardada(): Int = _items.value.size
+    override suspend fun cantidadGuardada(): Int = itemDao.contar()
 
-    override suspend fun cantidadFavoritos(): Int = _favoritos.value.size
+    override suspend fun cantidadFavoritos(): Int = itemDao.contarFavoritos()
 
     override suspend fun limpiarCache() {
-        _items.value = emptyList()
-        _favoritos.value = emptyList()
+        itemDao.borrarTodo()
     }
 }
