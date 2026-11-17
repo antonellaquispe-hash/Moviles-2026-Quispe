@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -25,10 +26,14 @@ class MapaViewModel(
     private val _estado = MutableStateFlow<UbicacionUi>(UbicacionUi.Inicial)
     val estado = _estado.asStateFlow()
 
-    private val _lugares = MutableStateFlow(
+    private val _todosLosLugares = MutableStateFlow(
         lugaresRepository.obtenerLugares().map { LugarConDistancia(it, null) }
     )
-    val lugares = _lugares.asStateFlow()
+    private val _categoriaSeleccionada = MutableStateFlow<String?>(null)
+    val categoriaSeleccionada = _categoriaSeleccionada.asStateFlow()
+    val lugares = combine(_todosLosLugares, _categoriaSeleccionada) { lista, categoria ->
+        if (categoria == null) lista else lista.filter { it.lugar.categoria == categoria }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _todosLosLugares.value)
     val masCercano: StateFlow<Lugar?> = lugares
         .map { lista -> lista.firstOrNull { it.metros != null }?.lugar }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
@@ -84,8 +89,19 @@ class MapaViewModel(
         _seleccionado.value = id
     }
 
+    fun filtrarPorCategoria(categoria: String?) {
+        _categoriaSeleccionada.value = categoria
+        val idsVisibles = _todosLosLugares.value
+            .filter { categoria == null || it.lugar.categoria == categoria }
+            .map { it.lugar.id }
+            .toSet()
+        if (_seleccionado.value?.let { it !in idsVisibles } == true) {
+            _seleccionado.value = null
+        }
+    }
+
     private fun actualizarDistancias(posicion: Posicion) {
-        _lugares.value = _lugares.value
+        _todosLosLugares.value = _todosLosLugares.value
             .map { item ->
                 item.copy(metros = distanciaMetros(posicion, item.lugar))
             }
