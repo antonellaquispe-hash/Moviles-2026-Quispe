@@ -1,7 +1,10 @@
 package com.quispe.campusgps.ui
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
@@ -120,9 +123,16 @@ fun PantallaMapa(viewModelFactory: CampusViewModelFactory) {
 
             val error = estado as? UbicacionUi.Error
             if (error != null) {
-                Text(
-                    text = error.mensaje,
-                    color = MaterialTheme.colorScheme.error
+                MensajeError(
+                    error = error,
+                    onAbrirAjustes = {
+                        val intent = Intent(
+                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            Uri.fromParts("package", contexto.packageName, null)
+                        )
+                        contexto.startActivity(intent)
+                    },
+                    onReintentar = ::obtenerUbicacion
                 )
             }
             if (estado == UbicacionUi.Buscando) {

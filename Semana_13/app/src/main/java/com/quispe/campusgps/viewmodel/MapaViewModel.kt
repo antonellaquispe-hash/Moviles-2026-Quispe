@@ -7,6 +7,7 @@ import com.quispe.campusgps.data.UbicacionRepository
 import com.quispe.campusgps.model.Lugar
 import com.quispe.campusgps.model.LugarConDistancia
 import com.quispe.campusgps.model.Posicion
+import com.quispe.campusgps.model.TipoError
 import com.quispe.campusgps.model.UbicacionUi
 import com.quispe.campusgps.util.distanciaMetros
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,22 +41,42 @@ class MapaViewModel(
 
         viewModelScope.launch {
             _estado.value = UbicacionUi.Buscando
+            if (!ubicacionRepository.playServicesDisponible()) {
+                _estado.value = UbicacionUi.Error(
+                    mensaje = "Este dispositivo no tiene Google Play Services.",
+                    tipo = TipoError.SIN_PLAY_SERVICES
+                )
+                return@launch
+            }
+
             ubicacionRepository.obtenerPosicion()
                 .onSuccess { posicion ->
                     actualizarDistancias(posicion)
                     _estado.value = UbicacionUi.Lista(posicion)
                 }
                 .onFailure { error ->
-                    _estado.value = UbicacionUi.Error(
-                        error.message ?: "No se pudo obtener la ubicación."
-                    )
+                    _estado.value = when (error) {
+                        is SecurityException -> UbicacionUi.Error(
+                            "Sin permiso de ubicación no puedo mostrar dónde estás.",
+                            TipoError.SIN_PERMISO
+                        )
+                        is IllegalStateException -> UbicacionUi.Error(
+                            "Activa el GPS e intenta de nuevo.",
+                            TipoError.GPS_APAGADO
+                        )
+                        else -> UbicacionUi.Error(
+                            error.message ?: "No se pudo obtener la ubicación.",
+                            TipoError.OTRO
+                        )
+                    }
                 }
         }
     }
 
     fun permisoDenegado() {
         _estado.value = UbicacionUi.Error(
-            "Necesitas conceder el permiso de ubicación para continuar."
+            "Sin permiso de ubicación no puedo mostrar dónde estás.",
+            TipoError.SIN_PERMISO
         )
     }
 
