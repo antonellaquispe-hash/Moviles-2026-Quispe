@@ -27,7 +27,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.quispe.campusgps.model.UbicacionUi
-import java.util.Locale
 import com.quispe.campusgps.viewmodel.CampusViewModelFactory
 import com.quispe.campusgps.viewmodel.MapaViewModel
 
@@ -37,6 +36,7 @@ fun PantallaMapa(viewModelFactory: CampusViewModelFactory) {
     val viewModel: MapaViewModel = viewModel(factory = viewModelFactory)
     val estado by viewModel.estado.collectAsStateWithLifecycle()
     val lugares by viewModel.lugares.collectAsStateWithLifecycle()
+    val seleccionado by viewModel.seleccionado.collectAsStateWithLifecycle()
     val contexto = LocalContext.current
 
     val lanzadorPermisos = rememberLauncherForActivityResult(
@@ -83,6 +83,7 @@ fun PantallaMapa(viewModelFactory: CampusViewModelFactory) {
             MapaUbicacion(
                 estado = estado,
                 lugares = lugares,
+                seleccionado = seleccionado,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
@@ -95,25 +96,22 @@ fun PantallaMapa(viewModelFactory: CampusViewModelFactory) {
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            when (val resultado = estado) {
-                UbicacionUi.Inicial -> Text("Pulsa el botón para consultar tu ubicación.")
-                UbicacionUi.Buscando -> CircularProgressIndicator()
-                is UbicacionUi.Lista -> {
-                    Text(
-                        text = "Latitud: ${String.format(Locale.US, "%.4f", resultado.posicion.latitud)}",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        text = "Longitud: ${String.format(Locale.US, "%.4f", resultado.posicion.longitud)}",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-                is UbicacionUi.Error -> Text(
-                    text = resultado.mensaje,
+            val error = estado as? UbicacionUi.Error
+            if (error != null) {
+                Text(
+                    text = error.mensaje,
                     color = MaterialTheme.colorScheme.error
                 )
             }
-            Spacer(modifier = Modifier.height(12.dp))
+            if (estado == UbicacionUi.Buscando) {
+                CircularProgressIndicator(modifier = Modifier.padding(bottom = 8.dp))
+            }
+            ListaLugares(
+                lugares = lugares,
+                seleccionado = seleccionado,
+                onClick = viewModel::seleccionar,
+                modifier = Modifier.height(220.dp)
+            )
         }
     }
 }

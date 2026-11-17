@@ -21,6 +21,7 @@ private val PUNTO_INICIAL_LIMA = LatLng(-12.0464, -77.0428)
 fun MapaUbicacion(
     estado: UbicacionUi,
     lugares: List<LugarConDistancia>,
+    seleccionado: Int?,
     modifier: Modifier = Modifier
 ) {
     val camara = rememberCameraPositionState {
@@ -33,6 +34,17 @@ fun MapaUbicacion(
             CameraUpdateFactory.newLatLngZoom(
                 LatLng(ubicacion.latitud, ubicacion.longitud),
                 16f
+            )
+        )
+    }
+
+    LaunchedEffect(seleccionado) {
+        val lugar = lugares.firstOrNull { it.lugar.id == seleccionado }?.lugar
+            ?: return@LaunchedEffect
+        camara.animate(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(lugar.latitud, lugar.longitud),
+                17f
             )
         )
     }
@@ -54,16 +66,22 @@ fun MapaUbicacion(
         lugares.forEach { lugarConDistancia ->
             val lugar = lugarConDistancia.lugar
             key(lugar.id) {
+                val estadoMarcador = rememberUpdatedMarkerState(
+                    position = LatLng(lugar.latitud, lugar.longitud)
+                )
                 Marker(
-                    state = rememberUpdatedMarkerState(
-                        position = LatLng(lugar.latitud, lugar.longitud)
-                    ),
+                    state = estadoMarcador,
                     title = lugar.nombre,
                     snippet = lugar.categoria,
                     icon = BitmapDescriptorFactory.defaultMarker(
                         BitmapDescriptorFactory.HUE_AZURE
                     )
                 )
+                if (seleccionado == lugar.id) {
+                    LaunchedEffect(seleccionado) {
+                        estadoMarcador.showInfoWindow()
+                    }
+                }
             }
         }
     }
