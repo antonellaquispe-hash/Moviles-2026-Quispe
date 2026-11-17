@@ -14,6 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -27,6 +28,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.quispe.campusgps.model.UbicacionUi
+import com.quispe.campusgps.util.formatearDistancia
 import com.quispe.campusgps.viewmodel.CampusViewModelFactory
 import com.quispe.campusgps.viewmodel.MapaViewModel
 
@@ -37,6 +39,7 @@ fun PantallaMapa(viewModelFactory: CampusViewModelFactory) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
     val lugares by viewModel.lugares.collectAsStateWithLifecycle()
     val seleccionado by viewModel.seleccionado.collectAsStateWithLifecycle()
+    val masCercano by viewModel.masCercano.collectAsStateWithLifecycle()
     val contexto = LocalContext.current
 
     val lanzadorPermisos = rememberLauncherForActivityResult(
@@ -84,6 +87,7 @@ fun PantallaMapa(viewModelFactory: CampusViewModelFactory) {
                 estado = estado,
                 lugares = lugares,
                 seleccionado = seleccionado,
+                masCercano = masCercano,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
@@ -95,6 +99,24 @@ fun PantallaMapa(viewModelFactory: CampusViewModelFactory) {
                 Text(if (estado == UbicacionUi.Buscando) "Buscando…" else "Obtener mi ubicación")
             }
             Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedButton(
+                onClick = { masCercano?.let { viewModel.seleccionar(it.id) } },
+                enabled = masCercano != null
+            ) {
+                Text("Ir al más cercano")
+            }
+            val textoMasCercano = masCercano?.let { lugar ->
+                val distancia = lugares.firstOrNull { it.lugar.id == lugar.id }?.metros
+                distancia?.let {
+                    "Más cercano: ${lugar.nombre} (${formatearDistancia(it)})"
+                }
+            } ?: "Más cercano: sin calcular"
+            Text(
+                text = textoMasCercano,
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier.padding(bottom = 6.dp)
+            )
 
             val error = estado as? UbicacionUi.Error
             if (error != null) {

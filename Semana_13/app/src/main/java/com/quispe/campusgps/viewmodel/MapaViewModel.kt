@@ -4,12 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.quispe.campusgps.data.LugaresRepository
 import com.quispe.campusgps.data.UbicacionRepository
+import com.quispe.campusgps.model.Lugar
 import com.quispe.campusgps.model.LugarConDistancia
 import com.quispe.campusgps.model.Posicion
 import com.quispe.campusgps.model.UbicacionUi
 import com.quispe.campusgps.util.distanciaMetros
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class MapaViewModel(
@@ -23,6 +28,9 @@ class MapaViewModel(
         lugaresRepository.obtenerLugares().map { LugarConDistancia(it, null) }
     )
     val lugares = _lugares.asStateFlow()
+    val masCercano: StateFlow<Lugar?> = lugares
+        .map { lista -> lista.firstOrNull { it.metros != null }?.lugar }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     private val _seleccionado = MutableStateFlow<Int?>(null)
     val seleccionado = _seleccionado.asStateFlow()
