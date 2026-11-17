@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.quispe.campusgps.data.LugaresRepositoryLocal
 import com.quispe.campusgps.data.UbicacionRepositoryGoogle
 import com.quispe.campusgps.ui.PantallaMapa
 import com.quispe.campusgps.ui.theme.CampusGPSTheme
@@ -18,7 +19,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         val viewModelFactory = CampusViewModelFactory(
-            ubicacionRepository = UbicacionRepositoryGoogle(applicationContext)
+            ubicacionRepository = UbicacionRepositoryGoogle(applicationContext),
+            lugaresRepository = LugaresRepositoryLocal()
         )
 
         setContent {

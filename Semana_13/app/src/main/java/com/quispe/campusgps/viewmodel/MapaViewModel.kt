@@ -2,17 +2,25 @@ package com.quispe.campusgps.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.quispe.campusgps.data.LugaresRepository
 import com.quispe.campusgps.data.UbicacionRepository
+import com.quispe.campusgps.model.LugarConDistancia
 import com.quispe.campusgps.model.UbicacionUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MapaViewModel(
-    private val ubicacionRepository: UbicacionRepository
+    private val ubicacionRepository: UbicacionRepository,
+    lugaresRepository: LugaresRepository
 ) : ViewModel() {
     private val _estado = MutableStateFlow<UbicacionUi>(UbicacionUi.Inicial)
     val estado = _estado.asStateFlow()
+
+    private val _lugares = MutableStateFlow(
+        lugaresRepository.obtenerLugares().map { LugarConDistancia(it, null) }
+    )
+    val lugares = _lugares.asStateFlow()
 
     fun buscar() {
         if (_estado.value == UbicacionUi.Buscando) return

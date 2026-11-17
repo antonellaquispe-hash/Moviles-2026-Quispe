@@ -5,6 +5,19 @@ data class Posicion(
     val longitud: Double
 )
 
+data class Lugar(
+    val id: Int,
+    val nombre: String,
+    val categoria: String,
+    val latitud: Double,
+    val longitud: Double
+)
+
+data class LugarConDistancia(
+    val lugar: Lugar,
+    val metros: Float?
+)
+
 sealed interface UbicacionUi {
     data object Inicial : UbicacionUi
     data object Buscando : UbicacionUi

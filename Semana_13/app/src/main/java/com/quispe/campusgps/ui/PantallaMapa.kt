@@ -36,6 +36,7 @@ import com.quispe.campusgps.viewmodel.MapaViewModel
 fun PantallaMapa(viewModelFactory: CampusViewModelFactory) {
     val viewModel: MapaViewModel = viewModel(factory = viewModelFactory)
     val estado by viewModel.estado.collectAsStateWithLifecycle()
+    val lugares by viewModel.lugares.collectAsStateWithLifecycle()
     val contexto = LocalContext.current
 
     val lanzadorPermisos = rememberLauncherForActivityResult(
@@ -81,6 +82,7 @@ fun PantallaMapa(viewModelFactory: CampusViewModelFactory) {
         ) {
             MapaUbicacion(
                 estado = estado,
+                lugares = lugares,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
