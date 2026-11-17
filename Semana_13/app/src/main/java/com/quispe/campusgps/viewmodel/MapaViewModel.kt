@@ -31,6 +31,8 @@ class MapaViewModel(
     )
     private val _categoriaSeleccionada = MutableStateFlow<String?>(null)
     val categoriaSeleccionada = _categoriaSeleccionada.asStateFlow()
+    private val _radioMetros = MutableStateFlow(200)
+    val radioMetros = _radioMetros.asStateFlow()
     val lugares = combine(_todosLosLugares, _categoriaSeleccionada) { lista, categoria ->
         if (categoria == null) lista else lista.filter { it.lugar.categoria == categoria }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _todosLosLugares.value)
@@ -100,11 +102,19 @@ class MapaViewModel(
         }
     }
 
+    fun seleccionarRadio(metros: Int) {
+        if (metros in RADIOS_CERCANIA) _radioMetros.value = metros
+    }
+
     private fun actualizarDistancias(posicion: Posicion) {
         _todosLosLugares.value = _todosLosLugares.value
             .map { item ->
                 item.copy(metros = distanciaMetros(posicion, item.lugar))
             }
             .sortedBy { it.metros }
+    }
+
+    private companion object {
+        val RADIOS_CERCANIA = setOf(100, 200, 500)
     }
 }
