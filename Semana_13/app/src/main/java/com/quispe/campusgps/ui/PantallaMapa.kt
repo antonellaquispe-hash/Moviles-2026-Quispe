@@ -25,11 +25,13 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -49,6 +51,7 @@ fun PantallaMapa(viewModelFactory: CampusViewModelFactory) {
     val seleccionado by viewModel.seleccionado.collectAsStateWithLifecycle()
     val masCercano by viewModel.masCercano.collectAsStateWithLifecycle()
     val categoriaSeleccionada by viewModel.categoriaSeleccionada.collectAsStateWithLifecycle()
+    val radioMetros by viewModel.radioMetros.collectAsStateWithLifecycle()
     val contexto = LocalContext.current
 
     val lanzadorPermisos = rememberLauncherForActivityResult(
@@ -84,7 +87,15 @@ fun PantallaMapa(viewModelFactory: CampusViewModelFactory) {
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("CampusGPS") }) }
+        topBar = {
+            TopAppBar(
+                title = { Text("CampusGPS") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF1976D2),
+                    titleContentColor = Color.White
+                )
+            )
+        }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -116,11 +127,29 @@ fun PantallaMapa(viewModelFactory: CampusViewModelFactory) {
                     )
                 }
             }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Radio:", style = MaterialTheme.typography.labelMedium)
+                listOf(100, 200, 500).forEach { radio ->
+                    FilterChip(
+                        selected = radioMetros == radio,
+                        onClick = { viewModel.seleccionarRadio(radio) },
+                        label = { Text("${radio} m") }
+                    )
+                }
+            }
             MapaUbicacion(
                 estado = estado,
                 lugares = lugares,
                 seleccionado = seleccionado,
                 masCercano = masCercano,
+                radioMetros = radioMetros,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
@@ -171,6 +200,7 @@ fun PantallaMapa(viewModelFactory: CampusViewModelFactory) {
             ListaLugares(
                 lugares = lugares,
                 seleccionado = seleccionado,
+                radioMetros = radioMetros,
                 onClick = viewModel::seleccionar,
                 modifier = Modifier.height(220.dp)
             )

@@ -34,6 +34,7 @@ import com.quispe.campusgps.util.formatearDistancia
 fun ListaLugares(
     lugares: List<LugarConDistancia>,
     seleccionado: Int?,
+    radioMetros: Int,
     onClick: (id: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -88,7 +89,14 @@ fun ListaLugares(
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = item.lugar.categoria,
+                            text = buildString {
+                                append(item.lugar.categoria)
+                                item.metros?.let { distancia ->
+                                    append(" · ")
+                                    append(if (distancia <= radioMetros) "Dentro" else "Fuera")
+                                    append(" de ${radioMetros} m")
+                                }
+                            },
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
