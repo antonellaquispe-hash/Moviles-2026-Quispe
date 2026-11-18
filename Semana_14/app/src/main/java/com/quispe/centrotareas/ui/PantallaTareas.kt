@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -49,6 +50,7 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
     val corriendo by viewModel.corriendo.collectAsState()
     val primos by viewModel.primos.collectAsState()
     val carga by viewModel.carga.collectAsState()
+    val simularError by viewModel.simularError.collectAsState()
     var toques by remember { mutableStateOf(0) }
     var limitePrimos by remember { mutableStateOf("500000") }
     val hasta = limitePrimos.toIntOrNull()
@@ -197,6 +199,16 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
                     )
                     Row(
                         modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Switch(
+                            checked = simularError,
+                            onCheckedChange = viewModel::cambiarSimularError
+                        )
+                        Text("Simular error")
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         OutlinedButton(
@@ -217,7 +229,31 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
                     when (val estado = carga) {
                         CargaUi.Inicial -> Unit
                         CargaUi.Cargando -> CircularProgressIndicator()
-                        is CargaUi.Error -> Text(estado.mensaje)
+                        is CargaUi.Error -> Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFFFCE4E4)
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(10.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    estado.mensaje,
+                                    color = Color(0xFFB3261E),
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                                Button(
+                                    onClick = viewModel::cargarALaVez,
+                                    enabled = carga != CargaUi.Cargando
+                                ) {
+                                    Text("Reintentar")
+                                }
+                            }
+                        }
                         is CargaUi.Exito -> Card(
                             modifier = Modifier.fillMaxWidth(),
                             colors = CardDefaults.cardColors(
