@@ -52,7 +52,9 @@ fun MapaUbicacion(
     modifier: Modifier = Modifier
 ) {
     val ubicacion = (estado as? UbicacionUi.Lista)?.posicion
-    val posicionUsuario = ubicacion?.let { Position(it.latitud, it.longitud) }
+    val posicionUsuario = ubicacion?.let {
+        Position(latitude = it.latitud, longitude = it.longitud)
+    }
     val mapState = rememberMapState(
         baseStyle = BaseStyle.Uri(OPEN_FREE_MAP_STYLE),
         initialCameraPosition = CameraPosition(center = PUNTO_INICIAL_LIMA, zoom = 12.0)
@@ -106,7 +108,7 @@ fun MapaUbicacion(
         val posicion = (estado as? UbicacionUi.Lista)?.posicion ?: return@LaunchedEffect
         mapState.animateCamera(
             CameraUpdate(
-                center = Position(posicion.latitud, posicion.longitud),
+                center = Position(latitude = posicion.latitud, longitude = posicion.longitud),
                 zoom = 16.0
             )
         )
@@ -117,7 +119,7 @@ fun MapaUbicacion(
             ?: return@LaunchedEffect
         mapState.animateCamera(
             CameraUpdate(
-                center = Position(lugar.latitud, lugar.longitud),
+                center = Position(latitude = lugar.latitud, longitude = lugar.longitud),
                 zoom = 17.0
             )
         )
@@ -131,7 +133,10 @@ fun MapaUbicacion(
             Column(
                 modifier = Modifier
                     .placedAt(
-                        Position(lugarSeleccionado.latitud, lugarSeleccionado.longitud),
+                        Position(
+                            latitude = lugarSeleccionado.latitud,
+                            longitude = lugarSeleccionado.longitud
+                        ),
                         alignment = Alignment.BottomCenter
                     )
                     .padding(bottom = 10.dp)
