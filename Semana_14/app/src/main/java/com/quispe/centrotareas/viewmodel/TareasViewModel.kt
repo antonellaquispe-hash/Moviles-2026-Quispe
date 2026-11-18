@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.quispe.centrotareas.data.TareasRepository
 import com.quispe.centrotareas.model.CargaUi
+import com.quispe.centrotareas.model.ComparacionTiempos
 import com.quispe.centrotareas.model.PrimosUi
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -12,7 +13,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class TareasViewModel(private val repo: TareasRepository) : ViewModel() {
@@ -20,22 +23,25 @@ class TareasViewModel(private val repo: TareasRepository) : ViewModel() {
     private var trabajoPrimos: Job? = null
 
     private val _mensaje = MutableStateFlow("Listo")
-    val mensaje = _mensaje.asStateFlow()
+    val mensaje: StateFlow<String> = _mensaje.asStateFlow()
 
     private val _progreso = MutableStateFlow(0f)
-    val progreso = _progreso.asStateFlow()
+    val progreso: StateFlow<Float> = _progreso.asStateFlow()
 
     private val _corriendo = MutableStateFlow(false)
-    val corriendo = _corriendo.asStateFlow()
+    val corriendo: StateFlow<Boolean> = _corriendo.asStateFlow()
 
     private val _primos = MutableStateFlow<PrimosUi>(PrimosUi.Inicial)
-    val primos = _primos.asStateFlow()
+    val primos: StateFlow<PrimosUi> = _primos.asStateFlow()
 
     private val _carga = MutableStateFlow<CargaUi>(CargaUi.Inicial)
-    val carga = _carga.asStateFlow()
+    val carga: StateFlow<CargaUi> = _carga.asStateFlow()
 
     private val _simularError = MutableStateFlow(false)
-    val simularError = _simularError.asStateFlow()
+    val simularError: StateFlow<Boolean> = _simularError.asStateFlow()
+
+    private val _comparacion = MutableStateFlow(ComparacionTiempos())
+    val comparacion: StateFlow<ComparacionTiempos> = _comparacion.asStateFlow()
 
     fun tareaLarga() {
         if (_corriendo.value) return
@@ -94,6 +100,10 @@ class TareasViewModel(private val repo: TareasRepository) : ViewModel() {
         _simularError.value = valor
     }
 
+    fun limpiarComparacion() {
+        _comparacion.value = ComparacionTiempos()
+    }
+
     private fun ejecutarCarga(modo: String, enParalelo: Boolean) {
         if (_carga.value == CargaUi.Cargando) return
         _carga.value = CargaUi.Cargando
@@ -105,11 +115,13 @@ class TareasViewModel(private val repo: TareasRepository) : ViewModel() {
                     enParalelo = enParalelo,
                     simularError = simularError
                 )
+                val milisegundos = System.currentTimeMillis() - inicio
+                _comparacion.update { it.registrar(enParalelo, milisegundos) }
                 _carga.value = CargaUi.Exito(
                     modo = modo,
                     perfil = perfil,
                     pedidos = pedidos.size,
-                    milisegundos = System.currentTimeMillis() - inicio
+                    milisegundos = milisegundos
                 )
             } catch (e: CancellationException) {
                 throw e
@@ -131,9 +143,7 @@ class TareasViewModel(private val repo: TareasRepository) : ViewModel() {
                 return if (enParalelo) {
                     coroutineScope {
                         val perfilDeferred = async { repo.cargarPerfil() }
-                        val pedidosDeferred = async {
-                            repo.cargarPedidos(simularError)
-                        }
+                        val pedidosDeferred = async { repo.cargarPedidos(simularError) }
                         perfilDeferred.await() to pedidosDeferred.await()
                     }
                 } else {
