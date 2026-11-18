@@ -11,6 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -34,6 +35,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.quispe.centrotareas.model.PrimosUi
+import com.quispe.centrotareas.model.CargaUi
 import com.quispe.centrotareas.viewmodel.TareasViewModel
 
 private val AzulCentro = Color(0xFF1976B2)
@@ -46,6 +48,7 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
     val progreso by viewModel.progreso.collectAsState()
     val corriendo by viewModel.corriendo.collectAsState()
     val primos by viewModel.primos.collectAsState()
+    val carga by viewModel.carga.collectAsState()
     var toques by remember { mutableStateOf(0) }
     var limitePrimos by remember { mutableStateOf("500000") }
     val hasta = limitePrimos.toIntOrNull()
@@ -169,6 +172,67 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
                                     "Primos hasta $limitePrimos: ${estado.cantidad}",
                                     color = Color(0xFF256B38)
                                 )
+                                Text(
+                                    "Tiempo: ${estado.milisegundos} ms",
+                                    color = Color(0xFF256B38),
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        "Dos cargas",
+                        modifier = Modifier.fillMaxWidth(),
+                        color = AzulCentro,
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = viewModel::cargarUnaPorUna,
+                            enabled = carga != CargaUi.Cargando,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Una por una")
+                        }
+                        Button(
+                            onClick = viewModel::cargarALaVez,
+                            enabled = carga != CargaUi.Cargando,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("A la vez")
+                        }
+                    }
+                    when (val estado = carga) {
+                        CargaUi.Inicial -> Unit
+                        CargaUi.Cargando -> CircularProgressIndicator()
+                        is CargaUi.Error -> Text(estado.mensaje)
+                        is CargaUi.Exito -> Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFFE5F3E8)
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(10.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text("Modo: ${estado.modo}", color = Color(0xFF256B38))
+                                Text("Perfil: ${estado.perfil}", color = Color(0xFF256B38))
+                                Text("Pedidos: ${estado.pedidos}", color = Color(0xFF256B38))
                                 Text(
                                     "Tiempo: ${estado.milisegundos} ms",
                                     color = Color(0xFF256B38),

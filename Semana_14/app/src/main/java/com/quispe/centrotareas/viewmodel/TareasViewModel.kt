@@ -9,6 +9,8 @@ import com.quispe.centrotareas.model.PrimosUi
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -84,5 +86,40 @@ class TareasViewModel(private val repo: TareasRepository) : ViewModel() {
 
     fun cancelarPrimos() {
         trabajoPrimos?.cancel()
+    }
+
+    fun cargarUnaPorUna() {
+        if (_carga.value == CargaUi.Cargando) return
+        _carga.value = CargaUi.Cargando
+        viewModelScope.launch {
+            val inicio = System.currentTimeMillis()
+            val perfil = repo.cargarPerfil()
+            val pedidos = repo.cargarPedidos(false)
+            _carga.value = CargaUi.Exito(
+                modo = "Una por una",
+                perfil = perfil,
+                pedidos = pedidos.size,
+                milisegundos = System.currentTimeMillis() - inicio
+            )
+        }
+    }
+
+    fun cargarALaVez() {
+        if (_carga.value == CargaUi.Cargando) return
+        _carga.value = CargaUi.Cargando
+        viewModelScope.launch {
+            val inicio = System.currentTimeMillis()
+            val (perfil, pedidos) = coroutineScope {
+                val perfilDeferred = async { repo.cargarPerfil() }
+                val pedidosDeferred = async { repo.cargarPedidos(false) }
+                perfilDeferred.await() to pedidosDeferred.await()
+            }
+            _carga.value = CargaUi.Exito(
+                modo = "A la vez",
+                perfil = perfil,
+                pedidos = pedidos.size,
+                milisegundos = System.currentTimeMillis() - inicio
+            )
+        }
     }
 }
