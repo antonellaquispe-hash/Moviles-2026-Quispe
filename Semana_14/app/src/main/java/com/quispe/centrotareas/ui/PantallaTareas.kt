@@ -59,10 +59,15 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
                     Button(onClick = { toques++ }) {
                         Text("Tócame: $toques")
                     }
-                    Button(onClick = viewModel::tareaLargaMala) {
-                        Text("Tarea larga (MAL)")
+                    Button(onClick = viewModel::tareaLarga) {
+                        Text("Tarea larga")
                     }
                     Text(mensaje, style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        "Los toques siguen sumando mientras trabaja",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = AzulCentro
+                    )
                 }
             }
         }
