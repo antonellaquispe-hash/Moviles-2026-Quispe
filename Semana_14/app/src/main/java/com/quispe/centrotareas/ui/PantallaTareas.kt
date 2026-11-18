@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,6 +33,7 @@ private val AzulCentro = Color(0xFF1976B2)
 fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
     val viewModel: TareasViewModel = viewModel(factory = viewModelFactory)
     val mensaje by viewModel.mensaje.collectAsState()
+    val progreso by viewModel.progreso.collectAsState()
     var toques by remember { mutableStateOf(0) }
 
     Scaffold(
@@ -56,18 +58,24 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
                     modifier = Modifier.padding(12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    Text(
+                        "Tarea con progreso",
+                        modifier = Modifier.fillMaxWidth(),
+                        color = AzulCentro,
+                        style = MaterialTheme.typography.titleSmall
+                    )
                     Button(onClick = { toques++ }) {
                         Text("Tócame: $toques")
                     }
                     Button(onClick = viewModel::tareaLarga) {
-                        Text("Tarea larga")
+                        Text("Iniciar")
                     }
-                    Text(mensaje, style = MaterialTheme.typography.bodyMedium)
-                    Text(
-                        "Los toques siguen sumando mientras trabaja",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = AzulCentro
+                    LinearProgressIndicator(
+                        progress = { progreso },
+                        modifier = Modifier.fillMaxWidth()
                     )
+                    Text("${(progreso * 100).toInt()} %", style = MaterialTheme.typography.bodySmall)
+                    Text(mensaje, style = MaterialTheme.typography.bodyMedium)
                 }
             }
         }

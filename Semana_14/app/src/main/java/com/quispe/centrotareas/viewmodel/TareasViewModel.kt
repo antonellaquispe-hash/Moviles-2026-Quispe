@@ -1,15 +1,15 @@
 package com.quispe.centrotareas.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import android.util.Log
 import com.quispe.centrotareas.data.TareasRepository
 import com.quispe.centrotareas.model.CargaUi
 import com.quispe.centrotareas.model.PrimosUi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -34,11 +34,15 @@ class TareasViewModel(private val repo: TareasRepository) : ViewModel() {
 
     fun tareaLarga() {
         viewModelScope.launch {
+            _progreso.value = 0f
             _mensaje.value = "Trabajando..."
             Log.d("HILO", "Antes: ${Thread.currentThread().name}")
             withContext(Dispatchers.Default) {
                 Log.d("HILO", "Dentro: ${Thread.currentThread().name}")
-                delay(4_000)
+                for (i in 1..100) {
+                    delay(40)
+                    _progreso.value = i / 100f
+                }
             }
             Log.d("HILO", "Después: ${Thread.currentThread().name}")
             _mensaje.value = "Terminó"
