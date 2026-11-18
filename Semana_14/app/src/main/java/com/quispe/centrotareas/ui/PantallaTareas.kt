@@ -24,6 +24,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -51,7 +52,7 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
     val primos by viewModel.primos.collectAsState()
     val carga by viewModel.carga.collectAsState()
     val simularError by viewModel.simularError.collectAsState()
-    var toques by remember { mutableStateOf(0) }
+    var toques by remember { mutableIntStateOf(0) }
     var limitePrimos by remember { mutableStateOf("500000") }
     val hasta = limitePrimos.toIntOrNull()
 
