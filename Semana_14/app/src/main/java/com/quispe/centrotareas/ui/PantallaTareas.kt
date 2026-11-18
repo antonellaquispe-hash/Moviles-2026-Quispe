@@ -3,15 +3,18 @@ package com.quispe.centrotareas.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -31,18 +34,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.quispe.centrotareas.model.PrimosUi
 import com.quispe.centrotareas.model.CargaUi
+import com.quispe.centrotareas.model.PrimosUi
 import com.quispe.centrotareas.viewmodel.TareasViewModel
 
 private val AzulCentro = Color(0xFF1976B2)
+private val VerdeTexto = Color(0xFF256B38)
+private val VerdeFondo = Color(0xFFE5F3E8)
+private val RojoTexto = Color(0xFFB3261E)
+private val RojoFondo = Color(0xFFFCE4E4)
 
-@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
     val viewModel: TareasViewModel = viewModel(factory = viewModelFactory)
@@ -52,6 +59,7 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
     val primos by viewModel.primos.collectAsState()
     val carga by viewModel.carga.collectAsState()
     val simularError by viewModel.simularError.collectAsState()
+    val comparacion by viewModel.comparacion.collectAsState()
     var toques by remember { mutableIntStateOf(0) }
     var limitePrimos by remember { mutableStateOf("500000") }
     val hasta = limitePrimos.toIntOrNull()
@@ -94,14 +102,14 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Button(
-                            onClick = viewModel::tareaLarga,
+                            onClick = { viewModel.tareaLarga() },
                             enabled = !corriendo,
                             modifier = Modifier.weight(1f)
                         ) {
                             Text("Iniciar")
                         }
                         OutlinedButton(
-                            onClick = viewModel::cancelar,
+                            onClick = { viewModel.cancelar() },
                             enabled = corriendo,
                             modifier = Modifier.weight(1f)
                         ) {
@@ -112,7 +120,10 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
                         progress = { progreso },
                         modifier = Modifier.fillMaxWidth()
                     )
-                    Text("${(progreso * 100).toInt()} %", style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        "${(progreso * 100).toInt()} %",
+                        style = MaterialTheme.typography.bodySmall
+                    )
                     Text(mensaje, style = MaterialTheme.typography.bodyMedium)
                 }
             }
@@ -141,14 +152,14 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Button(
-                            onClick = { hasta?.let(viewModel::contar) },
+                            onClick = { if (hasta != null) viewModel.contar(hasta) },
                             enabled = hasta != null && hasta >= 2 && primos != PrimosUi.Calculando,
                             modifier = Modifier.weight(1f)
                         ) {
                             Text("Contar")
                         }
                         OutlinedButton(
-                            onClick = viewModel::cancelarPrimos,
+                            onClick = { viewModel.cancelarPrimos() },
                             enabled = primos == PrimosUi.Calculando,
                             modifier = Modifier.weight(1f)
                         ) {
@@ -161,9 +172,7 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
                         PrimosUi.Cancelado -> Text("Cancelado")
                         is PrimosUi.Listo -> Card(
                             modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFFE5F3E8)
-                            )
+                            colors = CardDefaults.cardColors(containerColor = VerdeFondo)
                         ) {
                             Column(
                                 modifier = Modifier
@@ -173,11 +182,11 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
                             ) {
                                 Text(
                                     "Primos hasta $limitePrimos: ${estado.cantidad}",
-                                    color = Color(0xFF256B38)
+                                    color = VerdeTexto
                                 )
                                 Text(
                                     "Tiempo: ${estado.milisegundos} ms",
-                                    color = Color(0xFF256B38),
+                                    color = VerdeTexto,
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
@@ -200,11 +209,12 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
                     )
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Switch(
                             checked = simularError,
-                            onCheckedChange = viewModel::cambiarSimularError
+                            onCheckedChange = { viewModel.cambiarSimularError(it) }
                         )
                         Text("Simular error")
                     }
@@ -213,14 +223,14 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         OutlinedButton(
-                            onClick = viewModel::cargarUnaPorUna,
+                            onClick = { viewModel.cargarUnaPorUna() },
                             enabled = carga != CargaUi.Cargando,
                             modifier = Modifier.weight(1f)
                         ) {
                             Text("Una por una")
                         }
                         Button(
-                            onClick = viewModel::cargarALaVez,
+                            onClick = { viewModel.cargarALaVez() },
                             enabled = carga != CargaUi.Cargando,
                             modifier = Modifier.weight(1f)
                         ) {
@@ -232,9 +242,7 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
                         CargaUi.Cargando -> CircularProgressIndicator()
                         is CargaUi.Error -> Card(
                             modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFFFCE4E4)
-                            )
+                            colors = CardDefaults.cardColors(containerColor = RojoFondo)
                         ) {
                             Column(
                                 modifier = Modifier
@@ -244,22 +252,17 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
                             ) {
                                 Text(
                                     estado.mensaje,
-                                    color = Color(0xFFB3261E),
+                                    color = RojoTexto,
                                     style = MaterialTheme.typography.bodySmall
                                 )
-                                Button(
-                                    onClick = viewModel::cargarALaVez,
-                                    enabled = carga != CargaUi.Cargando
-                                ) {
+                                OutlinedButton(onClick = { viewModel.cargarALaVez() }) {
                                     Text("Reintentar")
                                 }
                             }
                         }
                         is CargaUi.Exito -> Card(
                             modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFFE5F3E8)
-                            )
+                            colors = CardDefaults.cardColors(containerColor = VerdeFondo)
                         ) {
                             Column(
                                 modifier = Modifier
@@ -267,12 +270,12 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
                                     .padding(10.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Text("Modo: ${estado.modo}", color = Color(0xFF256B38))
-                                Text("Perfil: ${estado.perfil}", color = Color(0xFF256B38))
-                                Text("Pedidos: ${estado.pedidos}", color = Color(0xFF256B38))
+                                Text("Modo: ${estado.modo}", color = VerdeTexto)
+                                Text("Perfil: ${estado.perfil}", color = VerdeTexto)
+                                Text("Pedidos: ${estado.pedidos}", color = VerdeTexto)
                                 Text(
                                     "Tiempo: ${estado.milisegundos} ms",
-                                    color = Color(0xFF256B38),
+                                    color = VerdeTexto,
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
@@ -280,6 +283,72 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
                     }
                 }
             }
+
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        "Comparación de tiempos",
+                        color = AzulCentro,
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        CeldaTabla("Modo", 1.4f, negrita = true)
+                        CeldaTabla("Veces", 0.8f, negrita = true)
+                        CeldaTabla("Último", 1f, negrita = true)
+                        CeldaTabla("Promedio", 1.1f, negrita = true)
+                    }
+                    FilaComparacion(
+                        modo = "Una por una",
+                        tiempos = comparacion.unaPorUna,
+                        promedio = comparacion.promedioUnaPorUna
+                    )
+                    FilaComparacion(
+                        modo = "A la vez",
+                        tiempos = comparacion.aLaVez,
+                        promedio = comparacion.promedioALaVez
+                    )
+                    val ahorro = comparacion.ahorroMs
+                    Text(
+                        text = if (ahorro == null) {
+                            "Ejecuta ambos modos para ver la diferencia"
+                        } else {
+                            "«A la vez» es $ahorro ms más rápido en promedio"
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (ahorro == null) Color.Gray else VerdeTexto
+                    )
+                    OutlinedButton(
+                        onClick = { viewModel.limpiarComparacion() },
+                        enabled = comparacion.unaPorUna.isNotEmpty() ||
+                                comparacion.aLaVez.isNotEmpty()
+                    ) {
+                        Text("Limpiar tabla")
+                    }
+                }
+            }
         }
+    }
+}
+
+@Composable
+private fun RowScope.CeldaTabla(texto: String, peso: Float, negrita: Boolean = false) {
+    Text(
+        text = texto,
+        modifier = Modifier.weight(peso),
+        fontWeight = if (negrita) FontWeight.Bold else FontWeight.Normal,
+        style = MaterialTheme.typography.bodySmall
+    )
+}
+
+@Composable
+private fun FilaComparacion(modo: String, tiempos: List<Long>, promedio: Long?) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        CeldaTabla(modo, 1.4f)
+        CeldaTabla("${tiempos.size}", 0.8f)
+        CeldaTabla(tiempos.lastOrNull()?.let { "$it ms" } ?: "—", 1f)
+        CeldaTabla(promedio?.let { "$it ms" } ?: "—", 1.1f)
     }
 }
