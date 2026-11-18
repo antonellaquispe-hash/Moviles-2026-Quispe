@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.quispe.centrotareas.data.TareasRepository
 import com.quispe.centrotareas.model.CargaUi
 import com.quispe.centrotareas.model.PrimosUi
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -16,6 +17,7 @@ import kotlinx.coroutines.withContext
 
 class TareasViewModel(private val repo: TareasRepository) : ViewModel() {
     private var trabajo: Job? = null
+    private var trabajoPrimos: Job? = null
 
     private val _mensaje = MutableStateFlow("Listo")
     val mensaje = _mensaje.asStateFlow()
@@ -62,5 +64,25 @@ class TareasViewModel(private val repo: TareasRepository) : ViewModel() {
         if (!_corriendo.value) return
         trabajo?.cancel()
         _mensaje.value = "Cancelado"
+    }
+
+    fun contar(hasta: Int) {
+        if (hasta < 2 || _primos.value == PrimosUi.Calculando) return
+        trabajoPrimos = viewModelScope.launch {
+            _primos.value = PrimosUi.Calculando
+            val inicio = System.currentTimeMillis()
+            try {
+                val cantidad = repo.contarPrimos(hasta)
+                val milisegundos = System.currentTimeMillis() - inicio
+                _primos.value = PrimosUi.Listo(cantidad, milisegundos)
+            } catch (e: CancellationException) {
+                _primos.value = PrimosUi.Cancelado
+                throw e
+            }
+        }
+    }
+
+    fun cancelarPrimos() {
+        trabajoPrimos?.cancel()
     }
 }

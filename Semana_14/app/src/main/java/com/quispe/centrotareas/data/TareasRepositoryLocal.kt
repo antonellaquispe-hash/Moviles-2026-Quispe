@@ -1,6 +1,10 @@
 package com.quispe.centrotareas.data
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
 import java.io.IOException
 
 class TareasRepositoryLocal : TareasRepository {
@@ -15,8 +19,22 @@ class TareasRepositoryLocal : TareasRepository {
         return listOf("Pedido 101", "Pedido 102", "Pedido 103")
     }
 
-    override suspend fun contarPrimos(hasta: Int): Int {
-        // Se implementa en el Paso 5 del laboratorio.
-        return 0
+    override suspend fun contarPrimos(hasta: Int): Int = withContext(Dispatchers.Default) {
+        var cantidad = 0
+        for (n in 2..hasta) {
+            currentCoroutineContext().ensureActive()
+            if (esPrimo(n)) cantidad++
+        }
+        cantidad
+    }
+
+    private fun esPrimo(n: Int): Boolean {
+        if (n < 2) return false
+        var divisor = 2
+        while (divisor.toLong() * divisor <= n) {
+            if (n % divisor == 0) return false
+            divisor++
+        }
+        return true
     }
 }
