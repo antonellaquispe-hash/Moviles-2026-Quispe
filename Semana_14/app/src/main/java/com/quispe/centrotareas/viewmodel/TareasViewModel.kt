@@ -26,5 +26,10 @@ class TareasViewModel(private val repo: TareasRepository) : ViewModel() {
     private val _simularError = MutableStateFlow(false)
     val simularError = _simularError.asStateFlow()
 
-    // Los comportamientos se agregan paso a paso en los commits del laboratorio.
+    // Paso 1: se ejecuta deliberadamente en el hilo principal para observar el bloqueo.
+    fun tareaLargaMala() {
+        _mensaje.value = "Trabajando..."
+        Thread.sleep(4_000)
+        _mensaje.value = "Terminó"
+    }
 }
