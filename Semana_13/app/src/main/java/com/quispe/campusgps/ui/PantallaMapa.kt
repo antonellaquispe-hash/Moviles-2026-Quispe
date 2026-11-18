@@ -1,6 +1,7 @@
 package com.quispe.campusgps.ui
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -27,7 +28,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,11 +41,23 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.quispe.campusgps.model.UbicacionUi
 import com.quispe.campusgps.util.formatearDistancia
 import com.quispe.campusgps.viewmodel.CampusViewModelFactory
 import com.quispe.campusgps.viewmodel.MapaViewModel
+
+private fun Context.tienePermisoDeUbicacion(): Boolean =
+    ContextCompat.checkSelfPermission(
+        this,
+        Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+        this,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,10 +70,25 @@ fun PantallaMapa(viewModelFactory: CampusViewModelFactory) {
     val categoriaSeleccionada by viewModel.categoriaSeleccionada.collectAsStateWithLifecycle()
     val radioMetros by viewModel.radioMetros.collectAsStateWithLifecycle()
     val contexto = LocalContext.current
+    var permisoUbicacion by remember(contexto) {
+        mutableStateOf(contexto.tienePermisoDeUbicacion())
+    }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner, contexto) {
+        val observador = LifecycleEventObserver { _, evento ->
+            if (evento == Lifecycle.Event.ON_RESUME) {
+                permisoUbicacion = contexto.tienePermisoDeUbicacion()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observador)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observador) }
+    }
 
     val lanzadorPermisos = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permisos ->
+        permisoUbicacion = contexto.tienePermisoDeUbicacion()
         if (permisos.values.any { it }) {
             viewModel.buscar()
         } else {
@@ -65,16 +97,8 @@ fun PantallaMapa(viewModelFactory: CampusViewModelFactory) {
     }
 
     fun obtenerUbicacion() {
-        val tienePermisoPreciso = ContextCompat.checkSelfPermission(
-            contexto,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-        val tienePermisoAproximado = ContextCompat.checkSelfPermission(
-            contexto,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-
-        if (tienePermisoPreciso || tienePermisoAproximado) {
+        permisoUbicacion = contexto.tienePermisoDeUbicacion()
+        if (permisoUbicacion) {
             viewModel.buscar()
         } else {
             lanzadorPermisos.launch(
@@ -150,6 +174,8 @@ fun PantallaMapa(viewModelFactory: CampusViewModelFactory) {
                 seleccionado = seleccionado,
                 masCercano = masCercano,
                 radioMetros = radioMetros,
+                permisoUbicacion = permisoUbicacion,
+                onSeleccionarLugar = viewModel::seleccionar,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
