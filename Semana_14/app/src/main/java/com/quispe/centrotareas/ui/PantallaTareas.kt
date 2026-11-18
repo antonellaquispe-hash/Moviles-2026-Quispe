@@ -1,6 +1,8 @@
 package com.quispe.centrotareas.ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -8,6 +10,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -34,6 +37,7 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
     val viewModel: TareasViewModel = viewModel(factory = viewModelFactory)
     val mensaje by viewModel.mensaje.collectAsState()
     val progreso by viewModel.progreso.collectAsState()
+    val corriendo by viewModel.corriendo.collectAsState()
     var toques by remember { mutableStateOf(0) }
 
     Scaffold(
@@ -67,8 +71,24 @@ fun PantallaTareas(viewModelFactory: ViewModelProvider.Factory) {
                     Button(onClick = { toques++ }) {
                         Text("Tócame: $toques")
                     }
-                    Button(onClick = viewModel::tareaLarga) {
-                        Text("Iniciar")
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = viewModel::tareaLarga,
+                            enabled = !corriendo,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Iniciar")
+                        }
+                        OutlinedButton(
+                            onClick = viewModel::cancelar,
+                            enabled = corriendo,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Cancelar")
+                        }
                     }
                     LinearProgressIndicator(
                         progress = { progreso },
