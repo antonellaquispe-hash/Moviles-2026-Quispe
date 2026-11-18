@@ -10,6 +10,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -100,19 +101,10 @@ class TareasViewModel(private val repo: TareasRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 val inicio = System.currentTimeMillis()
-                val (perfil, pedidos) = if (enParalelo) {
-                    coroutineScope {
-                        val perfilDeferred = async { repo.cargarPerfil() }
-                        val pedidosDeferred = async {
-                            repo.cargarPedidos(simularError)
-                        }
-                        perfilDeferred.await() to pedidosDeferred.await()
-                    }
-                } else {
-                    val perfil = repo.cargarPerfil()
-                    val pedidos = repo.cargarPedidos(simularError)
-                    perfil to pedidos
-                }
+                val (perfil, pedidos) = cargarDatosConReintentos(
+                    enParalelo = enParalelo,
+                    simularError = simularError
+                )
                 _carga.value = CargaUi.Exito(
                     modo = modo,
                     perfil = perfil,
@@ -127,5 +119,39 @@ class TareasViewModel(private val repo: TareasRepository) : ViewModel() {
                 )
             }
         }
+    }
+
+    private suspend fun cargarDatosConReintentos(
+        enParalelo: Boolean,
+        simularError: Boolean
+    ): Pair<String, List<String>> {
+        var reintentos = 0
+        while (true) {
+            try {
+                return if (enParalelo) {
+                    coroutineScope {
+                        val perfilDeferred = async { repo.cargarPerfil() }
+                        val pedidosDeferred = async {
+                            repo.cargarPedidos(simularError)
+                        }
+                        perfilDeferred.await() to pedidosDeferred.await()
+                    }
+                } else {
+                    val perfil = repo.cargarPerfil()
+                    val pedidos = repo.cargarPedidos(simularError)
+                    perfil to pedidos
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                if (reintentos == ESPERAS_REINTENTO_MS.size) throw e
+                delay(ESPERAS_REINTENTO_MS[reintentos])
+                reintentos++
+            }
+        }
+    }
+
+    private companion object {
+        val ESPERAS_REINTENTO_MS = longArrayOf(500, 1_000, 2_000)
     }
 }
