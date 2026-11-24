@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.quispe.murocampus.data.PostRepository
 import com.quispe.murocampus.model.Comentario
+import com.quispe.murocampus.model.NuevoPost
 import com.quispe.murocampus.model.Post
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -43,6 +44,9 @@ class PostsViewModel(private val repo: PostRepository) : ViewModel() {
     private val _detalle = MutableStateFlow<UiState<DetalleUi>>(UiState.Cargando)
     val detalle = _detalle.asStateFlow()
 
+    private val _publicacion = MutableStateFlow<UiState<Post>?>(null)
+    val publicacion = _publicacion.asStateFlow()
+
     init {
         cargar()
     }
@@ -65,6 +69,29 @@ class PostsViewModel(private val repo: PostRepository) : ViewModel() {
     fun filtrar(userId: Int?) {
         _usuarioFiltro.value = userId
         cargar()
+    }
+
+    fun publicar(titulo: String, texto: String) {
+        if (titulo.isBlank() || texto.isBlank()) return
+
+        viewModelScope.launch {
+            _publicacion.value = UiState.Cargando
+            repo.crear(
+                NuevoPost(
+                    userId = 1,
+                    title = titulo,
+                    body = texto
+                )
+            ).onSuccess { post ->
+                _publicacion.value = UiState.Exito(post)
+            }.onFailure { error ->
+                _publicacion.value = UiState.Error(mensajeDe(error))
+            }
+        }
+    }
+
+    fun limpiarResultadoPublicacion() {
+        _publicacion.value = null
     }
 
     fun abrir(id: Int) {

@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -25,6 +26,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.quispe.murocampus.data.PostRepositoryRemote
 import com.quispe.murocampus.data.remote.RetrofitClient
 import com.quispe.murocampus.ui.PantallaDetalle
+import com.quispe.murocampus.ui.PantallaCrear
 import com.quispe.murocampus.ui.PantallaLista
 import com.quispe.murocampus.ui.theme.MuroCampusTheme
 import com.quispe.murocampus.viewmodel.PostsViewModel
@@ -53,23 +55,45 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MuroCampusScreen(vm: PostsViewModel) {
     var idSeleccionado by rememberSaveable { mutableStateOf<Int?>(null) }
+    var creandoPublicacion by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(idSeleccionado) {
         idSeleccionado?.let(vm::abrir)
     }
-    BackHandler(enabled = idSeleccionado != null) {
-        idSeleccionado = null
+    LaunchedEffect(creandoPublicacion) {
+        if (creandoPublicacion) vm.limpiarResultadoPublicacion()
+    }
+    BackHandler(enabled = creandoPublicacion || idSeleccionado != null) {
+        if (creandoPublicacion) {
+            creandoPublicacion = false
+        } else {
+            idSeleccionado = null
+        }
     }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = { MuroCampusTopBar() }
+        topBar = { MuroCampusTopBar() },
+        floatingActionButton = {
+            if (!creandoPublicacion && idSeleccionado == null) {
+                FloatingActionButton(
+                    onClick = {
+                        vm.limpiarResultadoPublicacion()
+                        creandoPublicacion = true
+                    }
+                ) {
+                    Text("+")
+                }
+            }
+        }
     ) { innerPadding ->
         val contentModifier = Modifier
             .fillMaxSize()
             .padding(innerPadding)
         val postId = idSeleccionado
-        if (postId == null) {
+        if (creandoPublicacion) {
+            PantallaCrear(vm = vm, modifier = contentModifier)
+        } else if (postId == null) {
             PantallaLista(
                 vm = vm,
                 modifier = contentModifier,
