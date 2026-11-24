@@ -1,6 +1,7 @@
 package com.quispe.murocampus
 
 import android.os.Bundle
+import androidx.activity.compose.BackHandler
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -12,12 +13,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModelProvider
 import com.quispe.murocampus.data.PostRepositoryRemote
 import com.quispe.murocampus.data.remote.RetrofitClient
+import com.quispe.murocampus.ui.PantallaDetalle
 import com.quispe.murocampus.ui.PantallaLista
 import com.quispe.murocampus.ui.theme.MuroCampusTheme
 import com.quispe.murocampus.viewmodel.PostsViewModel
@@ -45,16 +52,36 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MuroCampusScreen(vm: PostsViewModel) {
+    var idSeleccionado by rememberSaveable { mutableStateOf<Int?>(null) }
+
+    LaunchedEffect(idSeleccionado) {
+        idSeleccionado?.let(vm::abrir)
+    }
+    BackHandler(enabled = idSeleccionado != null) {
+        idSeleccionado = null
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { MuroCampusTopBar() }
     ) { innerPadding ->
-        PantallaLista(
-            vm = vm,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        )
+        val contentModifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+        val postId = idSeleccionado
+        if (postId == null) {
+            PantallaLista(
+                vm = vm,
+                modifier = contentModifier,
+                onPostClick = { post -> idSeleccionado = post.id }
+            )
+        } else {
+            PantallaDetalle(
+                vm = vm,
+                postId = postId,
+                modifier = contentModifier
+            )
+        }
     }
 }
 

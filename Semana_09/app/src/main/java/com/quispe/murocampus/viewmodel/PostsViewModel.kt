@@ -4,7 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.quispe.murocampus.data.PostRepository
+import com.quispe.murocampus.model.Comentario
 import com.quispe.murocampus.model.Post
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -25,9 +28,17 @@ fun mensajeDe(error: Throwable): String = when (error) {
     else -> "Error desconocido"
 }
 
+data class DetalleUi(
+    val post: Post,
+    val comentarios: List<Comentario>
+)
+
 class PostsViewModel(private val repo: PostRepository) : ViewModel() {
     private val _lista = MutableStateFlow<UiState<List<Post>>>(UiState.Cargando)
     val lista = _lista.asStateFlow()
+
+    private val _detalle = MutableStateFlow<UiState<DetalleUi>>(UiState.Cargando)
+    val detalle = _detalle.asStateFlow()
 
     init {
         cargar()
@@ -39,6 +50,34 @@ class PostsViewModel(private val repo: PostRepository) : ViewModel() {
             repo.listar()
                 .onSuccess { posts -> _lista.value = UiState.Exito(posts) }
                 .onFailure { error -> _lista.value = UiState.Error(mensajeDe(error)) }
+        }
+    }
+
+    fun abrir(id: Int) {
+        viewModelScope.launch {
+            _detalle.value = UiState.Cargando
+            coroutineScope {
+                val postPendiente = async { repo.detalle(id) }
+                val comentariosPendientes = async { repo.comentarios(id) }
+                val resultadoPost = postPendiente.await()
+                val resultadoComentarios = comentariosPendientes.await()
+
+                resultadoPost.fold(
+                    onSuccess = { post ->
+                        resultadoComentarios.fold(
+                            onSuccess = { comentarios ->
+                                _detalle.value = UiState.Exito(DetalleUi(post, comentarios))
+                            },
+                            onFailure = { error ->
+                                _detalle.value = UiState.Error(mensajeDe(error))
+                            }
+                        )
+                    },
+                    onFailure = { error ->
+                        _detalle.value = UiState.Error(mensajeDe(error))
+                    }
+                )
+            }
         }
     }
 }

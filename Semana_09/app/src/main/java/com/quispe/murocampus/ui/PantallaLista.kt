@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -30,7 +31,11 @@ import com.quispe.murocampus.viewmodel.PostsViewModel
 import com.quispe.murocampus.viewmodel.UiState
 
 @Composable
-fun PantallaLista(vm: PostsViewModel, modifier: Modifier = Modifier) {
+fun PantallaLista(
+    vm: PostsViewModel,
+    modifier: Modifier = Modifier,
+    onPostClick: (Post) -> Unit = {}
+) {
     val estado by vm.lista.collectAsStateWithLifecycle()
 
     when (val actual = estado) {
@@ -46,14 +51,14 @@ fun PantallaLista(vm: PostsViewModel, modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(actual.datos, key = Post::id) { post ->
-                TarjetaPost(post)
+                TarjetaPost(post, onClick = { onPostClick(post) })
             }
         }
     }
 }
 
 @Composable
-private fun EstadoCargando(modifier: Modifier = Modifier) {
+fun EstadoCargando(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -66,7 +71,7 @@ private fun EstadoCargando(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun EstadoError(
+fun EstadoError(
     mensaje: String,
     alReintentar: () -> Unit,
     modifier: Modifier = Modifier
@@ -100,8 +105,15 @@ private fun EstadoError(
 }
 
 @Composable
-fun TarjetaPost(post: Post, modifier: Modifier = Modifier) {
-    Card(modifier = modifier.fillMaxWidth()) {
+fun TarjetaPost(
+    post: Post,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
+    Card(modifier = modifier
+        .fillMaxWidth()
+        .clickable(onClick = onClick)
+    ) {
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
