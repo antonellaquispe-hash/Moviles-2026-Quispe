@@ -51,6 +51,8 @@ En la rama `mejora-ia`, el repositorio traduce al español los títulos y cuerpo
 
 La lista también permite buscar por título en español sin volver a consultar la API. La búsqueda se combina con el filtro por usuario seleccionado.
 
+Todas las solicitudes HTTP incluyen el encabezado `Accept: application/json`, agregado por un interceptor de OkHttp.
+
 ## Capturas
 
 ### Lista de publicaciones
