@@ -49,6 +49,8 @@ La interfaz observa estados expuestos por el ViewModel. El repositorio encapsula
 
 En la rama `mejora-ia`, el repositorio traduce al español los títulos y cuerpos de publicaciones y comentarios recibidos en inglés. La traducción se ejecuta en el dispositivo con ML Kit; el modelo inglés-español se descarga por Wi-Fi la primera vez y las traducciones se guardan en memoria mientras la app está abierta. Las publicaciones creadas por la persona usuaria se conservan tal como fueron escritas.
 
+La lista también permite buscar por título en español sin volver a consultar la API. La búsqueda se combina con el filtro por usuario seleccionado.
+
 ## Capturas
 
 ### Lista de publicaciones

@@ -19,6 +19,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,11 +39,21 @@ fun PantallaLista(
     modifier: Modifier = Modifier,
     onPostClick: (Post) -> Unit = {}
 ) {
-    val estado by vm.lista.collectAsStateWithLifecycle()
+    val estado by vm.listaVisible.collectAsStateWithLifecycle()
     val usuarioFiltro by vm.usuarioFiltro.collectAsStateWithLifecycle()
+    val busqueda by vm.busqueda.collectAsStateWithLifecycle()
 
     Column(modifier = modifier.fillMaxSize()) {
         FilaFiltros(usuarioSeleccionado = usuarioFiltro, onSeleccionar = vm::filtrar)
+        OutlinedTextField(
+            value = busqueda,
+            onValueChange = vm::buscar,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            label = { Text("Buscar por título") },
+            singleLine = true
+        )
         val contenidoModifier = Modifier
             .fillMaxWidth()
             .weight(1f)
@@ -59,7 +70,10 @@ fun PantallaLista(
                     modifier = contenidoModifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Sin publicaciones")
+                    Text(
+                        if (busqueda.isBlank()) "Sin publicaciones"
+                        else "No se encontraron publicaciones"
+                    )
                 }
             } else {
                 LazyColumn(

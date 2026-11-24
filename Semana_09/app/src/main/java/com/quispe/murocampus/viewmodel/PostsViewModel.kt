@@ -11,7 +11,10 @@ import com.quispe.murocampus.model.Post
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import retrofit2.HttpException
@@ -39,6 +42,24 @@ data class DetalleUi(
 class PostsViewModel(private val repo: PostRepository) : ViewModel() {
     private val _lista = MutableStateFlow<UiState<List<Post>>>(UiState.Cargando)
     val lista = _lista.asStateFlow()
+
+    private val _busqueda = MutableStateFlow("")
+    val busqueda = _busqueda.asStateFlow()
+
+    val listaVisible = combine(_lista, _busqueda) { estado, consulta ->
+        when (estado) {
+            UiState.Cargando -> UiState.Cargando
+            is UiState.Error -> estado
+            is UiState.Exito -> {
+                val tituloBuscado = consulta.trim()
+                UiState.Exito(
+                    estado.datos.filter { post ->
+                        tituloBuscado.isEmpty() || post.title.contains(tituloBuscado, ignoreCase = true)
+                    }
+                )
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), _lista.value)
 
     private val _usuarioFiltro = MutableStateFlow<Int?>(null)
     val usuarioFiltro = _usuarioFiltro.asStateFlow()
@@ -71,6 +92,10 @@ class PostsViewModel(private val repo: PostRepository) : ViewModel() {
     fun filtrar(userId: Int?) {
         _usuarioFiltro.value = userId
         cargar()
+    }
+
+    fun buscar(consulta: String) {
+        _busqueda.value = consulta
     }
 
     fun publicar(titulo: String, texto: String) {
