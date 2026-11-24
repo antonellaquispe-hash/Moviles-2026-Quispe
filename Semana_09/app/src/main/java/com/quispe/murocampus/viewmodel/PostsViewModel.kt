@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.quispe.murocampus.data.PostRepository
+import com.quispe.murocampus.data.translation.ErrorDeTraduccion
 import com.quispe.murocampus.model.Comentario
 import com.quispe.murocampus.model.NuevoPost
 import com.quispe.murocampus.model.Post
@@ -23,6 +24,7 @@ sealed interface UiState<out T> {
 }
 
 fun mensajeDe(error: Throwable): String = when (error) {
+    is ErrorDeTraduccion -> "No se pudo traducir el contenido. Conéctate a Wi-Fi e inténtalo otra vez."
     is IOException -> "Sin conexión a internet.\nRevisa tu red e inténtalo otra vez."
     is HttpException -> "Error del servidor (${error.code()})"
     is SerializationException -> "Respuesta inesperada"

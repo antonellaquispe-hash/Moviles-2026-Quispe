@@ -119,7 +119,7 @@ fun EstadoCargando(modifier: Modifier = Modifier) {
     ) {
         CircularProgressIndicator()
         Spacer(modifier = Modifier.height(12.dp))
-        Text("Cargando publicaciones…")
+        Text("Cargando y traduciendo contenido…")
     }
 }
 

@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModelProvider
 import com.quispe.murocampus.data.PostRepositoryRemote
 import com.quispe.murocampus.data.remote.RetrofitClient
+import com.quispe.murocampus.data.translation.TraductorMlKit
 import com.quispe.murocampus.ui.PantallaDetalle
 import com.quispe.murocampus.ui.PantallaCrear
 import com.quispe.murocampus.ui.PantallaLista
@@ -36,7 +37,9 @@ class MainActivity : ComponentActivity() {
     private val postsViewModel: PostsViewModel by lazy {
         ViewModelProvider(
             this,
-            PostsViewModelFactory(PostRepositoryRemote(RetrofitClient.api))
+            PostsViewModelFactory(
+                PostRepositoryRemote(RetrofitClient.api, TraductorMlKit())
+            )
         )[PostsViewModel::class.java]
     }
 

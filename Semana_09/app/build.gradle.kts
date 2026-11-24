@@ -37,6 +37,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.google.mlkit.translate)
+    implementation(libs.kotlinx.coroutines.play.services)
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-kotlinx-serialization:2.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")

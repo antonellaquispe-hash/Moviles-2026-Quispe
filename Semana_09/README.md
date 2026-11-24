@@ -9,9 +9,12 @@ app/src/main/java/com/quispe/murocampus/
 ├── MainActivity.kt
 ├── data/
 │   ├── PostRepository.kt
-│   └── remote/
-│       ├── PostApi.kt
-│       └── RetrofitClient.kt
+│   ├── remote/
+│   │   ├── PostApi.kt
+│   │   └── RetrofitClient.kt
+│   └── translation/
+│       ├── TraductorContenido.kt
+│       └── TraductorMlKit.kt
 ├── model/
 │   └── Modelos.kt
 ├── ui/
@@ -41,6 +44,10 @@ flowchart TD
 ```
 
 La interfaz observa estados expuestos por el ViewModel. El repositorio encapsula las operaciones remotas y Retrofit realiza las solicitudes HTTP.
+
+## Fase 2: traducción al español
+
+En la rama `mejora-ia`, el repositorio traduce al español los títulos y cuerpos de publicaciones y comentarios recibidos en inglés. La traducción se ejecuta en el dispositivo con ML Kit; el modelo inglés-español se descarga por Wi-Fi la primera vez y las traducciones se guardan en memoria mientras la app está abierta. Las publicaciones creadas por la persona usuaria se conservan tal como fueron escritas.
 
 ## Capturas
 
