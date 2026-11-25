@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.quispe.avisoscampus.notificacion.Notificador
+import com.quispe.avisoscampus.receiver.EstadoCargadorReceiver
 import com.quispe.avisoscampus.receiver.ModoAvionReceiver
 import com.quispe.avisoscampus.model.Aviso
 import com.quispe.avisoscampus.viewmodel.AvisosViewModel
@@ -54,6 +55,7 @@ fun PantallaAvisos(vm: AvisosViewModel = viewModel()) {
     val mensaje by vm.mensaje.collectAsState()
     val faltan by vm.faltan.collectAsState()
     val escuchandoAvion by vm.escuchandoAvion.collectAsState()
+    val escuchandoCargador by vm.escuchandoCargador.collectAsState()
     val avisos by vm.avisos.collectAsState()
     val lanzador = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -78,6 +80,25 @@ fun PantallaAvisos(vm: AvisosViewModel = viewModel()) {
                 contexto,
                 receptor,
                 IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED),
+                ContextCompat.RECEIVER_NOT_EXPORTED
+            )
+            onDispose { contexto.unregisterReceiver(receptor) }
+        } else {
+            onDispose { }
+        }
+    }
+
+    DisposableEffect(contexto, escuchandoCargador) {
+        if (escuchandoCargador) {
+            val receptor = EstadoCargadorReceiver(vm::alCambiarCargador)
+            val filtro = IntentFilter().apply {
+                addAction(Intent.ACTION_POWER_CONNECTED)
+                addAction(Intent.ACTION_POWER_DISCONNECTED)
+            }
+            ContextCompat.registerReceiver(
+                contexto,
+                receptor,
+                filtro,
                 ContextCompat.RECEIVER_NOT_EXPORTED
             )
             onDispose { contexto.unregisterReceiver(receptor) }
@@ -312,6 +333,45 @@ fun PantallaAvisos(vm: AvisosViewModel = viewModel()) {
                     }
                     Text(
                         text = "Activa o desactiva el modo avión del celular",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(modifier = Modifier.padding(18.dp)) {
+                    Text(
+                        text = "Receptor del cargador",
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Escuchar el cargador",
+                            modifier = Modifier.weight(1f),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Switch(
+                            checked = escuchandoCargador,
+                            onCheckedChange = vm::cambiarEscuchaCargador
+                        )
+                    }
+                    Text(
+                        text = "Avísame al conectar o desconectar el cargador",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodySmall
                     )

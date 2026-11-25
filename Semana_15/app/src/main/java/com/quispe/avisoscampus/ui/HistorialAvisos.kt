@@ -69,6 +69,7 @@ private fun FilaAviso(aviso: Aviso) {
         Origen.BOTON -> MaterialTheme.colorScheme.primary to MaterialTheme.colorScheme.onPrimary
         Origen.RECORDATORIO -> Color(0xFFFFC107) to Color(0xFF332700)
         Origen.MODO_AVION -> Color(0xFF7659C6) to Color.White
+        Origen.CARGADOR -> MaterialTheme.colorScheme.tertiary to MaterialTheme.colorScheme.onTertiary
     }
     val hora = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
         .format(Date(aviso.creadoEn))
