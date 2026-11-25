@@ -18,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -46,6 +47,9 @@ fun PantallaAvisos(vm: AvisosViewModel = viewModel()) {
     LaunchedEffect(Unit) {
         if (Notificador.tienePermiso(contexto)) {
             vm.permisoRespondido(true)
+        }
+        vm.eventos.collect { aviso ->
+            Notificador.mostrar(contexto, aviso)
         }
     }
 
@@ -120,6 +124,40 @@ fun PantallaAvisos(vm: AvisosViewModel = viewModel()) {
                         shape = RoundedCornerShape(50)
                     ) {
                         Text("Permitir notificaciones")
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(18.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Avisos",
+                        modifier = Modifier.align(Alignment.Start),
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Button(
+                        onClick = vm::avisarAhora,
+                        shape = RoundedCornerShape(50),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Text("Mostrar aviso")
                     }
                 }
             }
