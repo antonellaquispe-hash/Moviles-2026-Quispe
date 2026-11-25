@@ -1,9 +1,0 @@
-package com.tecsup.rockvault.domain.model
-
-data class Item(
-    val id: String,
-    val titulo: String,
-    val subtitulo: String,
-    val imagenUrl: String? = null,
-    val esFavorito: Boolean = false
-)
