@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -28,6 +30,9 @@ class AvisosViewModel(
     private val _eventos = MutableSharedFlow<Aviso>(extraBufferCapacity = 1)
     val eventos = _eventos.asSharedFlow()
     private val siguienteId = AtomicInteger(1)
+    private var trabajoRecordatorio: Job? = null
+    private val _faltan = MutableStateFlow<Int?>(null)
+    val faltan: StateFlow<Int?> = _faltan.asStateFlow()
 
     fun permisoRespondido(concedido: Boolean) {
         _permiso.value = if (concedido) PermisoUi.Concedido else PermisoUi.Denegado
@@ -44,5 +49,33 @@ class AvisosViewModel(
             repository.registrar(aviso)
             _eventos.emit(aviso)
         }
+    }
+
+    fun recordarEn(segundos: Int = 10) {
+        if (trabajoRecordatorio?.isActive == true || segundos <= 0) return
+
+        trabajoRecordatorio = viewModelScope.launch {
+            try {
+                for (segundo in segundos downTo 1) {
+                    _faltan.value = segundo
+                    delay(1_000)
+                }
+
+                val aviso = Aviso(
+                    id = siguienteId.getAndIncrement(),
+                    titulo = "Recordatorio",
+                    texto = "Revisa tu laboratorio pendiente",
+                    origen = Origen.RECORDATORIO
+                )
+                repository.registrar(aviso)
+                _eventos.emit(aviso)
+            } finally {
+                _faltan.value = null
+            }
+        }
+    }
+
+    fun cancelarRecordatorio() {
+        trabajoRecordatorio?.cancel()
     }
 }
