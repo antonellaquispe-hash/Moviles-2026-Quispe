@@ -53,6 +53,8 @@ La lista también permite buscar por título en español sin volver a consultar 
 
 Todas las solicitudes HTTP incluyen el encabezado `Accept: application/json`, agregado por un interceptor de OkHttp.
 
+La interfaz utiliza una paleta azul fija y tarjetas compactas para acercarse a la referencia visual de la guía, manteniendo los controles de traducción, búsqueda y filtro de la fase 2.
+
 ## Capturas
 
 ### Lista de publicaciones

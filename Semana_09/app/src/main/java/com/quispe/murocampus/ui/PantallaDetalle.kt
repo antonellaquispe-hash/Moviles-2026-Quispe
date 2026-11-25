@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
@@ -37,26 +38,39 @@ fun PantallaDetalle(
         )
         is UiState.Exito -> LazyColumn(
             modifier = modifier,
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            contentPadding = PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item(key = "publicacion") {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = androidx.compose.material3.CardDefaults.cardColors(
+                        containerColor = androidx.compose.ui.graphics.Color.White
+                    ),
+                    elevation = androidx.compose.material3.CardDefaults.cardElevation(2.dp)
+                ) {
+                Column(
+                    modifier = Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
                     Text(
                         text = actual.datos.post.title,
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = actual.datos.post.body,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                }
                 }
             }
             item(key = "encabezado-comentarios") {
                 Text(
                     text = "Comentarios (${actual.datos.comentarios.size})",
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold
                 )
             }
@@ -69,17 +83,28 @@ fun PantallaDetalle(
 
 @Composable
 private fun TarjetaComentario(comentario: Comentario) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(10.dp),
+        colors = androidx.compose.material3.CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
                 text = comentario.email,
                 color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.labelLarge
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold
             )
-            Text(text = comentario.body)
+            Text(
+                text = comentario.body,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

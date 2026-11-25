@@ -5,6 +5,9 @@ import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.ConcurrentHashMap
 
@@ -33,8 +36,14 @@ class TraductorMlKit : TraductorContenido {
                     DownloadConditions.Builder().requireWifi().build()
                 ).await()
 
-                for (texto in pendientes) {
-                    cache[texto] = traductor.translate(texto).await()
+                pendientes.chunked(12).forEach { grupo ->
+                    coroutineScope {
+                        grupo.map { texto ->
+                            async { texto to traductor.translate(texto).await() }
+                        }.awaitAll().forEach { (original, traducido) ->
+                            cache[original] = traducido
+                        }
+                    }
                 }
             } catch (cancelacion: CancellationException) {
                 throw cancelacion
