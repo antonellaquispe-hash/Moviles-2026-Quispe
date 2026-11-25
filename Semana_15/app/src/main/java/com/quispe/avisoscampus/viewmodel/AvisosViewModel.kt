@@ -30,6 +30,8 @@ class AvisosViewModel(
     private val _eventos = MutableSharedFlow<Aviso>(extraBufferCapacity = 1)
     val eventos = _eventos.asSharedFlow()
     private val siguienteId = AtomicInteger(1)
+    private val _avisos = MutableStateFlow(repository.obtenerAvisos())
+    val avisos: StateFlow<List<Aviso>> = _avisos.asStateFlow()
     private var trabajoRecordatorio: Job? = null
     private val _faltan = MutableStateFlow<Int?>(null)
     val faltan: StateFlow<Int?> = _faltan.asStateFlow()
@@ -48,7 +50,7 @@ class AvisosViewModel(
                 texto = "Tu entrega fue registrada",
                 origen = Origen.BOTON
             )
-            repository.registrar(aviso)
+            registrarAviso(aviso)
             _eventos.emit(aviso)
         }
     }
@@ -69,7 +71,7 @@ class AvisosViewModel(
                     texto = "Revisa tu laboratorio pendiente",
                     origen = Origen.RECORDATORIO
                 )
-                repository.registrar(aviso)
+                registrarAviso(aviso)
                 _eventos.emit(aviso)
             } finally {
                 _faltan.value = null
@@ -93,8 +95,13 @@ class AvisosViewModel(
                 texto = if (activo) "Activado" else "Desactivado",
                 origen = Origen.MODO_AVION
             )
-            repository.registrar(aviso)
+            registrarAviso(aviso)
             _eventos.emit(aviso)
         }
+    }
+
+    private fun registrarAviso(aviso: Aviso) {
+        repository.registrar(aviso)
+        _avisos.value = repository.obtenerAvisos()
     }
 }

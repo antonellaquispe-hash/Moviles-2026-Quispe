@@ -42,6 +42,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.quispe.avisoscampus.notificacion.Notificador
 import com.quispe.avisoscampus.receiver.ModoAvionReceiver
+import com.quispe.avisoscampus.model.Aviso
 import com.quispe.avisoscampus.viewmodel.AvisosViewModel
 
 @Composable
@@ -50,6 +51,7 @@ fun PantallaAvisos(vm: AvisosViewModel = viewModel()) {
     val permiso by vm.permiso.collectAsState()
     val faltan by vm.faltan.collectAsState()
     val escuchandoAvion by vm.escuchandoAvion.collectAsState()
+    val avisos by vm.avisos.collectAsState()
     val lanzador = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = vm::permisoRespondido
@@ -280,6 +282,9 @@ fun PantallaAvisos(vm: AvisosViewModel = viewModel()) {
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(12.dp))
+            HistorialAvisos(avisos = avisos)
         }
     }
 }
