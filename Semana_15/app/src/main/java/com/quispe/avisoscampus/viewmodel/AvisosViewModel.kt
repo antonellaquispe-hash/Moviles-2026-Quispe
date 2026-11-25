@@ -76,7 +76,8 @@ class AvisosViewModel(
                     id = siguienteId.getAndIncrement(),
                     titulo = "Recordatorio",
                     texto = "Revisa tu laboratorio pendiente",
-                    origen = Origen.RECORDATORIO
+                    origen = Origen.RECORDATORIO,
+                    urgente = true
                 )
                 registrarAviso(aviso)
                 _eventos.emit(aviso)

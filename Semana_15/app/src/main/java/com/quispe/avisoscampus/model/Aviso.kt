@@ -5,6 +5,7 @@ data class Aviso(
     val titulo: String,
     val texto: String,
     val origen: Origen,
+    val urgente: Boolean = false,
     val creadoEn: Long = System.currentTimeMillis()
 )
 
