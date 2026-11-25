@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -49,6 +50,7 @@ import com.quispe.avisoscampus.viewmodel.AvisosViewModel
 fun PantallaAvisos(vm: AvisosViewModel = viewModel()) {
     val contexto = LocalContext.current
     val permiso by vm.permiso.collectAsState()
+    val mensaje by vm.mensaje.collectAsState()
     val faltan by vm.faltan.collectAsState()
     val escuchandoAvion by vm.escuchandoAvion.collectAsState()
     val avisos by vm.avisos.collectAsState()
@@ -62,7 +64,9 @@ fun PantallaAvisos(vm: AvisosViewModel = viewModel()) {
             vm.permisoRespondido(true)
         }
         vm.eventos.collect { aviso ->
-            Notificador.mostrar(contexto, aviso)
+            if (!Notificador.mostrar(contexto, aviso)) {
+                vm.noSePudoMostrar()
+            }
         }
     }
 
@@ -154,6 +158,35 @@ fun PantallaAvisos(vm: AvisosViewModel = viewModel()) {
                     ) {
                         Text("Permitir notificaciones")
                     }
+                }
+            }
+
+            if (mensaje != null) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.errorContainer
+                ) {
+                    Text(
+                        text = mensaje.orEmpty(),
+                        modifier = Modifier.padding(14.dp),
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = {
+                        val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                            putExtra(Settings.EXTRA_APP_PACKAGE, contexto.packageName)
+                        }
+                        contexto.startActivity(intent)
+                    },
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    shape = RoundedCornerShape(50)
+                ) {
+                    Text("Abrir ajustes")
                 }
             }
 
