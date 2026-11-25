@@ -54,7 +54,7 @@ class AvisosViewModel(
             val aviso = Aviso(
                 id = siguienteId.getAndIncrement(),
                 titulo = "Tarea lista",
-                texto = "Tu entrega fue registrada",
+                texto = "Tu entrega fue registrada. Revisa el historial de AvisosCampus para consultar los avisos recientes.",
                 origen = Origen.BOTON
             )
             registrarAviso(aviso)
